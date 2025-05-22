@@ -1,0 +1,2254 @@
+SCHEME INFORMATION DOCUMENT
+SECTION I
+Angel One Nifty 1D Rate Liquid ETF - Growth
+(An open-ended scheme replicating/tracking Nifty 1D Rate Index. A relatively low interest rate risk
+and relatively low credit risk.)
+(Scrip code for NSE will be added after listing of the units)
+Scheme Code – AOMF/O/O/DET/25/02/0003
+The face value of the Units is Rs. 1,000/- per unit.
+The product labelling assigned during the NFO as above is based on internal assessment of the
+scheme characteristics or model portfolio and the same may vary post NFO when the actual
+investments are made.
+Potential Risk Class (PRC) Matrix
+Potential Risk Class (PRC)
+Credit Risk
+Relatively Low Moderate Relatively High
+Interest Rate Risk (Class A) (Class B) (Class C)
+Relatively Low (Class I) A-I
+Moderate (Class II)
+Relatively High (Class III)
+Offer for Units of Rs. 1,000/- each as on the date of allotment for applications received during the
+New Fund Offer (“NFO”) period and at Intra-Day NAV based prices during the Ongoing Offer for
+applications directly received at AMC.
+New Fund Offer opens on: March 20, 2025
+New Fund Offer closes on: March 24, 2025
+Scheme re-opens on or before : April 08, 2025
+Name of the Mutual Fund : Angel One Mutual Fund
+Name of the Asset : Angel One Asset Management Company Limited
+Management Company CIN:U66301MH2023PLC402297
+Name of the Trustee Company : Angel One Trustee Limited
+CIN : U64300MH2023PLC403520
+Address of the above entities : G-1, Ground Floor, Ackruti Trade Centre, Road No. 7,
+Kondivita, MIDC, Andheri (East), Mumbai – 400 093
+Website : www.angelonemf.com
+Page 1 of 54
+The particulars of the Scheme have been prepared in accordance with the Securities and Exchange
+Board of India (Mutual Funds) Regulations 1996, (herein after referred to as SEBI (MF)
+Regulations) as amended till date and circulars issued thereunder filed with SEBI, along with
+a Due Diligence Certificate from the AMC. The units being offered for public Subscription
+have not been approved or recommended by SEBI nor has SEBI certified the accuracy or adequacy
+of the Scheme Information Document.
+The Scheme Information Document sets forth concisely the information about the Scheme that a
+prospective investor ought to know before investing. Before investing, Investors should also
+ascertain about any further changes to this Scheme Information Document after the date of this
+Document from the Mutual Fund / Investor Service Centres / Website / Distributors or Brokers.
+The Investors are advised to refer to the Statement of Additional Information (SAI) for details
+of Angel One Mutual Fund, Standard Risk Factors, Special Considerations, Tax and Legal issues and
+general information on www.angelonemf.com
+SAI is incorporated by reference (is legally a part of the Scheme Information Document). For
+a free copy of the current SAI, please contact your nearest Investor Service Centre or log
+on to our website.
+The Scheme Information Document (Section I and II) should be read in conjunction with the
+SAI and not in isolation.
+This Scheme Information Document is dated March 13, 2025.
+Disclaimer of NSE Indices Ltd. : Angel One Nifty 1D Rate Liquid ETF - Growth (“the Product”) is not
+sponsored, endorsed, sold or promoted by NSE INDICES LTD. NSE INDICES LTD does not make any
+representation or warranty, express or implied, to the owners of the Product or any member of the
+public regarding the advisability of investing in securities generally or in the Product particularly or
+the ability of the Nifty 1D Rate Index (“Index”) to track general stock market performance in India.
+The relationship of NSE INDICES LTD to Angel One Asset Management Company Limited
+(“Licensee”) is only in respect of the licensing of certain trademarks and trade names of its Index
+which is determined, composed and calculated by NSE INDICES LTD without regard to the Licensee
+or the Product. NSE INDICES LTD does not have any obligation to take the needs of the Licensee or
+the owners of the Product into consideration in determining, composing or calculating the Index.
+NSE INDICES LTD is not responsible for or has participated in the determination of the timing of,
+prices at, or quantities of the Product to be issued or in the determination or calculation of the
+equation by which the Product is to be converted into cash. NSE INDICES LTD has no obligation or
+liability in connection with the administration, marketing or trading of the Product. NSE INDICES
+LTD does not guarantee the accuracy and/or the completeness of the Index or any data included
+therein and they shall have no liability for any errors, omissions, or interruptions therein. NSE
+INDICES LTD does not make any warranty, express or implied, as to results to be obtained by the
+Licensee, owners of the Product, or any other person or entity from the use of the Index or any data
+included therein. NSE INDICES LTD makes no express or implied warranties, and expressly disclaim
+all warranties of merchantability or fitness for a particular purpose or use with respect to the Index
+or any data included therein. Without limiting any of the foregoing, NSE INDICES LTD expressly
+disclaim any and all liability for any damages or losses arising out of or related to the Product,
+including any and all direct, special, punitive, indirect, or consequential damages (including lost
+profits), even if notified of the possibility of such damages. An Investor, by subscribing or purchasing
+an interest in the Product(s), will be regarded as having acknowledged, understood and accepted
+the disclaimer referred to in clauses above and will be bound by it.
+Page 2 of 54
+Disclaimer of National Stock Exchange : As required, a copy of this Scheme Information Document
+has been submitted to National Stock Exchange of India Limited (hereinafter referred to as NSE). NSE
+has given vide its letter NSE/LIST/5785 dated February 12, 2025, permission to the Mutual Fund to
+use the Exchange's name in this Scheme Information Document as one of the stock exchanges on
+which the Mutual Fund's units are proposed to be listed subject to, the Mutual Fund fulfilling various
+criteria for listing. The Exchange has scrutinized this Scheme Information Document for its limited
+internal purpose of deciding on the matter of granting the aforesaid permission to the Mutual Fund.
+It is to be distinctly understood that the aforesaid permission given by NSE should not in any way be
+deemed or construed that the Scheme Information Document has been cleared or approved by NSE;
+nor does it in any manner warrant, certify or endorse the correctness or completeness of any of the
+contents of this Scheme Information Document; nor does it warrant that the Mutual Fund's units will
+be listed or will continue to be listed on the Exchange; nor does it take any responsibility for the
+financial or other soundness of the Mutual Fund, its sponsors, its management or any scheme of the
+Mutual Fund.
+Every person who desires to apply for or otherwise acquire any units of the Mutual Fund may do so
+pursuant to independent inquiry, investigation and analysis and shall not have any claim against the
+Exchange whatsoever by reason of any loss which may be suffered by such person consequent to or
+in connection with such subscription /acquisition whether by reason of anything stated or omitted to
+be stated herein or any other reason whatsoever.
+Page 3 of 54
+INDEX
+Sr. No. Particulars Page no.
+I HIGHLIGHTS/SUMMARY OF THE SCHEME 5
+DUE DILIGENCE BY THE ASSET MANAGEMENT COMPANY 10
+II INFORMATION ABOUT THE SCHEME 11
+A HOW WILL THE SCHEME ALLOCATE ITS ASSETS? 11
+B WHERE WILL THE SCHEME INVEST? 13
+C WHAT ARE THE INVESTMENT STRATEGIES? 13
+D HOW WILL THE SCHEME BENCHMARK ITS PERFORMANCE? 14
+E WHO MANAGES THE SCHEME? 14
+F HOW IS THE SCHEME DIFFERENT FROM EXISTING SCHEMES OF THE 15
+MUTUAL FUND?
+G HOW HAS THE SCHEME PERFORMED? 15
+H ADDITIONAL SCHEME RELATED DISCLOSURES 15
+III OTHER DETAILS 17
+A COMPUTATION OF NAV 17
+B NEW FUND OFFER (NFO) EXPENSES 18
+C ANNUAL SCHEME RECURRING EXPENSES 18
+D LOAD STRUCTURE 20
+II SECTION II 21
+I INTRODUCTION 21
+A DEFINITIONS/INTERPRETATION 21
+B RISK FACTORS (SCHEME SPECIFIC RISK FACTORS) 21
+C RISK MANAGEMENT STRATEGIES 24
+II INFORMATION ABOUT THE SCHEME 25
+A WHERE WILL THE SCHEME INVEST ? 25
+B WHAT ARE THE INVESTMENT RESTRICTIONS? 26
+C FUNDAMENTAL ATTRIBUTES 27
+D INDEX METHODOLOGY 28
+E OTHER SCHEME SPECIFIC DISCLOSURES 29
+III OTHER DETAILS 41
+A PERIODIC DISCLOSURES SUCH AS HALF YEARLY DISCLOSURES, HALF 41
+YEARLY RESULTS, ANNUAL REPORT MONTHLY / HALF YEARLY
+PORTFOLIO DISCLOSURES
+B TRANSPARENCY/NAV DISCLOSURE 43
+C TRANSACTION CHARGES AND STAMP DUTY 43
+D ASSOCIATE TRANSACTIONS 43
+E TAXATION 43
+F RIGHTS OF UNITHOLDERS 45
+G LIST OF OFFICIAL POINTS OF ACCEPTANCE 45
+H PENALTIES, PENDING LITIGATION OR PROCEEDINGS, FINDINGS OF 45
+INSPECTIONS OR INVESTIGATIONS FOR WHICH ACTION MAY HAVE
+BEEN TAKEN OR IS IN THE PROCESS OF BEING TAKEN BY ANY
+REGULATORY AUTHORITY
+Page 4 of 54
+PART I. HIGHLIGHTS/SUMMARY OF THE SCHEME
+Sr. Title Description
+No.
+I. Name of the scheme Angel One Nifty 1D Rate Liquid ETF - Growth
+II. Category of the Others - Exchange Traded Fund (ETF)
+Scheme
+III. Scheme type An open-ended Exchange Traded Fund replicating/tracking Nifty 1D
+Rate Index. A relatively low interest rate risk and relatively low credit
+risk.
+IV. Scheme code AOMF/O/O/DET/25/02/0003
+V. Investment objective The investment objective of the Scheme is to seek to provide current
+income, commensurate with low risk while providing a high level of
+liquidity through a portfolio of Tri-Party Repo on Government
+Securities or T-bills / Repo & Reverse Repo. The Scheme will provide
+returns before expenses, that track the total returns of Nifty 1D Rate
+Index, subject to tracking errors. However, there is no guarantee or
+assurance that the investment objective of the Scheme would be
+achieved.
+VI. Liquidity/listing Liquidity
+details The Units of the Scheme can be bought / sold like any other stock on
+the National Stock Exchange of India Ltd. (NSE) or directly buy/sell
+Units with the Fund in Creation Unit size. Additionally, in case of large
+investors, the execution value for direct Subscription / Redemption
+with the Fund shall be greater than Rs. 25 crores (except for Schemes
+managed by Employee Provident Fund Organisation (EPFO), India
+and Recognized Provident Funds, Approved Gratuity Funds and
+Approved Superannuation Funds under Income Tax Act, 1961, till
+August 31, 2025 or as specified in the Regulations time to time).
+The AMC shall appoint at least two Market Makers (MMs), who are
+members of the Stock Exchanges, for ETFs to provide continuous
+liquidity on the Stock Exchange platform by providing two-way
+quotes in the units of the Scheme during trading hours.
+Unit holdings in less than the Creation Unit Size can normally only be
+sold through the secondary market, except in situations mentioned
+below in the SID.
+Listing
+As the Units of the Scheme will be listed on NSE, an investor can buy/
+sell Units on continuous basis on the capital market segment of NSE
+during trading hours like any other publicly traded stock at prices
+which may be close to the indicative NAV of the Scheme. There is no
+minimum investment, although Units are Purchased/ sold in round
+lots of 1 Unit.
+Page 5 of 54
+Sr. Title Description
+No.
+VII. Benchmark Nifty 1D Rate Index
+The composition of the benchmark is such that it is most suited for
+comparing performance of the Scheme.
+VIII. NAV disclosure The AMC will calculate and disclose the first NAV within 5 Business
+Days from the date of allotment. Subsequently, the NAV will be
+calculated and disclosed at the close of every Business Day.
+NAVs will be determined for every Business Day except in special
+circumstances and will be calculated upto four decimal places.
+NAVs of the Scheme shall be made available on the website of AMFI
+(www.amfiindia.com) and the Mutual Fund (www.angelonemf.com)
+by 11.00 p.m. on all Business Days. The NAVs shall also be available on
+the call free number 1800-209-0231 and on the website of the
+Registrar CAMS (www.camsonline.com).
+Please refer to Part II (Information about the Scheme) – III (Other
+Details) – B (Transparency / NAV Disclosure) for further details.
+IX. Applicable timelines Dispatch of Redemption proceeds: The Fund shall dispatch the
+Redemption proceeds within 3 (three) Business Days from the date of
+acceptance of valid Redemption request at any of the Official Points
+of Acceptance of transactions.
+Further, Investors may note that in case of exceptional scenarios as
+prescribed by AMFI vide its communication no. AMFI/ 35P/ MEM-
+COR/ 74 / 2022-23 dated January 16, 2023 read with clause 14.2 of SEBI
+Master Circular dated June 27, 2024, the AMC may follow the
+additional timelines as prescribed. In case the Redemption proceeds
+are not made within 3 Business Days from the date of Redemption or
+Repurchase, interest will be paid @15% per annum or such other rate
+from the 4th day onwards, as may be prescribed by SEBI from time to
+time. Please refer to the SAI for details on exceptional scenarios.
+X. Plans and Options There are no plans under the Scheme. The Scheme will offer only
+growth option.
+Plans/Options and
+sub options under the The AMC and the Trustee reserve the right to introduce such other
+Scheme plans/options as they deem necessary or desirable from time to time,
+in accordance with the SEBI MF Regulations.
+XI Load Structure Entry Load : Not Applicable
+Exit Load : Nil
+The Trustee shall have the right to modify the Exit Load structure with
+prospective effect subject to a maximum prescribed under the SEBI
+MF Regulations.
+Page 6 of 54
+Sr. Title Description
+No.
+XII. Minimum Application During New Fund Offer :
+Amount (including Rs.1,000/- and in multiples of Re.1/- thereafter.
+switch-ins during on-
+going offer) During on-going offer :
+Directly with the Fund
+The facility of creating units in Creation Unit Size is available to the
+Authorised Participants/ Market Makers (whose names will be
+available on our website www.angelonemf.com) and Large Investors.
+However, in case of Large Investors, the execution value shall be
+greater than Rs. 25 crores or such other amount as may be specified
+by SEBI from time to time (except for schemes managed by Employee
+Provident Fund Organisation (EPFO), India and Recognized Provident
+Funds, Approved Gratuity Funds and Approved Superannuation Funds
+under Income Tax Act, 1961, till August 31, 2025 or as specified in the
+Regulations from time to time). The limit of Rs. 25 crores shall not be
+applicable to Market Makers.
+Minimum number of Units (Creation Units) – 500 units & in multiples
+of 1 unit thereafter.
+On the Exchange
+The minimum number of Units that can be bought by the Investors on
+the Exchange is 1 (one) Unit and in multiples thereafter.
+XIII Minimum Additional Not Applicable.
+Purchase Amount
+(including switch-ins
+during on-going
+offer)
+XIV Minimum Directly with Fund
+Redemption / switch The facility of redeeming units in Creation Unit Size is available to the
+out amount Authorised Participants/ Market Makers (whose names will be
+available on our website www.angelonemf.com) and Large Investors.
+However, in case of Large Investors, the execution value for direct
+Redemption with the Fund shall be greater than Rs. 25 crores or such
+other amount as may be specified by SEBI from time to time (except
+for schemes managed by Employee Provident Fund Organisation
+(EPFO), India and Recognized Provident Funds, Approved Gratuity
+Funds and Approved Superannuation Funds under Income Tax Act,
+1961, till August 31, 2025 or as specified in the Regulations from time
+to time). The limit of Rs. 25 crores shall not be applicable to Market
+Makers.
+Investors can directly approach the AMC for Redemption of units of
+the Scheme, for transaction up to Rs. 25 crores (or such other amount
+as may be specified by SEBI from time to time) without any Exit Load,
+in case of the following scenarios:
+Page 7 of 54
+Sr. Title Description
+No.
+(i) Traded price (closing price) of the ETF units is at discount of more
+than 1% to the day end NAV for 7 continuous trading days, or
+(ii) No quotes for such ETFs are available on Stock Exchange(s) for 3
+consecutive trading days, or
+(iii) Total bid size on the Stock Exchange is less than half of Creation
+Unit Size daily, averaged over a period of 7 consecutive trading
+days.
+In case of the above scenarios, applications received from Investors
+for Redemption up to 3.00 p.m. on any trading day, shall be processed
+by the AMC at the closing NAV of the day of receipt of application
+within the above cut-off time. Such instances shall be tracked by the
+AMC on an ongoing basis and in case any of the above mentioned
+scenario arises, the same shall be disclosed on the website of the
+Mutual Fund (viz. www.angelonemf.com).
+On the Exchange
+The Units of the Scheme can be sold in round lot of 1 Unit and
+multiples thereafter.
+XV New Fund Offer NFO opens on : March 20, 2025
+Period NFO closes on : March 24, 2025
+This is the period
+during which a new Minimum duration of the NFO will be 3 working days and will not be
+scheme sells its units kept open for more than 15 days. Any changes in the NFO dates will
+to its Investors. be announced through an addendum uploaded on the AMC website
+(www.angelonemf.com).
+XVI New Fund Offer Price Rs. 1,000/- per unit.
+This is the price per
+unit that the Investors
+have to pay to invest
+during the NFO.
+XVII Segregated portfolio The AMC may create a segregated portfolio of debt and Money
+/ side pocketing Market Instruments in the Scheme in case of a credit event/actual
+disclosure default and to deal with liquidity risk.
+In this regard, the term ‘segregated portfolio’ shall mean a portfolio
+comprising of debt or Money Market Instrument affected by a credit
+event / actual default that has been segregated in a mutual fund
+scheme and the term ‘main portfolio’ shall mean the scheme
+portfolio excluding the segregated portfolio. The term ‘total portfolio’
+shall mean the scheme portfolio including the securities affected by
+the credit event / actual default.
+For more details, kindly refer to SAI.
+XVIII Swing pricing Not Applicable
+disclosure
+XIX Stock Lending The Scheme does not intend to undertake /engage in stock lending of
+Securities.
+Page 8 of 54
+Sr. Title Description
+No.
+XX How to apply and Please refer to the SAI for detailed process (physical and online) with
+where can respect to NFO, additional/ongoing purchase, investments by NRIs
+applications for (Non-Resident Indians), FPIs (Foreign Portfolio Investors) and Foreign
+Subscription / Investors, Joint Applications etc. Investors can also read further
+Redemption be details in the application form available on the AMC website
+submitted (www.angelonemf.com).
+During the New Fund Offer (“NFO”) period, the applications for
+Subscription/Redemption/switches can be submitted at the
+designated Official Points of Acceptance of the AMC and CAMS.
+Pursuant to paragraph 14.8 of the SEBI Master Circular dated June 27,
+2024, an Investor can also subscribe to the NFO through ASBA facility.
+For further details, refer to the SAI.
+On an on-going basis, the facility of subscribing and redeeming units
+in Creation Unit Size is available to the Authorised Participants/
+Market Makers and Large Investors.
+XXI Investor Services Contact details for general service requests and for compliant
+resolution:
+E-mail : support@angelonemf.com
+Toll-Free : 1800-209-0231
+Details of Investor Relation Officer :
+Name : Mr. Murali Ramasubramanian
+Address and Contact Number : Angel One Asset Management
+Company Limited, G-1, Ground floor, Ackruti Trade Centre, Road No.
+7, Kondivita, MIDC, Andheri (East), Mumbai – 400 093.
+Tel. No. : +91-22-6977 7777
+XXII Specific attribute of Not applicable
+the Scheme
+XXIII Special products The Scheme does not offer any special products or special facilities.
+/facilities available
+during the NFO and
+on ongoing basis
+XIV Weblink This is a new scheme and the TER details shall be available from the
+first NAV date at the following link :
+Link for last 6 months and Daily TER : www.angelonemf.com/daily-
+ter
+Link for Scheme factsheet: www.angelonemf.com/downloads
+Page 9 of 54
+DUE DILIGENCE BY THE ASSET MANAGEMENT COMPANY
+It is confirmed that:
+(i) The Scheme Information Document submitted to SEBI is in accordance with the SEBI (Mutual Funds)
+Regulations, 1996 and the guidelines and directives issued by SEBI from time to time.
+(ii) All legal requirements connected with the launching of the Scheme as also the guidelines,
+instructions, etc., issued by the Government and any other competent authority in this behalf, have
+been duly complied with.
+(iii) The disclosures made in the Scheme Information Document are true, fair and adequate to enable
+the investors to make a well informed decision regarding investment in the Scheme.
+(iv) The intermediaries named in the Scheme Information Document and Statement of Additional
+Information are registered with SEBI and their registration is valid, as on date.
+(v) The contents of the Scheme Information Document including figures, data, yields etc. have been
+checked and are factually correct.
+(vi) A confirmation that the AMC has complied with the compliance checklist applicable for Scheme
+Information Documents and other than cited deviations/that there are no deviations from the SEBI
+MF Regulations.
+(vii) Notwithstanding anything contained in this Scheme Information Document, the provisions of the
+SEBI (Mutual Funds) Regulations, 1996 and the guidelines thereunder shall be applicable.
+(viii) The Trustee has ensured that Angel One Nifty 1D Rate Liquid ETF – Growth approved by them is a
+new product offered by Angel One Mutual Fund and is not a minor modification of any existing
+scheme/fund/product.
+Date : February 28, 2025 Name : Ferhana Mansoor
+Place : Mumbai Designation : Chief Compliance Officer & Company
+Secretary
+Page 10 of 54
+PART II. INFORMATION ABOUT THE SCHEME
+A. HOW WILL THE SCHEME ALLOCATE ITS ASSETS?
+Under normal circumstances, the asset allocation under the Scheme will be as follows:
+Indicative asset allocation
+Instruments (% of total assets)
+Minimum Maximum
+Tri-Party Repo on Government Securities or T- 95 100
+bills/Repo & Reverse Repo
+Cash & Cash Equivalents and Money Market
+instruments (having residual maturity not
+0 5
+exceeding 91 days)
+Cash Equivalents include Government Securities, T-Bills and Repo on Government Securities having
+residual maturity of less than 91 days.
+The Scheme may invest upto 5% net assets in money market / liquid schemes without charging any fees,
+provided that aggregate inter-scheme investment made by all schemes under the management of the
+AMC or in schemes under the management of any other asset management company shall not exceed 5%
+of the NAV of the Mutual Fund in accordance with Clause 4 of Seventh Schedule of SEBI MF Regulations.
+The margin may be placed in the form of such securities / instruments / deposits as may be
+permitted/eligible to be placed as margin from the assets of the Scheme.
+The Fund Manager would monitor the Tracking Error and Tracking Difference of the Scheme on an ongoing
+basis and would seek to minimize the same to the extent possible. Under normal circumstances, the AMC
+shall endeavor that the Tracking Difference of the Scheme does not exceed 1.25% per annum. There can
+be no assurance or guarantee that the Scheme will achieve any particular level of Tracking Error or
+Tracking Difference relative to performance of the Underlying Index.
+The cumulative gross exposure through TREPS, Money Market Instruments and such other securities /
+assets as may be permitted by SEBI from time to time shall not exceed 100% of the net assets of the
+Scheme, as per paragraph 12.24 of SEBI Master Circular dated June 27, 2024.
+As per paragraph 12.25 of SEBI Master Circular dated June 27, 2024, cash and Cash Equivalents having
+residual maturity of less than 91 days are not considered for the purpose of calculating gross exposure
+limit. SEBI has vide its letter dated November 03, 2021 clarified that Cash Equivalents shall consist of
+Government Securities, T-Bills and Repo on Government Securities.
+As per SEBI circular no. SEBI/HO/IMD/DF2/CIR/P/2019/101 dated September 20, 2019, liquid funds and
+overnight funds shall not park funds pending deployment in short term deposits of scheduled commercial
+banks.
+Indicative Table (Actual instrument/percentages may vary subject to applicable SEBI circulars)
+Page 11 of 54
+Sr. Type of Instrument Percentage of Circular reference
+No exposure
+1. Money market or liquid schemes of own Upto 5% of the net Clause 4 of the Seventh
+or other mutual funds assets of the Scheme Schedule to the SEBI MF
+Regulations
+The Scheme will not invest / have exposure in the following instruments :
+Sr. Particulars
+No.
+1 Securitised Debt
+2 Real Estate Investment Trusts (REITs) or Infrastructure Investment Trusts (InvITs)
+3 Fund of Fund schemes
+4 Credit Default Swaps
+5 Debt Instruments with special features (AT1 and AT2 Bonds)
+6 Debt Instruments with Structured Obligations / Credit Enhancements
+7 Short selling of securities
+8 Repo / Reverse Repo in corporate debt securities
+9 Foreign Securities
+10 Unrated instruments (except TREPS/ Government Securities/ T- Bills / Repo and Reverse Repo
+in Government Securities)
+11 Derivatives
+12 Securities lending and borrowing
+Portfolio Concentration Norms
+In accordance with paragraph 3.5.4 of the SEBI Master Circular dated June 27, 2024, the Scheme shall be
+considered to be replicating the index if the duration of the portfolio of the Scheme replicates the duration of
+the Underlying Index within a maximum permissible deviation of +/- 10%.
+Page 12 of 54
+Change in Investment Pattern
+Portfolio rebalancing due to short term defensive consideration
+Any alteration in the investment pattern will be for a short term on defensive considerations as per
+paragraph 1.14.1.2.b of the SEBI Master Circular dated June 27, 2024, the intention being at all times to
+protect the interests of the Unit holders and the Scheme shall rebalance the portfolio within 7 calendar
+days from the date of deviation. It may be noted that no prior intimation/indication will be given to
+Investors when the composition/asset allocation pattern under the Scheme undergoes changes within
+the permitted band as indicated above.
+Portfolio rebalancing in case of passive breaches :
+Pursuant to paragraph 3.6.7 of the SEBI Master Circular dated June 27, 2024, in case of change in
+constituents of the index due to periodic review, the portfolio of the Scheme will be rebalanced within 7
+calendar days.
+Portfolio replication :
+The Scheme shall replicate the Underlying Index subject to the requirements as specified under paragraph
+3.5.2.6 of the SEBI Master Circular dated June 27, 2024.
+Any transactions undertaken in the portfolio of the Scheme in order to meet the Redemption and
+Subscription obligations shall be done while ensuring that post such transactions replication of the
+portfolio with the index is maintained at all points of time.
+Provided further and subject to the above, any change in the asset allocation affecting the investment
+profile of the Scheme shall be effected only in accordance with the provisions of sub regulation (15A) of
+Regulation 18 read with sub-regulation (26) of Regulation 25 of the SEBI MF Regulations.
+B. WHERE WILL THE SCHEME INVEST?
+Subject to the SEBI MF Regulations, the corpus of the Scheme can be invested in any (but not exclusively)
+of the following securities / instruments:
+1. Securities constituting the Underlying Index.
+2. Money Market Instruments
+3. Tri-Party Repo on Government Securities and/or Treasury bills/ Repo & Reverse Repo
+4. Cash & Cash Equivalents
+5. Units of money market / liquid mutual fund schemes, subject to requisite regulatory guidelines.
+6. Any other securities / instruments as may be permitted by SEBI from time to time, subject to
+requisite regulatory approvals, if any.
+Detailed definition and applicable regulations/guidelines for each instrument is included in Section II.
+C. WHAT ARE THE INVESTMENT STRATEGIES?
+Angel One Nifty 1D Rate Liquid ETF - Growth will track Nifty 1D Rate Index and will use a “passive” or
+indexing approach to endeavour to achieve the Scheme's investment objective. The AMC does not make
+any judgments about the investment merit of a particular security nor will it attempt to apply any
+economic, financial or market analysis. Indexing eliminates active management risks with regard to over/
+Page 13 of 54
+underperformance vis-à-vis a benchmark. The Scheme will invest at least 95% of its total assets in the
+securities comprising the Underlying Index. The Scheme may also invest in Money Market Instruments /
+money market or liquid schemes of own or other mutual funds to meet the liquidity and expense
+requirements.
+Procedure and recording of investment decisions and risk control
+All investment decisions relating to the Scheme will be undertaken by the AMC in accordance with the
+Regulations and the investment objectives specified in this Scheme Information Document. All investment
+decisions taken by the AMC along with justification in relation to the Scheme shall be recorded.
+The designated fund manager of the Scheme will be responsible for taking the day-to-day investment
+decisions and will inter alia be responsible for asset allocation, security selection and timing of investment
+decisions.
+The Scheme may invest in other schemes managed by the AMC or in the schemes of any other mutual
+fund, provided it is in conformity to the investment objectives of the Scheme and in terms of the prevailing
+Regulations. No investment management fees will be charged for such investments and the aggregate
+inter-scheme investment made by all schemes of the Mutual Fund or in the schemes under the
+management of other asset management companies shall not exceed 5% of the Net Asset Value of the
+Mutual Fund. The limit, however, does not apply to any Fund of Funds scheme.
+PORTFOLIO TURNOVER
+Not applicable.
+D. HOW WILL THE SCHEME BENCHMARK ITS PERFORMANCE?
+Nifty 1D Rate Index is selected as the benchmark for the Scheme.
+The composition of the benchmark is such that it is most suited for comparing performance of the
+Scheme.
+E. WHO MANAGES THE SCHEME?
+The Fund Managers of the Scheme are Mr. Mehul Dama and Mr. Kewal Shah.
+Name Age / Brief Experience Other schemes
+Qualification managed / co-
+managed
+Mr. Mehul 42 years Mr. Mehul Dama has over 19 years of work • Angel One Nifty
+Dama experience in financial services industry Total Market
+B. Com., C. A. including 14 years in Indian Passive Mutual Index Fund.
+Fund industry, across operations, fund • Angel One Nifty
+accounting, valuation, and investment roles. Total Market ETF
+Please find below brief details of his
+experience:
+• Angel One AMC : December 2023 till
+Date
+• Nippon India AMC :
+• April 2018 to December 2023 (Fund
+Manager & Dealer ETF)
+Page 14 of 54
+Name Age / Brief Experience Other schemes
+Qualification managed / co-
+managed
+• November 2016 to April 2018 (Lead
+Finance)
+• Goldman Sachs AMC : August 2011 to
+November 2016 (Vice President –
+Controllers)
+• Benchmark AMC : January 2010 to
+August 2011 (Assistant Vice President–
+Operations /Controllers)
+Mr. Kewal 35 years Mr. Kewal Shah has an overall experience of • Angel One Nifty
+Shah over 10 years across Operations and Dealing Total Market
+PGDM functions in the mutual fund industry. Index Fund.
+(Finance) • Angel One Nifty
+Prior to joining Angel One AMC, Mr. Kewal Total Market ETF
+Shah was associated with ICICI Prudential
+AMC as Fund Manager where he managed
+domestic and international ETFs along with
+other passive funds for around 2.5 years,
+prior to which he was part of the Operations
+team for around 5 years. Mr. Kewal Shah
+was also associated with Philip Capital
+(India) Pvt. Ltd. and with JM Financial
+Services Ltd. in the Operations team.
+F. HOW IS THE SCHEME DIFFERENT FROM EXISTING SCHEMES OF THE MUTUAL FUND?
+The Scheme is the only ETF scheme offered by the Mutual Fund which will invest its corpus entirely in Tri-
+Party Repo on Government Securities or T-bills/Repo and Reverse Repo and if required, in cash and cash
+equivalents and other Money Market Instruments to the extent of 5%. Hence, it cannot be compared with
+other schemes of the Mutual Fund.
+G. HOW HAS THE SCHEME PERFORMED?
+The Scheme is a new scheme and does not have any performance track record.
+H. ADDITIONAL SCHEME RELATED DISCLOSURES
+i. Scheme’s portfolio holdings:
+The Scheme is a new scheme and does not have any portfolio holdings. Investors can refer to
+the below link for any information on the above point as and when applicable
+(www.angelonemf.com/downloads).
+ii. Disclosure of name and exposure to top 7 issuers, stocks, groups and top 4 sectors as a percentage
+of NAV of the scheme:
+The Scheme is a new scheme and hence, this disclosure is currently not applicable. Investors can
+refer to the below link for any information on the above point as and when applicable
+(www.angelonemf.com/downloads).
+Page 15 of 54
+Change in the constituents of the index, if any, shall be disclosed on the AMC website on the
+day of change.
+iii. Functional website link for Portfolio Disclosure:
+The Scheme is a new scheme and hence, this disclosure is currently not applicable. Investors can
+refer to the below link for any information on the above point as and when applicable
+(www.angelonemf.com/downloads).
+iv. Portfolio Turnover Rate particularly for equity-oriented schemes shall also be disclosed:
+Not Applicable.
+v. Aggregate investment in the Scheme by :
+Sr. No. Category of Net Value Market Value (in Rs.)
+Persons
+Units NAV per units
+Not Applicable*
+*The Scheme is a new scheme and hence, this disclosure is currently not applicable. For details
+of investments made by the Directors and Key Personnel of the AMC, please refer to SAI.
+vi. Investments of AMC in the Scheme:
+From time to time and subject to the SEBI MF Regulations, the Sponsor, its associate companies
+and subsidiaries, and the AMC may invest either directly or indirectly in the Scheme. The AMC
+shall not be entitled to charge any fees on its own investment in the Scheme. Please refer to
+(www.angelonemf.com/downloads) for details of investments made by the AMC in the Scheme.
+Page 16 of 54
+PART III- OTHER DETAILS
+A. COMPUTATION OF NAV
+The NAV of the Units of the Scheme will be computed by dividing the net assets of the Scheme by the
+number of Units outstanding as on the valuation date. The Fund shall value its investments according to
+the valuation norms, as specified in Schedule VIII of the SEBI MF Regulations or such norms as may be
+prescribed by SEBI from time to time, and as stipulated in the valuation policy and procedures mentioned
+in the SAI.
+NAV of Units under the Scheme shall be calculated as shown below :
+NAV (Rs.) =
+Market or Fair Value of + Current Assets - Current Liabilities and Provisions
+Scheme's investments
+No. of Units outstanding under the Scheme
+During the continuous offer of the Scheme, the Units will be available at the Applicable NAV based
+prices. NAV will be calculated upto four decimal places at the close of every Business Day of the Scheme
+and will be declared on each Business Day.
+The AMC will also calculate indicative NAV (iNAV) and publish the same on its website viz.
+www.angelonemf.com. iNAV will not have any bearing on the creation or redemption of units directly with
+the Fund by the Market Makers/Large Investors. For transactions by Market Makers / Large Investors
+directly with the AMC, Intra-Day NAV based on the executed price at which the securities representing
+the Underlying Index are purchased / sold, shall be applicable.
+Illustration:
+Computation of NAV :
+Market or Fair Value of Scheme’s investments : Rs. 10,000,000;
+Current assets of the Scheme : Rs. 2,500,000;
+Current Liabilities and Provisions : Rs. 1,500,000;
+No. of Units outstanding : 500,000.
+Thus, the NAV will be calculated as:
+NAV =
+Rs. 10,000,000 + Rs. 2,500,000 - Rs. 1,500,000
+500,000
+Therefore, the NAV of the Scheme is Rs. 22/-.
+Computation of Repurchase Price - If the Applicable NAV is Rs. 10, Exit Load is 2% then Redemption price
+will be Rs. 10* (1-0.02) = Rs. 9.80.
+Page 17 of 54
+The Redemption Price will not be lower than 95% of the NAV.
+For details on policies related to computation of NAV, rounding off, procedure in case of delay in
+disclosure of NAV, etc. please refer to SAI.
+B. NEW FUND OFFER (NFO) EXPENSES
+These expenses are incurred for the purpose of various activities related to the NFO like marketing and
+advertising, Registrar expenses, printing and stationary, bank charges etc. Such expenses shall be borne
+by the AMC and will not be charged to the Scheme.
+C. ANNUAL SCHEME RECURRING EXPENSES
+These are the fees and expenses for operating the Scheme. These expenses include Investment
+Management and Advisory Fee charged by the AMC, Registrar and Transfer Agent’s fee, marketing and
+selling costs etc. as given in the table below.
+The AMC has estimated that upto 1.00% (plus additional expenses as permitted under SEBI MF
+Regulations of the daily net assets of the Scheme will be charged to the Scheme as expenses.
+For the actual current expenses being charged, Investors should refer to the website of the Mutual Fund
+(viz. www.angelonemf.com/daily-ter).
+Expense Head % p.a. of daily Net
+Assets (Estimated
+p.a.)
+Investment Management & Advisory Fee Upto 1.00%
+Audit fees/fees and expenses of trustees
+Custodial Fees
+Registrar & Transfer Agent Fees including cost of providing account
+statements / IDCW / Redemption cheques/ warrants
+Marketing & selling expenses including Agents’ commission and
+statutory advertisement
+Listing and licensing fees
+Incentives to Market Makers
+Costs related to Investor communications
+Costs of fund transfer from location to location
+Cost towards Investor education & awareness
+Goods & Services Tax on expenses other than investment and
+advisory fees
+Brokerage and transaction cost (including GST) over and above 12
+bps and 5 bps for cash and Derivative market trades respectively
+Other Expenses*
+Maximum Total Expense Ratio (TER) permissible under Regulation Upto 1.00%
+52 (6)(b)^
+The Scheme shall not incur any distribution expenses and no commission shall be paid by this Scheme.
+* As permitted under Regulation 52 of the SEBI MF Regulations or such other basis as specified by SEBI
+from time to time. ^In line with clause 10.1.16.a of SEBI Master Circular dated June 26, 2024, the AMC /
+Page 18 of 54
+Mutual Fund shall annually set apart 1 basis point (i.e. 0.01%) on daily net assets of the Scheme within the
+maximum limit of Total Expense Ratio as per Regulation 52 of the SEBI MF Regulations for investor
+education and awareness initiatives. Expenses will be charged on daily net assets.
+The above expenses are fungible within the overall maximum limit prescribed under SEBI MF Regulations,
+which means there will be no internal sub-limits on expenses and the AMC is free to allocate them within
+the overall TER.
+The Scheme can charge expenses within the overall maximum limits prescribed under the SEBI MF
+Regulations without any internal cap allocated to any of the expense heads specified in the above table.
+Brokerage and transaction costs (inclusive of GST) which are incurred for the purpose of execution of
+trades, shall be charged to the Scheme as per Regulation 52(6A)(a) of SEBI MF Regulations not exceeding
+0.12 per cent in case of cash market transactions and 0.05 per cent in case of Derivatives transactions (if
+permitted in the Scheme). With effect from April 1, 2023, to align with Indian Accounting Standards
+requirement, transactions cost incurred for the purpose of execution of trades are expensed out (viz.
+charged to Revenue Account instead of Capitalization (i.e. forming part of cost of investment)). Any
+payment towards brokerage and transaction cost, over and above the said 0.12 percent and 0.05 percent
+for cash market transactions and Derivatives transactions (if applicable) respectively may be charged to
+the Scheme within the maximum limit of Total Expense Ratio (TER) as prescribed under Regulation 52 of
+the SEBI MF Regulations.
+All Scheme related expenses shall necessarily be paid from the Scheme only within the regulatory limits
+and not from the books of the AMC, its associates, Sponsor, Trustee or any other entity through any route.
+The AMC may charge Goods and Services Tax (“GST”) on investment and advisory fees to the Scheme of
+the Mutual Fund in addition to the maximum limit of total expenses ratio as prescribed in Regulation 52
+of the Regulations, whereas GST on other than investment and advisory fees, if any, shall be borne by the
+Scheme within the maximum limit as per regulation 52 of the SEBI MF Regulations.
+For the actual current expenses being charged to the Scheme, the Investor should refer to the website of
+the Mutual Fund at www.angelonemf.com/daily-ter ). Any change in the expense ratio will be
+communicated to the unitholders through notice via SMS / e-mail at least three working days prior to the
+effective date of change. Such notice of change in TER shall also be updated on the AMC website at least
+three working days prior to effecting such change.
+Illustration – Impact of Expense Ratio on the returns of the Scheme :
+Value of Rs. 1 lakh on 12% annual returns in 1 year, considering Expense
+Ratio of 1%
+Amount invested (Rs.) 100,000.00
+NAV at the time of Investment (Rs.) 10.00
+No. of Units 10,000
+Gross NAV at end of 1 year 11.20
+(assuming 12% annual return) (Rs.)
+Expenses (assuming Expense Ratio 0.11
+of 1% on average of opening and
+closing NAV) (Rs.)
+Actual NAV at end of 1 year post 11.09
+expenses (assuming Expense Ratio
+as above) (Rs.)
+Value of investment at end of 1 year 112,000.00
+Page 19 of 54
+Value of Rs. 1 lakh on 12% annual returns in 1 year, considering Expense
+Ratio of 1%
+(Before expenses) (Rs.)
+Value of Investment at end of 1 year 110,940.00
+(After expenses) (Rs.)
+Note: The above is an approximate illustration of the impact of expense ratio on the returns, where the
+Gross NAV has been simply reduced to the extent of the expenses. In reality, the actual impact would
+vary depending on the returns over the period under consideration. Expenses will be charged on daily
+net assets.
+D. LOAD STRUCTURE
+Entry Load : Not Applicable
+Exit Load is an amount which is paid by the Investor to redeem the units from the Scheme. Load amounts
+are variable and are subject to change from time to time. For the current applicable structure, please refer
+to the website of the AMC (www.angelonemf.com) or call at toll free no. 1800-209-0231 or reach out to
+your distributor.
+Type of Load Load chargeable (as % of NAV)
+Exit Nil
+The Exit Load charged, if any, shall be credited back to the Scheme. Goods and Services tax on Exit Load
+shall be paid out of the Exit Load proceeds and Exit Load net of Goods and Services tax shall be credited
+to the Scheme. Investors are requested to check the prevailing load structure of the Scheme before
+investing. Any imposition or enhancement in the load shall be applicable on prospective investments only.
+Subject to the SEBI MF Regulations, the Trustee reserves the right to modify/alter the Load structure on
+the Units subscribed/redeemed on any Business Day. At the time of changing the Load structure, the AMC
+/ Mutual Fund may adopt the following procedure:
+i. The addendum detailing the changes will be attached to Scheme Information Document and Key
+Information Memorandum. The addendum will be circulated to all the distributors/brokers so that
+the same can be attached to all Scheme Information Documents and Key Information Memoranda
+already in stock.
+ii. Arrangements will be made to display the addendum in the Scheme Information Document in the
+form of a notice in all the Investor Service Centres and distributors/brokers office.
+iii. The introduction of the Exit Load along with the details will be stamped in the acknowledgement slip
+issued to the Investors on submission of the application form and will also be disclosed in the
+statement of accounts issued after the introduction of such Load.
+iv. A public notice shall be provided on the website of the AMC in respect of such changes.
+Page 20 of 54
+SECTION II
+I. INTRODUCTION
+A. Definitions/Interpretation
+Please refer the following link for Definitions/Interpretations : (www.angelonemf.com/downloads)
+B. Risk factors (Scheme specific risk factors)
+(i) Risks associated with the Scheme being an Exchange Traded Fund (“ETF”) :
+a) Absence of prior active market: Although the Units of the Scheme will be listed on the Stock
+Exchange for trading, there can be no assurance that an active secondary market will develop or
+be maintained.
+b) Lack of market liquidity: Trading in Units of the Scheme on the Stock Exchange on which it is listed
+may be halted because of market conditions or for reasons that, in the view of the concerned
+Stock Exchange or market regulator, trading in the ETF Units is inadvisable. In addition, trading in
+the Units of the Scheme may be subject to trading halts caused by extraordinary market volatility
+pursuant to ‘circuit breaker’ rules. There can be no assurance that the requirements of the
+concerned Stock Exchange necessary to maintain the listing of the Units of the Scheme will
+continue to be met or will remain unchanged.
+c) Units of the Scheme may trade at prices other than NAV: Units of the Scheme may trade above
+or below its NAV. The NAV of the Scheme may fluctuate with changes in the market value of a
+Scheme’s holdings. The trading prices of Units of the Scheme will fluctuate in accordance with
+changes in its NAVs as well as market supply and demand. However, given that the Scheme can
+be created / redeemed in Creation Units, directly with the Fund, large discounts or premiums to
+the NAVs will not sustain due to arbitrage possibility available.
+d) Regulatory Risk: Any changes in trading regulations by the Stock Exchange or SEBI may affect the
+ability of the Market Maker to arbitrage resulting into wider premium/discount to NAV. Although
+the Scheme is proposed to be listed on the Exchange, the AMC and the Trustee will not be liable
+for delay in listing of Units of the Scheme on Exchange / or due to connectivity problems with the
+Depositories due to the occurrence of any event beyond their control.
+e) Right to limit Redemption: The Trustee, in the general interest of the Unit holders of the Scheme
+offered under this SID and keeping in view of the unforeseen circumstances/unusual market
+conditions, may limit the total number of Units which can be redeemed on any Business Day
+depending on the total “Saleable Underlying Stock” available with the Fund.
+f) Redemption Risk: The Unit holders may note that even though this is an open ended scheme, the
+Scheme would ordinarily repurchase Units in Creation Unit Size. Thus, unit holdings less than the
+Creation Unit Size can normally only be sold through the secondary market unless no quotes are
+available on the Exchange for 3 trading days consecutively.
+g) Though the Scheme will be listed on the stock exchange, there is no assurance that an active
+secondary market will develop or be maintained.
+h) Investors may note that even though this is an open-ended scheme, they will have to buy or sell
+Units of the Scheme on the Stock Exchanges where these Units are listed for liquidity at the
+market price, subject to the rules and regulations of the Exchange. Buying and selling units on the
+Stock Exchange requires the investor to engage the services of a broker and are subject to
+payment of margins as required by the Stock Exchange/broker, payment of brokerage, securities
+transactions tax and such other costs.
+i) The market price of the Units of the Scheme, like any other listed security, is largely dependent
+on two factors, viz. (1) the intrinsic value of the Unit (or NAV) and (2) demand and supply of Units
+in the market. Sizeable demand or supply of the Units on the Stock Exchange may lead to market
+price of the Units to quote at premium or discount to NAV. However, since the eligible investors
+can transact with the AMC for Units in the Creation Unit Size, there should not be a significant
+Page 21 of 54
+variance from the NAV. Hence, the price of the Scheme is less likely to hold significant variance
+(large premium or discount) from the latest declared NAV all the time.
+j) The Units will be issued only in demat form through Depositories. The records of the Depository
+are final with respect to the number of Units available to the credit of Unit holder. Settlement of
+trades, repurchase of Units by the Mutual Fund depends on the confirmations to be received from
+Depository(ies) on which the AMC has no control.
+k) Political Risks: Whereas the Indian market was formerly restrictive, a process of deregulation has
+been taking place over recent years. This process has involved removal of trade barriers and
+protectionist measures, which could adversely affect the value of investments. It is possible that
+the future changes in the Indian political situation, including political, social or economic
+instability, diplomatic developments and changes in laws and regulations could have an effect on
+the value of investments. Expropriation, confiscatory taxation or other relevant developments
+could affect the value of investments.
+(ii) Risks relating to Tracking Error and Tracking Difference :
+The performance of the Scheme may not be commensurate with the performance of its index on any
+given day or over any given period. Tracking Errors are inherent in any fund based on index and such
+errors may cause the Scheme to generate returns which are not in line with the performance of the index.
+Tracking Errors may result from a variety of factors including but not limited to:
+• Fees & Expenditure incurred by the Scheme.
+• The funds may not be invested at all times as it may keep a portion of the funds in cash to meet
+Redemptions or expenses or for corporate actions of securities in the index.
+• Any delay experienced in the purchase or sale of securities underlying the index due to illiquidity of
+the market, settlement and realization of sale proceeds and the registration of any securities
+transferred and any delays in receiving cash and interest and resulting delays in reinvesting them.
+• The Underlying Index reflects the prices of securities at close of Business Hours. However, the Scheme
+may buy or sell the securities at different points of time during the trading session at the then
+prevailing prices which may not correspond to the closing prices on the Exchange.
+• The potential for trades to fail which may result in the Scheme not having acquired securities at a
+price necessary to track the index.
+• The holding of a cash position to meet the Redemptions and other liquidity requirements) and accrued
+income prior to distribution and accrued expenses.
+• Rounding off of securities underlying the index.
+• Disinvestments to meet Redemptions, recurring expenses, etc.
+• Change in constituents of Underlying Index - in such an event, the Scheme will endeavor to reallocate
+its portfolio to replicate the changes. However, the reallocation process may not occur
+instantaneously and permit precise replication of the index due to prevailing market conditions and
+such delay may affect the NAV of the Scheme.
+(iii) Passive Investments:
+The Scheme is not actively managed. Since the Scheme is linked to index, it may be affected by a general
+decline in the Indian markets relating to its Underlying Index. The Scheme in line with its investment
+objective will invest in securities which are constituents of its Underlying Index regardless of their
+investment merit.
+(iv) Settlement Risk:
+In certain cases, settlement periods may be extended significantly by unforeseen circumstances. The
+inability of the Scheme to make intended securities purchases due to settlement problems could cause
+the Scheme to miss certain investment opportunities as in certain cases, settlement periods may be
+extended significantly by unforeseen circumstances. Similarly, the inability to sell securities held in the
+Scheme portfolio may result, at times, in potential losses to the Scheme, and there can be a subsequent
+Page 22 of 54
+decline in the value of the securities held in the Scheme portfolio.
+(v) Right to Limit Redemptions:
+The Trustee, in the general interest of the Unit holders of the Scheme offered in this Document and
+keeping in view the unforeseen circumstances / unusual market conditions, may limit the total number of
+Units which can be redeemed on any Business Day. The same shall be in accordance with paragraph 1.12
+of the SEBI Master Circular dated June 27, 2024.
+(vi) Risks associated with investing in Money Market Instruments:
+• Price-Risk or Interest-Rate Risk: Fixed income securities such as bonds, debentures and Money Market
+Instruments run price-risk or interest-rate risk. Generally, when interest rates rise, prices of existing
+fixed income securities fall and when interest rates drop, such prices increase. The extent of fall or
+rise in the prices is a function of the existing coupon, days to maturity and the increase or decrease in
+the level of interest rates.
+• Credit Risk: In simple terms this risk means that the issuer of a debenture/bond or a Money Market
+Instrument may default on interest payment or even in paying back the principal amount on maturity.
+Even where no default occurs, the price of a security may go down because the credit rating of an
+issuer goes down. It must, however, be noted that where the Scheme has invested in Government
+Securities, there is no credit risk to that extent. Different types of securities in which the Scheme would
+invest as per its asset allocation pattern, carry different levels and types of risk. Accordingly, the
+Scheme’s risk may increase or decrease depending upon its investment pattern. E.g. commercial
+papers carry a higher amount of risk than Government Securities. Further, commercial papers which
+are A1+ rated are comparatively less risky than those which are B1+ rated.
+• Re-investment Risk: Investments in fixed income securities may carry re-investment risk as interest
+rates prevailing on the interest or maturity due dates may differ from the original coupon of the
+security. Consequently, the proceeds may get invested at a lower rate.
+• Liquidity Risk: Due to the evolving nature of the fixed income market, there may be an increased risk
+of liquidity risk in the portfolio from time to time.
+Investments in money market / liquid schemes will also be subject to the above risks.
+(vii) Risks associated with segregated portfolio:
+• Liquidity risk – A segregated portfolio is created when a credit event / default occurs at an issuer level
+in the Scheme. This may reduce the liquidity of the security issued by the said issuer, as demand for
+this security may reduce. This is also further accentuated by the lack of secondary market liquidity for
+corporate papers in India. As per SEBI norms, the Scheme will be closed for Redemption and
+Subscriptions until the segregated portfolio is created, running the risk of Investors being unable to
+redeem their investments. However, it may be noted that the proposed segregated portfolio is
+required to be formed within one day from the occurrence of the credit event.
+Investors may note that no Redemption and Subscription shall be allowed in the segregated portfolio.
+However, in order to facilitate exit to Unit holders in segregated portfolio, the AMC shall list the units
+of the segregated portfolio on a recognized stock exchange within 10 working days of creation of
+segregated portfolio and also enable transfer of such units on receipt of transfer requests. For the units
+listed on the Exchange, it is possible that the market price at which the units are traded may be at a
+discount to the NAV of such Units. There is no assurance that an active secondary market will develop
+for units of segregated portfolio listed on the Stock Exchange. This could limit the ability of the
+Investors to resell them.
+• Valuation risk - The valuation of the securities in the segregated portfolio is required to be carried out
+in line with the applicable SEBI guidelines. However, it may be difficult to ascertain the fair value of
+the securities due to absence of an active secondary market and difficulty to price in qualitative factors.
+Page 23 of 54
+(viii) Risks associated with investing in Government of India securities:
+• Market liquidity risk - Even though the Government of India securities market is more liquid compared
+to other debt instruments, on certain occasions, there could be difficulties in transacting in the market
+due to extreme volatility leading to constriction in market volumes. Also, the liquidity of the Scheme
+may suffer in case the relevant guidelines issued by Reserve Bank of India undergo any adverse
+changes.
+• Interest rate risk - While Government of India securities generally carry relatively minimal credit risk
+since they are issued by the Government of India, they do carry price risk depending upon the general
+level of interest rates prevailing from time to time. Generally, when interest rates rise, prices of fixed
+income securities fall and when interest rates decline, the prices of fixed income securities increase.
+The extent of fall or rise in the prices is a function of the coupon rate, days to maturity and the increase
+or decrease in the level of interest rates. The price-risk is not unique to Government of India securities
+and exists for all fixed income securities. Therefore, their prices tend to be influenced more by
+movement in interest rates in the financial system than by changes in the Government's credit rating.
+By contrast, in the case of corporate or institutional fixed income securities, prices are influenced by
+their respective credit standing as well as the general level of interest rates.
+(ix) Risks associated with investing in TREPS Segments :
+As a member of the securities and TREPS segments of the Clearing Corporation of India (CCIL), all
+transactions of the Mutual Fund in Government Securities and in TREPS segments will be settled centrally
+through the infrastructure and settlement systems provided by CCIL, thus reducing the settlement and
+counterparty risks considerably for transactions in the said segments. The members of CCIL are required
+to contribute an amount as communicated by CCIL from time to time to the default fund maintained by
+CCIL as a part of the default waterfall (a loss mitigating measure of CCIL in case of default by any member
+in settling transactions routed through CCIL). The Mutual Fund will be exposed to the extent of its
+contribution to the default fund of CCIL at any given point in time. In the event that the default waterfall
+is triggered and the contribution of the Mutual Fund is called upon to absorb settlement/default losses
+of another member by CCIL, the Scheme may lose an amount equivalent to its contribution to the default
+fund allocated to the Scheme on a pro-rata basis.
+(x) Risks associated with investing in securitized debt:
+The Scheme will not invest in securitized debt.
+(xi) Risks associated with investing in Foreign Securities:
+The Scheme will not invest in Foreign Securities.
+(xii) Risks associated with short selling:
+The Scheme will not engage in short selling of securities.
+C. Risk Management Strategies
+The Scheme will invest 95-100% in TREPs which has overnight maturity. Thus, the market risk, interest
+rate risk, liquidity risk and credit risk is considered as low for such instruments.
+The Scheme will endeavor to manage risks associated with investing in debt and Money Market securities
+by following a holistic risk management strategy. The risk control process involves identifying and
+measuring risks through various risk measurement tools.
+The AMC has identified following risks of investing in debt and Money Market securities and designed risk
+management strategies, which are embedded in the investment process to manage such risks :
+Risks associated with investments in debt and money market securities
+Page 24 of 54
+Risk Description Risk Mitigants/management strategy
+Market Risk / Interest Rate Risk The Scheme may invest in Money Market
+As with all fixed income securities, changes in interest Instruments having relatively shorter maturity
+rates may affect the Scheme’s Net Asset Value as the thereby mitigating the price volatility due to
+prices of securities generally increase as interest rates interest rate changes generally associated
+decline and generally decrease as interest rates rise. with long-term securities.
+Prices of long-term securities generally fluctuate more in
+response to interest rate changes than do short-term
+securities. Indian debt markets can be volatile leading to
+the possibility of price movements up or down in fixed
+income securities and thereby to possible
+movements in the NAV.
+Liquidity risk or Marketability Risk The Scheme may invest in Money Market
+This refers to the ease with which a security can be sold Instruments having relatively shorter
+at or near to its valuation yield- to maturity (YTM). maturity, which have low liquidity risk, as
+compared to medium to long maturity
+securities.
+Credit Risk Management analysis may be used for
+Credit risk or default risk refers to the risk that an issuer of identifying company specific risks.
+a fixed income security may default (i.e., will be unable Management’s past track record may also be
+to make timely principal and interest payments on the studied. Preference will be towards high
+security). quality instruments.
+II. INFORMATION ABOUT THE SCHEME:
+A. Where will the Scheme invest ?
+The corpus of the Scheme will be invested in Tri-Party Repo on Government Securities and/or Treasury
+bills/ Repo and Reverse Repo and/or Money Market Instruments and/or units of money market/liquid
+schemes.
+Subject to the applicable regulations, the corpus of the Scheme can be invested in any (but not exclusively)
+of the following securities / instruments :
+a) Securities constituting the Underlying Index.
+b) Tri-Party Repo on Government Securities and/or Treasury bills/ Repo and Reverse Repo.
+c) Units of money market/liquid mutual fund schemes, subject to requisite regulatory guidelines.
+d) Cash and Cash Equivalents.
+e) Money Market Instruments which include commercial papers, commercial bills, treasury bills,
+Government Securities having an unexpired maturity up to one year, call or notice money, certificate
+of deposit, usance bills, and any other like instruments as specified by the Reserve Bank of India from
+time to time to meet the liquidity requirements.
+f) Any other securities / instruments as may be permitted by SEBI from time to time, subject to requisite
+regulatory approvals if any.
+The Scheme may invest in other schemes managed by the AMC or in the schemes of any other mutual
+funds, provided it is in conformity with the investment objective of the Scheme and in terms of the
+prevailing regulations. As per the Regulations, no investment management fees will be charged for such
+investments and the aggregate inter-scheme investment made by all schemes of the Mutual Fund or in
+schemes under the management of other asset management companies shall not exceed 5% of the Net
+Asset Value of the Mutual Fund.
+Page 25 of 54
+MONEY MARKET IN INDIA
+The money market in India essentially consist of the call money market (i.e. market for overnight and term
+money between banks and institutions), Repo transactions (temporary sale with an agreement to buy
+back the securities at a future date at a specified price), commercial papers (CPs, short term unsecured
+promissory notes, generally issued by corporates), certificate of deposits (CDs, issued by banks) and
+Treasury Bills & Cash Management Bills (issued by RBI). In a predominantly institutional market, the key
+money market players are banks, financial institutions, insurance companies, mutual funds, primary
+dealers and corporates.
+Following table exhibits various debt instruments along with indicative yields as on February 27, 2025:
+Instruments Yield level (% per annum)
+3 months CP 7.86
+3 months CD 7.54
+1 year CP 8.08
+1 year CD 7.64
+Source: NSE Indices Ltd. Note: Yields provided in the above table are based on the Nifty CP
+& Nifty CD indices
+The actual yields will, however, vary in line with general levels of interest rates and debt/money market
+conditions prevailing from time to time.
+B. What are the investment restrictions?
+Pursuant to the SEBI MF Regulations as amended from time to time, the following investment restrictions
+are presently applicable to the Scheme:
+1) The Scheme shall not invest in unlisted commercial papers (CPs), other than (a) Government
+Securities, and (b) other Money Market Instruments.
+For the above purposes, listed instruments shall include listed and to be listed instruments.
+2) The Scheme shall not invest more than 5% of its net assets in unrated Money Market Instruments,
+other than Government Securities, treasury bills, Derivative products such as Interest Rate Swaps
+(IRS), Interest Rate Futures (IRF), etc. All such investments shall be made with the prior approval of
+the Boards of AMC and Trustee.
+Such investments would be made only in such instruments, including bills re-discounting, usance bills,
+etc., that are generally not rated and for which separate investment norms or limits are not provided
+in SEBI (Mutual Fund) Regulations, 1996 and various circulars issued thereunder.
+3) The Scheme shall buy and sell securities on the basis of deliveries and shall in all cases of purchases, take
+delivery of relevant securities and in all cases of sale, deliver the securities.
+Provided further that sale of government security already contracted for purchase shall be permitted
+in accordance with the guidelines issued by the Reserve Bank of India in this regard.
+4) The Scheme shall not make any investment in:
+i. any unlisted security of an associate or group company of the Sponsor; or
+ii. any security issued by way of private placement by an associate or group company of the Sponsor;
+or
+iii. the listed securities of group companies of the Sponsor which is in excess of 25 per cent of the net
+assets, except for investments made by the Scheme in compliance with such conditions as
+specified by SEBI.
+5) Transfer of investments from one scheme to another scheme in the same Mutual Fund is permitted
+provided:
+Page 26 of 54
+i. such transfers are done at the prevailing market price for quoted instruments on spot basis (spot
+basis shall have the same meaning as specified by the stock exchanges for spot transactions); and
+ii. the securities so transferred shall be in conformity with the investment objective of the scheme to
+which such transfer has been made, and
+iii. the transfer is in accordance with the applicable guidelines provided under paragraph 12.30 of
+SEBI Master Circular dated June 27, 2024.
+6) The Scheme may invest in other schemes under the Asset Management Company or any other mutual
+fund without charging any fees, provided the aggregate inter-scheme investment made by all the
+schemes under the same management or in schemes under management of any other asset
+management company shall not exceed 5% of the Net Asset Value of the Fund.
+7) The Fund shall get the securities purchased transferred in the name of the Fund on account of the
+Scheme, wherever investments are intended to be of a long-term nature.
+8) No loans for any purpose can be advanced by the Scheme.
+9) The Scheme shall not borrow except to meet temporary liquidity needs of the Scheme for the purpose
+of Repurchase/Redemption of units or payment of interest and/or Dividend to the Unitholders,
+provided that the Scheme shall not borrow more than 20% of its net assets and the duration of the
+borrowing shall not exceed a period of 6 months.
+10) The Scheme shall not make any investment in a Fund of Funds scheme.
+The Scheme will comply with the relevant regulatory investment limits applicable to the investments of
+mutual funds from time to time. The Trustee may alter the above restrictions from time to time to the
+extent that changes in the relevant Regulations may allow and/or as deemed fit in the general interest of
+the Unitholders.
+All investment restrictions shall be applicable at the time of making the investment.
+C. Fundamental Attributes
+Following are the “fundamental attributes” of the Scheme, in terms of Regulation 18(5A) of the
+SEBI MF Regulations:
+(i) Type of a scheme
+Please refer to Section-I - Part I - Highlights/Summary of the Scheme.
+(ii) Investment Objective
+• Main Objective: Please refer to Section-I - Part I - Highlights/Summary of the Scheme.
+• Investment Pattern: Please refer to Section-I - Part II – Information about the Scheme.
+(iii) Terms of Issue
+• Listing: Please refer to Section-I - Part I - Highlights/Summary of the Scheme.
+• Redemption: Please refer to Section-I - Part I - Highlights/Summary of the Scheme.
+• Aggregate Fees and Expenses: Please refer to Section-I – Part III - C. Annual Scheme
+Recurring Expenses.
+• Any safety net or guarantee provided- None.
+In accordance with Regulation 18(15A) and Regulation 25(26) of the SEBI (MF) Regulations and paragraph
+1.14.1.4 of the SEBI Master Circular dated June 27, 2024, the Trustee shall ensure that no change in the
+fundamental attributes of the Scheme and the Plan(s)/Option(s) thereunder or the trust or fee and
+expenses payable or any other change which would modify the Scheme and the Plan(s) / Option(s)
+thereunder and affect the interests of Unitholders is carried out unless:
+• SEBI has reviewed and provided its comments on the proposal;
+• A written communication about the proposed change is sent to each Unitholder and an
+advertisement is given in one English daily newspaper having nationwide circulation as well as in a
+Page 27 of 54
+newspaper published in the language of the region where the Head Office of the Mutual Fund is
+situated; and
+• The Unitholders are given an option for a period of at least 30 calendar days to exit at the prevailing
+Net Asset Value without any Exit Load.
+D. Index Methodology
+The objective of this Index is to measure the returns generated by market participants lending in the
+overnight market with government securities as underlying collateral.
+The Index uses the overnight rate published on “Triparty Repo Dealing System (TREPS)", platform of CCIL,
+with government securities as underlying, for computation of index values. The details of TREPS are
+available on CCIL.
+Methodology
+• Annualised weighted average rate published by CCIL at end of the day is considered for computation
+of index
+• The annualized rate is converted to the daily rate for index calculation, by dividing the annual rate by
+365 days
+• The interest based on daily rate is added to the index value of the previous day
+• TREPS with T+0 settlement is considered
+• If next day is a working day then rate with 1 day maturity is considered
+• If next day is holiday or Saturday, rate of “n” days maturity is considered, where “n” is number of days
+until next working day. For example on Friday, rate for 3 days maturity would be considered for
+computation of index on (Friday, Saturday and Sunday)
+• The index is computed daily at end of the day
+• The base date for index is January 03, 2011 and base value is 1000
+Source: NSE
+For more details on index methodology, please visit www.niftyindices.com.
+The updated constituents of the Underlying Index of the Scheme shall also be made available on the
+website i.e. www.angelonemf.com at all points of time.
+Constituent details as on February 27, 2025 :
+Sr. No. Name of Constituent Index Weightage (%)
+1 Tri Party Repo 100%
+Source: NSE Indices Ltd.
+Page 28 of 54
+E. Other Scheme Specific Disclosures:
+Listing and transfer of units Listing :
+The units of the Scheme will be listed on NSE within 5 working days
+from the date of allotment. It may also list on any other exchanges
+subsequently.
+Transfer :
+In accordance with clause 14.4.4 of SEBI Master Circular dated June
+27, 2024, units of the Scheme are held in electronic (demat) form and
+will be transferable. The units will be subject to the transmission
+facility in accordance with the provisions of SEBI (Depositories and
+Participants) Regulations, 1996 as may be amended from time to time.
+If a person becomes a holder of the Units consequent to operation of
+law, or upon enforcement of a pledge, the Fund will, subject to
+production of satisfactory evidence, effect the transfer, if the
+transferee is otherwise eligible to hold the Units. Similarly, in cases of
+transfers taking place consequent to death, insolvency etc., the
+transferee’s name will be recorded by the Fund subject to production of
+satisfactory evidence.
+The delivery instructions for transfer of units will have to be lodged
+with the DP in requisite form as may be required from time to time
+and transfer will be effected in accordance with such rules /
+regulations as may be in force governing transfer of securities in
+dematerialized mode.
+Dematerialization of units 1) Units of the Scheme will be available in Dematerialized (electronic)
+form only.
+2) The applicant under the Scheme will be required to have a
+beneficiary account with a Depository Participant of NSDL/CDSL
+and will be required to indicate in the application the Depository
+Participants (DP’s) name, DP ID Number and the beneficiary
+account number of the applicant.
+3) Units of the Scheme will be issued, traded and settled compulsorily
+in dematerialized form.
+4)
+Please refer to the SAI for further details.
+Minimum Target amount The Scheme seeks to collect Rs. 10 crores as the minimum Subscription
+(This is the minimum amount and would retain any excess Subscription collected. If the Scheme
+required to operate the does not collect the minimum Subscription during the NFO, refund will
+scheme and if this is not be made within 5 Business Days from closure of the NFO.
+collected during the NFO
+period, then all the Investors
+would be refunded the amount
+invested without any return.)
+Maximum Amount to be There is no limit to the maximum amount that can be raised by the
+raised (if any) Scheme.
+Page 29 of 54
+Dividend Policy (IDCW) Not Applicable.
+Allotment (Detailed The AMC shall allot units to those applicants whose valid applications
+procedure) have been accepted and funds have been credited to the Scheme’s
+bank account.
+For applicants applying through ASBA on allotment, the amount will
+be unblocked in their respective bank accounts and their bank
+accounts will be debited only to the extent required to pay for
+allotment of Units applied in the application form.
+The AMC shall allot units within 5 Business Days from the date of
+closure of the NFO period. The amount for fractional units, if any, will
+be refunded to the Investor.
+The AMC/Trustee may reject any application for Subscription if found
+incomplete.
+Allotment Confirmation / Consolidated Account Statement (CAS)
+Single Consolidated Account Statement (SCAS):
+The AMC shall send allotment confirmation specifying the number of
+units allotted to the Investor by way of email and/or SMSs to the
+Investor’s registered email address and/or mobile number not later
+than 5 (five) Business Days from the date of closure of the New Fund
+Offer Period. Thereafter, Single Consolidated Account Statement
+(SCAS), based on PAN of the holders, shall be sent by the Depositories,
+for each calendar month within 15th day of the succeeding month to
+the unitholders in whose folio(s)/demat account(s) transactions have
+taken place during that month.
+Applicants under the Scheme will be issued Units in dematerialized
+form only. Applications which do not contain valid details of the demat
+account of the investors would be rejected and the application money
+will be refunded within the prescribed timeline. Where units are held
+by Investor in dematerialised form, the demat statement issued by the
+DP would be deemed adequate compliance with the requirements in
+respect of dispatch of statements of account.
+The Units of the Scheme held in the dematerialised form will be fully
+and freely transferable (subject to lock-in period, if any, and subject to
+lien, if any marked on the Units) in accordance with the provisions of
+SEBI (Depositories and Participants) Regulations, 1996 as may be
+amended from time to time and as stated in paragaph 14.4.4 of SEBI
+Master Circular no. SEBI/HO/IMD/IMD-PoD-1/P/CIR/2024/90 dated
+June 27, 2024. Further, for the procedure of release of lien, the
+investors are requested to contact their respective DP.
+Refund If the application is rejected for any reason, full amount will be
+refunded within 5 working days of closure of the NFO. No interest will
+be payable on any Subscription money refunded within five Business
+Days from the closure of NFO. If refunded later than 5 working days
+interest @15% p.a. for delay period will be paid to the applicant and
+Page 30 of 54
+charged to the AMC for the period from the day following the date of
+expiry of five Business Days until the actual date of the refund.
+Refund will be initiated in the name of the applicant in the case of a
+sole applicant and in the name of the first applicant in all other cases.
+In both cases, the bank account number and bank name, as specified
+in the application, will be considered for refund. The bank and/ or
+collection charges, if any, will be borne by the applicant. All the refund
+payments will be initiated in the manner as may be specified by SEBI
+from time to time.
+The bank and/ or collection charges, if any, will be borne by the
+applicant. All the refund payments will be sent by registered post or
+courier service or as required under the Regulations.
+Who can invest The following persons may apply for Subscription to the units of the
+This is an indicative list and Scheme (subject, wherever relevant, to purchase of units of mutual
+Investors shall consult their funds being permitted under respective constitutions, relevant
+financial advisor to ascertain statutory regulations and with all applicable approvals):
+whether the Scheme is suitable • Resident adult individuals either singly or jointly (not exceeding
+to their risk profile. three) or on anyone or survivor basis.
+• Minor through parent/lawful guardian.
+• Companies, Bodies Corporate, Public Sector Undertakings, Co-
+operative societies, Association of Persons or Body of Individuals
+whether incorporated or not and societies registered under the
+Societies Registration Act, 1860 (so long as the purchase of units is
+permitted under the respective constitutions).
+• Charitable or religious trusts, wakf boards or endowments and
+registered societies (including registered co-operative societies)
+and private trusts authorized to invest in mutual fund schemes
+under their trust deeds.
+• Non-Government Organisations as may be permitted by their
+regulator.
+• Proprietorship in the name of the sole proprietor.
+• Partnership Firms and Limited Liability Partnerships (LLPs).
+• Hindu Undivided Family (HUF) in the name of Karta.
+• Banks (including Co-operative Banks and Regional Rural
+Banks), Financial Institutions and Investment Institutions.
+• Non-resident Indians/Persons of Indian origin residing abroad
+(NRIs) on full repatriation basis or on non-repatriation basis.
+• Foreign Portfolio Investors (FPIs) /sub-accounts registered with
+SEBI (subject to regulations / directions prescribed by the RBI/SEBI
+from time to time relating to FPI investments in mutual fund
+schemes) on repatriation basis.
+• Army, Air Force, Navy, para-military funds and other eligible
+institutions.
+• Scientific and Industrial Research Organizations.
+• Mutual funds / Alternative Investment Funds registered with SEBI.
+• Provident/Pension/Gratuity/Superannuation and such other
+retirement and employee benefit and other similar funds as and
+when permitted to invest.
+• International Multilateral Agencies or body corporates
+Page 31 of 54
+incorporated outside India approved by the Government of
+India/RBI.
+• Special Purpose Vehicles (SPVs) approved by appropriate authority
+(subject to RBI approval)
+• Unincorporated body of persons as may be accepted by the
+AMC/Trustee.
+• The Trustee, AMC or Sponsor of the Mutual Fund or their
+associates
+• Other schemes of Angel One Mutual Fund, subject to the
+conditions and limits prescribed by SEBI and/or by the Trustee/
+AMC.
+• Insurers, insurance companies / corporations registered with the
+Insurance Regulatory Development Authority.
+• Other categories of Investors who are permitted to invest in the
+Scheme as per their respective constitutions.
+The above list is indicative and the applicable law, if any, would
+supersede the above list. Investors are requested to ensure compliance
+with the regulatory guidelines applicable to them, while making such
+investments.
+Who cannot invest The following persons are not eligible to subscribe to the Units of the
+Scheme:
+1) Residents in Canada.
+2) United States Persons (U.S. Persons) and Non-resident
+Indians/Persons of Indian Origin residing in United States and
+Canada.
+3) Persons residing in the Financial Action Task Force (FATF) Non
+Compliant Countries and Territories (NCCTs).
+4) Any entity who is not permitted to invest in the Scheme as per its
+constitution / applicable regulations.
+How to apply and where can Please refer to the SAI for detailed process (physical and online) with
+you submit the filled up respect to NFO, additional/ongoing purchase, investments by NRIs
+applications (Non-Resident Indian), FPIs (Foreign Portfolio Investors) and foreign
+Investors, joint applications, etc. Investors can also read further details
+in the application form available on the website of the AMC viz.
+www.angelonemf.com/downloads. Please refer to the SAI and
+application form for the instructions.
+The applications for Subscription/Redemption/switches can be
+submitted at the Official Points of Acceptance of the AMC and CAMS as
+provided on the website of the AMC viz.
+www.angelonemf.com/service-branches
+Investors can also subscribe and redeem units through the website of
+the AMC viz. www.angelonemf.com and other digital assets, distributor
+/ RIA platforms, Stock Exchange mechanism, Official Points of
+Acceptance through MF Utility, through the electronic platform of
+CAMS and through the MF Central website.
+Page 32 of 54
+Pursuant to paragraph 14.8 of the SEBI Master Circular dated June 27,
+2024, an Investor can also subscribe to the New Fund Offer (NFO)
+through ASBA facility.
+ASBAs can be accepted only by those banks whose names appear in the
+list of banks as displayed by SEBI on its website www.sebi.gov.in. Kindly
+refer to the said link for complete details.
+MANDATORY QUOTING OF BANK MANDATE BY INVESTORS
+As per the directives issued by SEBI, it is mandatory for applicants to
+mention their bank account numbers in their applications and
+therefore, Investors are requested to fill-up the appropriate box in the
+application form failing which applications are liable to be rejected.
+Kindly refer to below link for the list of Official Points of Acceptance of
+transactions for Angel One Mutual Fund :
+www.angelonemf.com/service-branches
+The policy regarding reissue of The units under the Scheme once Repurchased, shall not be reissued.
+Repurchased units, including
+the maximum extent, the
+manner of reissue, the entity
+(the scheme or the AMC)
+involved in the same
+Restrictions, if any, on the In the interest of the Investors and in order to protect the portfolio from
+right to freely retain or dispose market volatility, the Trustee reserves the right to limit or discontinue
+of units being offered Subscriptions under the Scheme for a specified period of time or till
+further notice.
+Cut off timing for The requirement of “cut-off” timing for NAV applicability as prescribed
+Subscriptions/ Redemptions/ by SEBI from time to time shall not be applicable for direct
+switches transactions by the Market Makers and other eligible investors. For
+Authorised Participants/ Market Makers / Large Investors, as the
+This is the time before which Scheme is Exchange Traded Fund, the Subscriptions and Redemptions
+your application (complete in of Units would be based on the Portfolio Deposit and Cash Component
+all respects) should reach the as defined by the Fund for that respective Business Day. The Fund may
+Official Points of Acceptance. also allow cash (viz. RTGS, NEFT or transfer cheque)
+Subscription/Redemption in Creation Unit Size by Large Investors.
+Investors / Unit holders are requested to note that the cut-off time
+will not be applicable to transactions undertaken on a recognised
+Stock Exchange.
+Cut-off timings will be in accordance with SEBI guidelines issued from
+time to time for applicability of NAV.
+Kindly refer to the notices issued from time to time for the applicable
+cut-off timings available on the website of the AMC (viz.
+www.angelonemf.com).
+Page 33 of 54
+Where can the applications for Authorised Participants / Market Makers / Large Investors may
+purchase / Redemption submit/mail the completed application forms at any of the Official
+/switches be submitted ? Points of Acceptance designated by the AMC. Please refer to the AMC
+website (www.angelonemf.com) for the list of Official Points of
+Acceptance, etc.
+As per the directives issued by SEBI, it is mandatory for an investor to
+declare his/her bank account number in the application form. This is
+to safeguard the interest of Unit holders from loss or theft of their
+redemption cheques / DDs. Additionally, if the bank details provided
+by Investors are different from the details available on the instrument,
+the AMC may seek additional details from the Investors to validate the
+bank details provided by the Investors.
+Minimum amount for During New Fund Offer :
+purchase / Redemption/ Rs. 1,000/- and in multiples of Re.1/- thereafter.
+switches
+During on-going offer :
+Directly with the Fund
+The facility of creating units in Creation Unit Size is available to the
+Authorised Participants/ Market Makers and Large Investors.
+However, in case of Large Investors, the execution value shall be
+greater than Rs. 25 crores or such other amount as may be specified
+by SEBI from time to time (except for schemes managed by Employee
+Provident Fund Organisation (EPFO), India and Recognized Provident
+Funds, Approved Gratuity Funds and Approved Superannuation Funds
+under Income Tax Act, 1961, till August 31, 2025 or as specified in the
+Regulations time to time). The limit of Rs. 25 crores shall not be
+applicable to Market Makers.
+Minimum number of Units (Creation Units) – 500 units & in multiples
+of 1 unit thereafter.
+Investors can directly approach the AMC for Redemption of units of
+the Scheme, for transaction up to Rs. 25 crores (or such other amount
+as may be specified by SEBI from time to time) without any Exit Load,
+in case of the following scenarios:
+(i) Traded price (closing price) of the ETF units is at discount of more
+than 1% to the day end NAV for 7 continuous trading days, or
+(ii) No quotes for such ETFs are available on Stock Exchange(s) for 3
+consecutive trading days, or
+(iii) Total bid size on the Stock Exchange is less than half of Creation
+Unit Size daily, averaged over a period of 7 consecutive trading
+days.
+In case of the above scenarios, applications received from Investors
+for Redemption up to 3.00 p.m. on any trading day, shall be processed
+by the AMC at the closing NAV of the day of receipt of application
+within the above cut-off time. Such instances shall be tracked by the
+AMC on an ongoing basis and in case any of the above mentioned
+Page 34 of 54
+scenario arises, the same shall be disclosed on the website of the
+Mutual Fund (viz. www.angelonemf.com).
+On the Exchange
+The minimum number of Units that can be bought by the Investors on
+the Exchange is 1 (one) Unit and in multiples thereafter.
+Minimum Switch Amount
+Minimum switch-in amount will be as per the minimum application
+amount in the Scheme.
+Switch-in facility into the Scheme from eligible open-ended (non-
+ETF) schemes
+For availing this facility, Investors are requested to note the following
+operational modalities:
+a) Based on number of baskets the Investor wants to switch-in to the
+Scheme, the switch-out amount from the open ended (non-ETF)
+scheme should be calculated to nearest basket lot size so that the
+minimum switch-in amount as on switch-in date is greater than
+Rs. 25 crores as per the Intra-Day NAV.
+b) Switch-in to the Scheme will be in terms of number of basket/
+Creation Lot specified in the application form subject to minimum
+switch-in amount of greater than Rs. 25 crores.
+c) Switch transaction will be processed at the Applicable NAV of the
+switch-out scheme and only if the value is available in the switch-
+out scheme.
+d) The applicability of the NAV in the Scheme will be the Intra-Day
+NAV of the Business Day on which the funds are realized in the
+Scheme’s account before the cut-off time.
+e) In case the value of Intra-Day NAV X no. of applicable Creation Lot
+is greater than the switch funding amount, the switch-in
+transaction will be rejected and the entire amount will be
+refunded to the Investor.
+f) Investors may note that the pattern and sequence of holding in
+both the open-ended (Non-ETF) folio and in demat account (used
+for the Scheme units) should be the same. However, in case there
+is no existing folio in the Scheme, the Investor has to provide the
+details and signatures of all holders for folio creation in the
+Scheme.
+Switch-out facility to eligible open-ended (non-ETF) Schemes
+For availing this facility, Investors are requested to note the following
+operational modalities:
+a) Switch-out from the Scheme will be allowed only in terms of
+basket size (unit) and subject to minimum switch-out amount
+of greater than Rs. 25 crores.
+b) Switch transaction will be processed subject to availability of all
+details as per regulatory guidelines.
+c) Switch out transaction will be processed at the intra day NAV
+of the Scheme.
+Page 35 of 54
+d) The applicability of the NAV in the transferee scheme will be
+the NAV of the Business Day on which the funds are realized in
+the scheme’s account before cut-off time.
+e) In case of any rejection of switch-in to the scheme, the amount
+will be refunded to the Investor as Redemption proceeds.
+f) Investors are requested to note that the pattern and sequence
+of holding in the folio of the transferee scheme and in demat
+account (used for ETF unit holding) should be same. However,
+in case there is no existing folio, the Investor has to provide the
+details and signatures of all holders for folio creation in the
+transferee scheme.
+g) Investors should have the clear balance of ETF units in their
+demat account for execution of the switch-out transaction.
+The limit of Rs. 25 crores shall not be applicable to schemes managed
+by Employee Provident Fund Organisation (EPFO), India and
+Recognized Provident Funds, Approved Gratuity Funds and Approved
+Superannuation Funds under Income Tax Act, 1961, till August 31,
+2025 or as specified in the Regulations time to time.
+The AMC/Trustee reserves the right to introduce, change, modify or
+withdraw any of the features available in this facility from time to
+time.
+Principles of incentive Incentives to the Market Maker will be linked to the performance of
+structure for market makers the Market Maker in terms of generating liquidity in units of the
+Scheme. Incentives, if any, to the Market Maker shall be charged to
+the Scheme within the maximum permissible limit of TER. Incentives
+to the Market Maker shall be at the discretion of the AMC which may
+be variable in nature or fixed amount adhering to maximum
+permissible limit of TER.
+Determination of incentives for Market Makers
+Listed below are a few criteria based on which the AMC will determine
+the incentives to the Market Makers :
+• Volume carried out by the Market Maker on the Exchange as
+compared to total volume of respective ETFs on the Exchange.
+• Any other performance-based incentive that the Market Maker
+Committee of the AMC may decide.
+The incentive may be fixed monthly compensation which shall not
+exceed TER of the Scheme.
+Incentives, if any, will be payable to the Market Maker subject to the
+Market Maker fulfilling its obligations and responsibilities.
+Minimum balance to be Not Applicable.
+maintained and consequences
+of non-maintenance
+Account statements (during Units issued by the AMC under the Scheme shall be credited to the
+on going offer) Investor’s beneficiary account with a Depository Participant (DP) of
+CDSL or NSDL. The AMC will endeavour to credit the units to the
+beneficiary account of the Unit holder within two Business Days from
+the date of receipt of credit of the funds.
+Page 36 of 54
+Unit holders who have a Demat Account are requested to note the
+following :
+• Investors who have holdings in mutual funds and securities in their
+demat account shall receive a Single Consolidated Account
+Statement from the Depository.
+• Consolidation of account statement shall be done on the basis of
+PAN. In case of multiple holdings, it shall be PAN of the first holder
+and pattern of holding.
+• The CAS shall be generated on a monthly basis and shall be issued
+on or before the 15th of the immediately succeeding month to the
+Unit holder(s) in whose folio(s) transaction(s) has/have taken
+place during the month.
+• As a green initiative measure, SEBI vide its circular no.
+SEBI/HO/MRD-PoD2/CIR/P/2024/93 dated July 1, 2024 has
+specified that the CAS shall be despatched by e-mail to all the
+Investors whose e-mail addresses are registered with the
+Depositories and AMCs/MF-RTAs. However, where an Investor
+does not wish to receive CAS through e-mail, an option shall be
+given to the Investor to receive the CAS in physical form at the
+address registered with the Depositories and the AMCs/MF-RTAs.
+The Depositories shall also intimate the Investor on a quarterly
+basis through the SMS mode specifying the e-mail id on which the
+CAS is being sent. In case there is no transaction in any of the
+mutual fund folios, then CAS detailing holdings of investments
+across all schemes of the mutual funds will be issued on half yearly
+basis at the end of every six months (i.e. September/ March) on or
+before 21st of the immediately succeeding month.
+For further details, refer SAI.
+Dividend / IDCW Not Applicable.
+Redemption The Market Maker/Large Investor may submit Redemption request
+transaction form prescribed by the AMC enclosed with Redemption
+request slip used in the depository system duly acknowledged by the
+Depository Participant with which the Market Maker/Large Investor
+has a depository account.
+Redemption proceeds in the form of basket of securities included in
+the Underlying Index in the same proportion will be credited to the
+designated DP account of the Market Maker/Large Investor. Any
+fractions in the number of securities transferable to Market
+Maker/Large Investor will be rounded off to the lower integer and the
+value of the fractions will be added to the Cash Component payable.
+Applicable Cash Component will be recovered along with necessary
+transaction handling charges.
+Payment of proceeds in cash: The Fund at its discretion may accept the
+request of Market Maker/Large Investor for payment of redemption
+proceeds in cash in Creation Unit Size or in multiples thereof. Such
+investors shall submit Redemption request transaction form
+prescribed by the AMC enclosed with redemption request slip used in
+Page 37 of 54
+the depository system duly acknowledged by the depository
+participant with which Market Maker/Large Investor has a depository
+account. whereupon the Fund will arrange to sell underlying portfolio
+securities on behalf of the investor. Accordingly, the sale proceeds at
+the actual execution price of the underlying portfolio, after adjusting
+necessary transaction handling charges/costs and applicable Cash
+Component, will be remitted to the investor. The number of Units so
+redeemed will be subtracted from the unitholder’s account balance
+(DP) and a statement to this effect will be issued to the unitholder by
+depository.
+The Redemption or Repurchase proceeds shall be dispatched to the
+Unitholders within three working days from the date of Redemption or
+Repurchase.
+AMFI, in consultation with SEBI, has published a list of exceptional
+circumstances for schemes unable to transfer Redemption or
+Repurchase proceeds to Investors within the stipulated time as
+mentioned above, along with applicable time frame for transfer of
+Redemption or Repurchase proceeds to the unitholders in such
+exceptional circumstances. The said list is available on AMFI website.
+Bank Mandate As per the directives issued by SEBI, it is mandatory for applicants to
+mention their bank account numbers in their applications and
+therefore, Investors are requested to fill-up the appropriate box in the
+application form failing which applications are liable to be rejected.
+Additionally, if the bank details provided by Investors are different from
+the details available on instrument, the AMC may seek additional details
+from Investors to validate the bank details provided by Investors.
+Delay in payment of The Asset Management Company shall be liable to pay interest to the
+Redemption / Repurchase unitholders at @ 15% per annum as specified vide paragraph 14.2 of
+proceeds the SEBI Master Circular dated June 27, 2024 for the period of such
+delay.
+However, the AMC will not be liable to pay any interest or
+compensation or any amount otherwise, in case the AMC/Trustee is
+required to obtain from the Investor/Unit holder, verification of
+identity or such other details relating to Subscription/Redemption for
+Units under any applicable law or as may be requested by a Regulatory
+Authority or any government authority, which may result in delay in
+processing the application.
+Unclaimed Redemption The unclaimed Redemption amount may be deployed by the Mutual
+Amount Fund in call money market, Money Market Instruments or separate
+plan of overnight scheme/ liquid scheme / money market mutual fund
+scheme floated specifically for deployment of the unclaimed amounts
+only. Provided that such schemes where the unclaimed Redemption
+amounts are deployed shall be only those Overnight scheme/ Liquid
+scheme / Money Market Mutual Fund schemes which are placed in A-
+1 cell (Relatively Low Interest Rate Risk and Relatively Low Credit Risk)
+of Potential Risk Class matrix.
+Page 38 of 54
+The Investors who claim the unclaimed amounts during a period of
+three years from the due date shall be paid initial unclaimed amount
+along-with the income earned on its deployment. Investors, who claim
+these amounts after 3 years, shall be paid initial unclaimed amount
+along-with the income earned on its deployment till the end of the
+third year. After the third year, the income earned on such unclaimed
+amounts shall be used for the purpose of investor education.
+Please refer to SAI for further details.
+Disclosure w.r.t. investment A minor can invest through his/her parent/lawful guardian. Minors
+by minors can complete their KYC requirements for their folio through guardian.
+Payment for investment by any mode shall be accepted from the bank
+account of the minor, parent or legal guardian of the minor with
+parent or legal guardian.
+For further details, please refer to SAI.
+Settlement of purchase/sale Buying/Selling of Units of the Scheme on the Exchange(s) is just like
+of units of the Scheme on the buying/selling any other normal listed security. If an Investor has
+Stock Exchange bought Units, then such Investor has to pay the purchase amount to
+the broker/sub-broker such that the amount paid is realised before
+the funds pay-in day of the settlement cycle on the Exchange(s). If an
+Investor has sold Units, then such Investor has to deliver the Units to
+the broker/sub-broker before the securities pay-in day of the
+settlement cycle on the Exchange(s). The Units (in the case of Units
+bought) and the funds (in the case of Units sold) are paid out to the
+broker on the payout day of the settlement cycle on the Exchange(s).
+The Exchange(s) regulations stipulate that the trading member should
+pay the money or Units to the Investor within 24 hours of the payout.
+If an Investor has bought Units, then such Investor should give
+Standing Instructions for ‘Delivery-In’ to its Depository Participant for
+accepting Units in its beneficiary account. An Investor should give the
+details of its beneficiary account and the Depository Participant-ID of
+their Depository Participant to their trading member. The trading
+member will transfer the Units directly to the beneficiary account of
+the Investor on receipt of the same from Exchange(s)’ clearing
+corporation.
+An Investor who has sold Units should instruct their Depository
+Participant to give ‘Delivery Out’ instructions to transfer the Units
+from their beneficiary account to the pool account of their trading
+member through whom they have sold the Units. The details of the
+Pool A/c (CM-BP-ID) of their trading member to which the Units are to
+be transferred, Unit quantity etc. should be mentioned in the Delivery
+Out instructions given by them to the Depository Participant. The
+instructions should be given well before the prescribed securities pay-
+in day.
+SEBI has advised that the Delivery Out instructions should be given at
+least 24 hours prior to the cut-off time for the prescribed securities
+Page 39 of 54
+pay-in to avoid any rejection of instructions due to data entry errors,
+network problems, etc.
+The rolling settlement will be on T+1 basis.
+While calculating the days from the trading day, weekend days (i.e.
+Saturday and Sundays), Exchange holidays and bank holidays will not
+be taken into consideration.
+Potential Risk Class (PRC) Please refer to PRC matrix disclosed on the cover page. The PRC
+reflects the maximum risks (i.e., interest rate risk and credit risk) that
+the Scheme can take. Positioning of an ETF/ Index Fund in the Potential
+Risk Class (PRC) matrix shall be in the same cell as that of positioning
+of the index in the PRC matrix. However, movement to a lower risk cell
+in the PRC matrix shall be permitted on account of investment into
+higher rated securities and exposure to cash within the permitted
+range of portfolio replication norms.
+Page 40 of 54
+III. OTHER DETAILS
+A. Periodic Disclosures such as Half yearly disclosures, half yearly results, annual report Monthly / Half
+yearly Portfolio Disclosures:
+Portfolio disclosures
+The AMC shall disclose portfolio (along with ISIN) of the Scheme on a fortnightly basis within 5 days from
+end of every fortnight and as on the last day of the month / half year within 10 days from the close of
+each month / half year on the websites of the AMC (www.angelonemf.com) and AMFI
+(www.amfiindia.com) in a user-friendly and downloadable spreadsheet format. In case of unitholders
+whose email addresses are registered with the Fund, the portfolios disclosed as above shall be sent to the
+unitholders via email. The unitholders whose e-mail address are not registered with the Fund are
+requested to update / provide their email address to the Fund for updating the database. An
+advertisement shall be published in the all India edition of at least two daily newspapers, one each in
+English and Hindi, disclosing the hosting of the Scheme’s half yearly portfolio on the websites of AMC and
+AMFI and the modes through which a Unit holder can submit a request for a physical or electronic copy
+of the statement of the Scheme’s portfolio.
+Investors may place a specific request to the Mutual Fund for sending the half yearly Scheme portfolio
+through e-mail. The AMC shall provide a physical copy of the statement of its Scheme’s portfolio, without
+charging any cost, on specific request received from a Unit holder.
+Half Yearly Financial Results
+The AMC shall within one month from the close of each half year, that is on 31st March and on 30th
+September, host a soft copy of its unaudited financial results on its website (www.angelonemf.com) and
+on AMFI’s website (www.amfiindia.com) and shall publish an advertisement disclosing the hosting of such
+financial results on the websites, in at least one English daily newspaper having nationwide circulation
+and in a newspaper having wide circulation published in the language of the region where the Head Office
+of the Mutual Fund is situated.
+Annual Report
+The scheme wise Annual Report or an abridged summary thereof shall be mailed to all unitholders within
+four months from the date of closure of the relevant account’s year i.e. 31st March each year, whose e-
+mail address is registered with the Fund. The physical copies of the scheme wise Annual Report will be
+sent to those unitholders who have opted-in to receive physical copies, and the same will also be made
+available to the unitholders at the registered office of the AMC.
+An advertisement shall also be published in all India edition of at least two daily newspapers, one each in
+English and Hindi, disclosing the hosting of the scheme wise annual report on the websites of the AMC
+and AMFI and the modes such as SMS, telephone, email or written request (letter), etc. through which
+Unit holders can submit a request for a physical or electronic copy of the scheme wise annual report or
+abridged summary thereof.
+The physical copy of the scheme wise annual report or abridged summary shall be made available to the
+Investors at the registered office of the AMC. A link of the Scheme’s annual report shall be displayed
+prominently on the website of the Mutual Fund (www.angelonemf.com) and that of AMFI
+(www.amfiindia.com).
+The AMC shall also provide a physical copy of abridged summary of the annual report, without charging any
+Page 41 of 54
+cost, on specific request received from the unitholder.
+Risk-o-meter
+In accordance with paragraph 5.16 of SEBI Master Circular dated June 27, 2024, the AMC shall disclose:
+(a) risk-o-meter of the Scheme and benchmark while disclosing the performance of the Scheme vis-à-vis
+benchmark and
+(b) details of the Scheme portfolio including the Scheme risk-o-meter, name of benchmark and risk-o-
+meter of benchmark while communicating the fortnightly, monthly and half-yearly statement of Scheme
+portfolio via email.
+Risk-o-meter of the Scheme shall be evaluated on a monthly basis and shall be disclosed along with
+Scheme portfolio disclosure on the website of the Mutual Fund (www.angelonemf.com) and that of AMFI
+(www.amfiindia.com) within 10 days from the close of each month. The AMC shall also disclose the risk
+level of its schemes as on March 31 of every year, along with number of times the risk level has changed
+over the year, on its website and on AMFI’s website.
+Any change in risk-o-meter of the Scheme shall be communicated by way of notice-cum-addendum and
+by way of an e-mail or SMS to the unitholders of the Scheme.
+Scheme Summary Document
+The scheme summary document for all the schemes of the Mutual Fund shall be disclosed on the websites
+of the AMC (www.angelonemf.com), AMFI (www.amfiindia.com) and Stock Exchanges, containing details
+of the schemes including but not limited to scheme features, Fund Manager details, investment details,
+investment objective, expense ratios, portfolio details, etc. in 3 data formats i.e. PDF, spreadsheet and a
+machine readable format (either JSON or XML) on a monthly basis or whenever there is change in any of the
+specified fields, whichever is earlier, within 5 working days of such change.
+Indicative Net Asset Value (iNAV)
+iNAV of the Scheme i.e. the per unit NAV based on the current market value of its portfolio during the trading
+hours of the Scheme, shall be disclosed on a continuous basis on the Stock Exchange(s), where the units of
+the Scheme are listed and traded and shall be updated at least four times a day i.e. opening and closing iNAV
+and at least two times during the intervening period with minimum time lag of 90 minutes between the two
+disclosures. iNAV will be disclosed only on Business Days.
+Tracking Error
+The Tracking Error based on past one year rolling data, shall be disclosed on a daily basis, on the websites
+of the AMC and AMFI. In case the Scheme has been in existence for a period of less than one year, the
+annualized Tracking Error shall be calculated based on available data.
+Tracking Difference
+Tracking Difference i.e. the annualized difference of daily returns between the index and the NAV of the
+Scheme shall be disclosed on the websites of the Mutual Fund and AMFI, on a monthly basis, for tenures 1
+year, 3 years, 5 year, 10 year and since the date of allotment of units. This would be applicable after the
+Scheme completes one year since inception.
+Page 42 of 54
+B. Transparency/NAV Disclosure:
+NAVs will be determined for every Business Day except in special circumstances. NAVs shall be calculated
+upto four decimal places and shall be made available on the websites of AMFI (www.amfiindia.com) and
+the Mutual Fund (www.angelonemf.com) by 11.00 p.m. on all Business Days. The NAVs shall also be
+available on the Toll Free Number 1800-209-0231 on all Business Days (viz. Monday to Friday between
+9.00 a.m. to 6 p.m. and on Saturdays (1st & 3rd) between 9.00 a.m. to 1.00 p.m.) and on the website of the
+Registrar and Transfer Agent CAMS (www.camsonline.com).
+In case the NAVs are not available before the commencement of Business Hours on the following day due
+to any reason, the AMC shall issue a press release giving reasons for the delay and explain when it would
+be able to publish the NAVs. Further, the AMC will extend facility of sending latest available NAVs to
+unitholders through SMS, upon receiving a specific request in this regard.
+C. Transaction charges and stamp duty:
+Transaction charges :
+No transaction charge shall be deducted from the Subscription amount for transactions / applications
+received through the distributors.
+Stamp Duty :
+Pursuant to the notification no. S.O. 1226(E) and G.S.R. 226(E) dated March 30, 2020 issued by the
+Department of Revenue, Ministry of Finance, Government of India, read with Part I of Chapter IV of the
+notification dated February 21, 2019 issued by the Legislative Department, Ministry of Law and Justice,
+Government of India on the Finance Act, 2019 and Clause 10.1 of SEBI Master Circular dated May 19,
+2023, a stamp duty @ 0.005% of the transaction value would be levied on applicable mutual fund
+transactions, with effect from July 01, 2020. Accordingly, pursuant to levy of stamp duty, the number of
+units allotted on purchase/ switch-in transactions to the unitholders would be reduced to that extent.
+Please refer to SAI for further details.
+D. Associate Transactions :
+Please refer to SAI for further details.
+E. Taxation :
+For details on taxation please refer to the clause on Taxation in the SAI apart from the following:
+Particulars Resident Investors Non-Resident Mutual Fund
+Investors
+Dividend2 Taxable at normal tax 20%*
+rates applicable to
+Investor
+Page 43 of 54
+Particulars Resident Investors Non-Resident Mutual Fund
+Investors
+Capital Gains: 12.5%* (without 12.5%* (without NIL1
+indexation benefit) indexation & foreign
+a) Long Term (period exchange fluctuation
+of holding: more benefit)
+than 24 months)
+b) Short Term3 At normal tax rates as At normal tax rates as
+(period of holding: may be applicable* may be applicable*
+up to 24 months)
+* Basic Tax shall be increased by surcharge as per applicable rate and Health & Education Cess at the
+rate of 4% on aggregate of basic tax & surcharge.
+Notes:
+1. As per section 10(23D) of the Income-tax Act,1961, a mutual fund registered with Securities and
+Exchange Board of India (SEBI), the entire income of such mutual fund is exempt from income-
+tax. Further, such mutual fund will receive all its income without deduction of tax at source as
+per provisions of Section 196 of the Act.
+2. With effect from April 1, 2020, income distributed by a mutual fund in respect of units of mutual
+funds is taxable in the hands of the unitholders at normal tax rates (plus applicable surcharge and
+cess).
+3. As per section 111A of the Income-tax Act, 1961 as amended by Finance Act 2024 (No.2) short-
+term capital gains on transfer of units shall be taxable @20% subject to STT on transfer of such
+units.
+TDS Applicability:
+In case of Resident Investors: TDS is applicable at the rate of 10% on income distributed in excess of
+Rs.5,000 by a mutual fund.
+In case of Non-Resident Investors: TDS is applicable on any income in respect of units of a Mutual Fund
+at lower of 20% (plus applicable surcharge and cess) or rate of income-tax provided in the relevant
+Double Taxation Avoidance Agreement (‘DTAA’).
+As per the provisions of section 90(2) of the Act, in determining the taxability of a non-resident, the
+provisions of the relevant DTAA or the Act, whichever are more beneficial, shall apply. Accordingly, if
+the Investor is a resident of country with which India has entered into a DTAA, the provisions of the
+DTAA or of the Act, whichever are more beneficial to the Investor, shall apply.
+Section 90(4) of the Act, provides that a taxpayer, not being a resident, to whom a DTAA applies, shall
+not be entitled to claim any relief under such DTAA unless a certificate of it being a resident in any
+country outside India is obtained by it from the Government of that country. Further, section 90(5),
+provides that the taxpayer referred to in section 90(4) of the Act, shall also provide such other
+documents and information, as may be prescribed.
+Section 206AB of the Act provides for higher rate for TDS for the non-filers of income-tax return. The
+TDS rate in this section is higher of the following rates:
+i) twice the rate specified in the relevant provision of the Act; or
+ii) twice the rate or rates in force; or
+Page 44 of 54
+iii) the rate of five per cent.
+However, the said provision does not apply to a non-resident who does not have a permanent
+establishment in India and a person who is not required to furnish the return of income for the
+assessment year relevant to the said previous year and is notified by the Central Government in the
+Official Gazette in this behalf.
+Section 206AA of the Act apply in case PAN is not furnished, the tax shall be deducted at higher of
+the following rates:
+i) rates specified in relevant provisions of the Act; or
+ii) rate or rates in force; or
+iii) rate of 20%.
+The above income-tax/TDS rates are in accordance with the provisions of the Income-tax Act, 1961
+as amended by Finance Act 2024. The above rates are based on the assumption that the mutual fund
+units are held by the Investors as capital assets and not as stock in trade.
+Investors are requested to note that the tax position prevailing at the time of investment may change
+in future due to statutory amendment(s). The Mutual Fund will pay/deduct taxes as per the applicable
+tax laws on the relevant date considering the provisions of the Act. The above information is provided
+for only general information purposes and does not constitute tax or legal advice. In view of the
+individual nature of tax benefits, each Investor is advised to consult with his/ her tax consultant with
+respect to the specific direct tax implications arising out of their transactions.
+F. Rights of Unitholders :
+Please refer to SAI for details.
+G. List of Official Points of Acceptance:
+Please refer to the link (www.angelonemf.com/service-branches)
+H. Penalties, pending litigation or proceedings, findings of inspections or investigations for which
+action may have been taken or is in the process of being taken by any Regulatory Authority:
+Please refer to the link ( www.angelonemf.com/downloads )
+Notwithstanding anything contained in this Scheme Information Document, the provisions of the SEBI
+(Mutual Funds) Regulations, 1996 and the guidelines there under shall be applicable.
+The Scheme under this Scheme Information Document was approved by the Directors of the AMC on
+September 10, 2024 and December 11, 2024 and by the Directors of the Trustee on September 12, 2024
+and December 13, 2024. The Trustee has ensured that Angel One Nifty 1D Rate Liquid ETF - Growth
+approved by the Trustee is a new product offered by Angel One Mutual Fund and is not a minor
+modification of any existing scheme/fund/product.
+Name, address and contact no. of Registrar and Transfer Agent (R&T), email id of R&T, website address
+of R&T, Official Points of Acceptance, collecting banker details etc.
+R&T
+Computer Age Management Services Limited (CAMS) 9th Floor | Tower II | Rayala Towers # 158 | Anna
+Salai | Chennai – 600 002. Contact numbers : +91-44-2843 3303 /+91-44-6102 3303 | E-Mail ID:
+enq_g@camsonline.com |website: www.camsonline.com
+Page 45 of 54
+Official point of acceptance of transactions (AMC office) :
+G-1, Ground floor, Ackruti Trade Centre, Road no. 7, Kondivita, Andheri (East), Mumbai – 400 093
+Official Points of Acceptance of transactions (CAMS offices) :
+Please refer to the link (www.angelonemf.com/service-branches). Details of the OPAs are also mentioned
+below :
+• Nibedita First Floor, J B Road, Palace Compound, Agartala, Near Babuana Tea and Snacks, Tripura
+West, Pin - 799001
+• No. 8, II Floor Maruti Tower Sanjay Place, Agra, Uttarpradesh - 282002
+• 111 - 113, 1 st Floor - Devpath Building Off C G Road Behind Lal Bungalow, Ellis Bridge, Ahmedabad,
+Gujarat - 380006
+• No. 3. First Floor, Shree Parvati, Plot No. 1 / 175, Opp. Mauli Sabhagruh, Zopadi Canteen, Savedi,
+Ahmednagar - 414003
+• AMC No. 423 / 30, Near ChurchOpp T B Hospital, Jaipur Road, Ajmer, Rajasthan - 305001
+• Opp. RLT Science College Civil Lines, Akola, Maharashtra - 444001
+• City Enclave, Opp. Kumar Nursing Home, Ramghat Road, Aligarh, Uttarpradesh - 202001
+• 30/2, A & B, Civil Lines Station Besides, Vishal Mega Mart Strachey Road, Allahabad, Uttarpradesh
+- 211001
+• Doctor's Tower Building, Door No. 14 / 2562, First Floor, North of Iorn Bridge, Near Hotel Arcadia
+Regency, Alleppey, Kerala - 688001
+• 256A, Scheme No. 1, Arya Nagar, Alwar, Rajasthan - 301001
+• 81, Gulsham Tower,2nd Floor,Near Panchsheel Talkies,Amaravati,Maharashtra,444601
+• Shop No.4250, Near B D Senior Secondary School, Ambala Cantt, Ambala Haryana – 133001
+• B 1, First Floor, Mira Arcade, Library Road, Opp. SBS Bank, Amreli - 365601
+• 3rd Floor, Bearing Unit No. 313, Mukut House, Amritsar - 143001
+• 101, A.P. Tower, B / H, Sardhar Gunj, Next to Nathwani Chambers, Anand, Gujarat - 388001
+• AGVR Arcade, Second Floor, Plot No. 37 (Part), Layout No. 466 / 79, Near Canara Bank, Sangamesh
+Nagar, Anantapur, Andhra Pradesh - 515001
+• No. 351, Icon, 501, Fifth Floor, Western Express Highway, Andheri East, Mumbai - 400069
+• Similipada, Near Sidhi Binayak +2 Science Collage, Angul - 759122
+• Shop No. F - 56, First Floor, Omkar Complex, Opp. Old Colony, Near Valia Char Rasta, GIDC,
+Ankleshwar, Gujarat - 393002
+• Mukherjee Building First Floor, Beside MP Jwellers, Next to Mannapuram, Ward no 5 Link Road,
+Arambagh Hooghly, West Bengal 712601
+• Old N C C Office, Ground Floor, Club Road, Arrah - 802301
+• Block - G, First Floor, P C Chatterjee Market Complex, Rambandhu Talab PO, Ushagram Asansol,
+West Bengal - 713303
+• 2nd Floor, Block No. D - 21 - D - 22, Motiwala Trade Centre, Nirala Bazar, New Samarth Nagar, Opp.
+HDFC Bank, Aurangabad - 431001
+• Shop No. 02, First Floor, Shreyas Complex, Near Old Bus Stand, Bagalkot, Karnataka - 587101
+• B. C. Sen Road, Balasore, Orissa - 756001
+• No. 18 /47 /A, Govind Nilaya, Ward No. 20, Sangankal Moka Road, Gandhinagar, Ballari - 583102
+• Trade Centre, 1st Floor, 45, Dikensen Road ( Next to Manipal Centre), Bangalore, Karnataka -
+560042
+• First Floor, No. 17 / 1, (272) Tweleth Cross Road, Wilson Garden, Bangalore - 560027
+• First Floor, Central Bank Building, Machantala, PO Bankura, Dist Bankura, West Bengal - 722101
+• N / 39, K. N .C. Road, First Floor, Shrikrishna Apartment (Behind HDFC Bank Barasat Branch), P. O.
+Page 46 of 54
+and P. S. Barasat, Dist. 24 P. G. S. (North) - 700124
+• F - 10, First Wings, Desai Market, Gandhi Road, Bardoli - 394601
+• F - 62 - 63, Second Floor, Butler Plaza, Commercial Complex, Civil Lines, Bareilly, Uttarpradesh -
+243001
+• Apurba Market, Ground Floor, Vill Mirjapur, Opp: Basirhat College, P.O. Basirhat College, Dist. 24
+P G S (North), Basirhat - 743412
+• C/O. Rajesh Mahadev & Co., Shop No. 3, First Floor, Jamia Complex Station Road, Basti - 272002
+• Classic Complex, Block No. 104, First Floor, Saraf Colony, Khanapur Road, Tilakwadi, Belgaum -
+590006
+• Kalika temple Street, Ground Floor, Beside SBI BAZAR Branch, Berhampur - 760002
+• Das & Das Complex, First Floor, By Pass Road, Opposite to Vishal Mega Mart, Chhapulia, Bhadrak,
+Odisha - 756100
+• Ground Floor, Gurudwara Road, Near Old Vijaya Bank, Bhagalpur - 812001
+• B - 12, Shopping Center, Ranjeet Nagar, Bharatpur, Rajasthan - 321001
+• A - 111, First Floor, R K Casta, Behind Patel Super Market, Station Road, Bharuch - 392001
+• 2907 GH, GT Road, Near Zila Parishad, Bhatinda, Punjab - 151001
+• 501 – 503, Bhayani Skyline, Behind Joggers Park, Atabhai Road, Bhavnagar – 364001
+• First Floor, Plot No.3, Block No.1, Priyadarshini Pariswar west, Behind IDBI Bank, Nehru Nagar,
+Bhilai - 490020
+• C/o. Kodwani Associtates, Shope No. 211 - 213 2nd floor, Indra Prasth Tower syam Ki Sabji Mandi,
+Near Mukerjee Garden, Bhilwara, Rajasthan - 311001
+• Plot no 10, 2nd Floor, Alankar Complex, Near ICICI Bank, MP Nagar, Zone II, Bhopal, Madhya
+Pradesh - 462011
+• Plot No. 501 / 1741 / 1846, Office No. 203 (2nd Floor), Centre Point, Sriya Talkies Road, Kharvel
+Nagar, Unit-3, Bhubaneswar, Odisha - 751001
+• Tirthkala First Floor, Opp BMCB Bank, New Station Road, Bhuj _kachchh. 370001
+• 3, Adelade Apartment, Christain Mohala, Behind Gulshan - E - Iran Hotel, Amardeep Talkies Road,
+Bhusawal, Maharashtra - 425201
+• R - C Palace, Amber Station Road, Opp Mamta Cpmplex, Biharsharif - 803101
+• Padmasagar Complex, First Floor, 2nd Gate, Ameer Talkies Road, Vijayapur (Bijapur) – 586101
+• Behind Rajasthan Patrika In front of vijaya bank, 1404, amar singh pura Bikaner - 334001
+• Shop No. B - 104, First Floor, Narayan Plaza, Link Road, Bilaspur (C. G) - 495001
+• No. 107 / 1, A C Road, Ground Floor, Bohorompur, Murshidabad, West Bengal - 742103
+• 1st Floor, Plot No. HE-7 City Centre, Sector 4, Bokaro Steel City, Bokaro, Jharkhand - 827004
+• Bhubandanga, Opposite. Shiv Shambhu Rice Mill, First Floor, Bolpur, West Bengal - 731204
+• G. N. B. Road, Bye Lane, Prakash Cinema, P.O. & Dist. Bongaigaon, Assam - 783380
+• 501 – TIARA, CTS 617, 617 / 1 - 4, Off Chandavarkar Lane, Maharashtra Nagar, Borivali – West,
+Mumbai – 400092
+• 399, G T Road, Basement, Building Name - Talk of the Town, Burdwan, West Bengal - 713101
+• 29 / 97G, 2nd Floor, S A Arcade, Mavoor Road, Arayidathupalam, Calicut, Kerala - 673016
+• A. T., Gram - Gutusahi, Under The Nimdih, Panchayat, P.O. Chaibasa, Thana. Muffasil, Dist - West
+Singhbhum, Jharkhand - 833201
+• Deepak Tower, SCO 154 - 155, 1st Floor - Sector 17 - Chandigarh, Punjab - 160017
+• Opp Mustafa decor, Behind Bangalore, Bakery Kasturba Road, Chandrapur, Maharashtra - 442402
+• New No. 10 (Old No. 178) M.G.R. Salai, Nungambakkam, Chennai – 600 034.
+• No. 158, Rayala Tower - 1, Anna Salai, Chennai - 600002
+• Second Floor, Parasia Road, Near Surya Lodge, Sood Complex, Above Nagpur CT Scan, Chhindwara,
+Madhya Pradesh - 480001
+• Shop No. 7, A V C Arcade, 3, South Car Street - 608001
+• 3, Ashok Nagar, Near Heera Vatika, Chittorgarh, Rajasthan - 312001
+Page 47 of 54
+• Building Name Modayil, Door No. 39 / 2638, DJ, 2nd Floor, 2A, M.G. Road, Cochin - 682016
+• No. 1334, Thadagam Road, Thirumurthy Layout, R.S. Puram, Behind Venketeswara Bakery,
+Coimbatore - 641002
+• Nipendra Narayan Road (N. N. Road), Opposite Udichi Market Near - Banik Decorators PO & Dist ,
+Cooch Behar, West Bengal - 736101
+• Near Indian Overseas Bank, Cantonment Road, Mata Math, Cuttack, Orissa - 753001
+• Ground Floor , Belbhadrapur, Near Sahara Office, Laheriasarai Tower Chowk, Laheriasarai,
+Darbhanga - 846001
+• 13, First Floor, Akkamahadevi Samaj Complex, Church Road, P. J. Extension, Davangere, Karnataka
+- 577002
+• 204 / 121, Nari Shilp Mandir Marg, First Floor, Old Connaught Place, Chakrata Road, Dehradun,
+Uttarakhand, 248001
+• S S M Jalan Road, Ground floor, Opp. Hotel Ashoke, Caster Town, Deoghar, Jharkhand - 814112
+• 11 Ram Nagar, First Floor, A. B. Road, Near Indian - Allahabad Bank, Dewas - 455001
+• Urmila Towers, Room No. 111 First Floor, Bank More, Dhanbad, Jharkhand - 826001
+• 16 A / 63 A, Pidamaneri Road, Near Indoor Stadium, Dharmapuri, Tamilnadu - 636701
+• 1793/ A , J B Road, Near Tower Garden, Dhule - 424001
+• Amba Complex, Ground Floor, H S Road, Dibrugarh - 786001
+• H / No. - 2 / 2, S K K Building, OPP SUB - Urban Police Station, Dr. Hokishe Sema Road, Signal Point,
+Dimapur - 797112
+• Plot No.3601, Nazrul Sarani, City Centre, Durgapur - 713216
+• No. 22 b - 3 - 9, Karl Marx Street, Powerpet, Eluru, Andhra Pradesh - 534002
+• 197, Seshaiyer Complex, Agraharam Street, Erode, Tamilnadu - 638001
+• 9/1/51, Rishi Tola Fatehganj, Ayodhya, Faizabad, Uttar Pradesh–224001
+• LG3, SCO 12 Sector 16, Behind Canara Bank, Faridabad – 121002
+• First Floor, Adjacent to Saraswati Shishu Mandir School, Gaushala, Near UPPCL Sub Station (Gandhi
+Park), Company Bagh Chauraha, Firozabad - 283203
+• No. 507, 5Th Floor, Shree Ugati Corporate Park, Opp Pratik Mall, Near HDFC Bank, Kudasan,
+Gandhinagar - 382421
+• Shyam Sadan, First Floor, Plot No. 120, Sector 1 / A, Gandhidham - 370201
+• House No. GTK / 006 / D / 20(3) (Near Janata Bhawan), D. P. H. Road, Gangtok, Sikkim - 737101
+• C/o. Sri Vishwanath Kunj, Ground Floor, Tilha Mahavir Asthan, Gaya - 823001
+• Platinum Mall, Office No. 307, Third Floor, Jawahar Road, Ghatkopar East, Mumbai - 400077
+• 1st Floor, C - 10, RDC Rajnagar, Opp Kacheri, Gate No. 2, Ghaziabad - 201002
+• Office No. 103, 1st Floor, Unitech City Centre, M.G. Road, Panaji Goa, Goa - 403001
+• First Floor, Prem Praksh Tower B / H, B. N. Chambers Ankleshwar, Mahadev Road, Godhra, Gujarat
+- 389001
+• A / 177, Kailash Complex, Opp. Khedut Decor Gondal, Gujarat, 360311
+• Shop No. 5 & 6, Third Floor, Cross Road, The mall, A D Tiraha, Bank Road, Gorakhpur -273001
+• Pal Complex, First Floor, Opp. City Bus Stop, Super Market, Gulbarga, Karnataka - 585101
+• Door No. 31 - 13 - 1158, First Floor, 13 / 1, Arundelpet, Ward No. 6, Guntur - 522002
+• Unit No. - 115, First Floor Vipul Agora Building, Sector - 28, Near Sahara Mall, Mehrauli, Gurgaon
+Road, Chakkarpur, Gurgaon - 122001
+• Piyali Phukan Road, K. C. Path, House No. 1, Rehabari, Guwahati - 781008
+• G - 6, Global Apartment, Kailash Vihar Colony, Opp. Income Tax Office, City Centre, Gwalior,
+Madhya Pradesh - 474002
+• Mouza - Basudevpur, J. L. No. 126, Haldia Municipality, Ward No. 10, Durgachak, Haldia - 721602
+• Durga City Centre, Nainital Road, Haldwani, Uttarakhand - 263139
+• F - 3, Hotel Shaurya, New Model Colony, Haridwar, Uttarkhand - 249408
+• PANKAJA', Second Floor, Near Hotel Palika, Race Course Road, Hassan - 573201
+Page 48 of 54
+• Municipal Market, Annanda Chowk, Hazaribag, Jharkhand - 825301
+• Unit No. 326, Third Floor, One World - 1, Block - A, Himmatnagar - 383001
+• No - 12, Opp. HDFC Bank, Red Square Market, Hisar, Haryana - 125001
+• Near Archies Gallery, Shimla Pahari Chowk, Hoshiarpur, Punjab - 146001
+• Survey No. 25 / 204, Attibele Road, HCF Post, Mathigiri, Above Time Kids School, Oppsite To Kuttys
+Frozen Foods, Hosur - 635110
+• No. 204 - 205, First Floor, B - Block, Kundagol Complex, Opp. Court, Club Road, Hubli, Karnataka-
+580029
+• 101, Shalimar Corporate Centre, 8 - B, South Tukogunj, Opp.Greenpark, Indore, MadhyaPradesh -
+452001
+• 8, Ground Floor, Datt Towers, Behind Commercial Automobiles, Napier Town, Jabalpur, Madhya
+Pradesh - 482001
+• R-7, Yudhisthir Marg C - Scheme, Behind Ashok Nagar Police Station, Jaipur, Rajasthan - 302001
+• 144, Vijay Nagar, Near Capital Small Finance Bank, Football Chowk, Jalandhar City, Punjab -144001
+• Rustomji Infotech Services 70, Navipeth, Opp. Old Bus Stand, Jalgaon, Maharashtra - 425001
+• Shop No. 6, Ground Floor, Anand Plaza Complex, Bharat Nagar, Shivaji Putla Road, Jalna,
+Maharashtra - 431203
+• Babu Para, Beside Meenaar Apartment ,Ward No. VIII, Kotwali Police Station, Jalpaiguri, West
+Bengal - 735101
+• JRDS Heights, Sector 14, Nanak Nagar, Near Peaks Auto Showroom, Jammu Jammu & Kashmir -
+180004
+• 207, Manek Centre, P N Marg, Jamnagar, Gujarat - 361001
+• Tee Kay Corporate Towers, 3rd Floor, S B Shop Area, Main Road, Bistupur, Jamshedpur-831001
+• Office Number 112, First Floor, Mahatta Tower, B Block Community Centre, Janakpuri, New Delhi
+-110058
+• 248, Fort Road Near Amber Hotel, Jaunpur Uttarpradesh - 222001
+• No. 372 / 18D, First Floor, Above IDBI Bank, Beside V - Mart, Near RAKSHAN, Gwalior Road, Jhansi
+- 284001
+• 1/5, Nirmal Tower, 1st Chopasani Road, Jodhpur, Rajasthan - 342003
+• SINGH BUILDING, GROUND FLOOR, C/O-PRABHDEEP SINGH, PUNJABI GALI, OPP V-MART, GAR ALI,
+PO & PS-JORHAT, JORHAT-785001
+• "Aastha Plus", 202 - A, Second Floor, Sardarbag Road, Nr. Alkapuri, Opp. Zansi Rani Statue,
+Junagadh, Gujarat - 362001
+• D No 3/2151/2152, Shop No 4, Near Food Nation, Raja Reddy Street, Kadapa – 516001, Andhra
+Pradesh
+• D. No. 25 - 4 - 29, First Floor, Kommireddy vari street, Beside Warf Road, Opp swathi medicals,
+Kakinada - 533001
+• Office No. 413, 414, 415, Fourth Floor, Seasons Business Centre, Opp. KDMC (Kalyan Dombivli
+Municipal Corporation), Shivaji Chowk, Kalyan (W) – 421301
+• A – 1 / 50, Block A, Kalyani - Nadia Dt, PIN - 741235
+• Collage Road, Kangra, Dist. Kangra - 176001
+• Room No. PP. 14 / 435, Casa Marina Shopping Centre, Talap, Kannur, Kerala - 670004
+• First Floor 106 - 108 City Centre, Phase II, 63/ 2, The Mall, Kanpur, Uttarpradesh - 208001
+• H. No. 7 - 1 - 257, Upstairs S B H mangammathota, Karimnagar, Telangana - 505001
+• No. 29, Avtar Colony, Behind vishal mega mart, Karnal - 132001
+• 126 G, V. P. Towers, Kovai Road, Basement of Axis BankKarur, Tamilnadu - 639002
+• KMC XXV / 88, I, Second Floor, Stylo Complex, Above Canara Bank, Bank Road, Kasaragod - 671121
+• Dev Bazar, Bazpur Road, Kashipur - 244713
+• C/o. Rice Education and IT Centre, Near Wireless Gali, Amla Tola, Katihar - 854105
+• First Floor, Gurunanak dharmakanta, Jabalpur Road, Bargawan, Katni, Madhya Pradesh - 483501
+Page 49 of 54
+• Shop No. 11 - 2 - 31 / 3, First Floor, Philips Complex, Balajinagar, Wyra Road, Near Baburao Petrol
+Bunk, Khammam, Telangana - 507001
+• "Silver Palace" OT Road, Inda - Kharagpur, G - P - Barakola, P.S. Kharagpur Local, Dist West
+Midnapore - 721305
+• 2 B, 3rd Floor, Ayodhya Towers, Station Road, Kolhapur, Maharashtra - 416001
+• 2/1, Russell Street, 2nd Floor, Kankaria Centre, Kolkata - 700071
+• 3 / 1, R. N. Mukherjee Road, Third Floor, Office space - 3 C, “Shreeram Chambers”, Kolkata - 700001
+• Uthram Chanmbers (Ground Floor), Thamarakulam, Kollam - 691006
+• Kh. No. 183 / 2 G, Opposite Hotel Blue Diamond, T. P. Nagar, Korba - 495677
+• B-33, Kalyan Bhawan, Near Triangle Park, Vallabh Nagar, Kota, Rajasthan - 324007
+• 1307 B, Puthenparambil Building, KSACS Road, Opp. ESIC Office, Behind Malayala Manorama
+Muttambalam - P O, Kottayam - 686501
+• R. N. Tagore Road, In front of Kotawali, P. S. Krishnanagar Nadia - 741101
+• No. 15 - 31 - 2 M - 1 / 4, First Floor, 14 - A, MIG, KPHB Colony, Kukatpally, Hyderabad - 500072
+• No. 28 / 8, First Floor, Balakrishna Colony, Pachaiappa Street, Near VPV Lodge, Kumbakonam –
+612001
+• Shop No. 26 and 27, Door No. 39 / 265 A and 39 / 265 B, Second Floor, Skanda Shopping Mall, Old
+Chad Talkies, Vaddageri, 39th Ward, Kurnool - 518001
+• Office No. 107, First Floor, Vaisali Arcade Building, Plot No 11, 6 Park Road, Lucknow - 226001
+• U/ GF, Prince Market, Green Field, Near Traffic Lights, Sarabha Nagar Pulli, Pakhowal Road,
+Ludhiana, Punjab - 141002
+• Shop No. 3, 2nd Floor Surya Towers, No. 272/273, Goodshed Street, Madurai - 625001
+• H. No. 14-3-178/1B/A/1, Near Hanuman Temple, Balaji Nagar, Boothpur Road, Mahabubnagar -
+509001, Telangana State.
+• Kadakkadan Complex, Opp central school, Malappuram - 676505
+• Daxhinapan Abasan, Opp Lane of Hotel Kalinga, SM Pally, Malda, West bengal - 732101
+• "3 - 407 / 40 - 4, Basement Floor, Royal Enfield Show Room Building, Bellampally Road,
+• Mancherial, Telangana State – 504302"
+• No. 328 / 12, Ram Nagar, First Floor, Above Ram Traders, Mandi - 175001
+• Opp. Bank of Bikaner and Jaipur, Harchand Mill Road, Motia Khan, Mandi Gobindgarh, Punjab -
+147301
+• 14-6-674/15(1), SHOP NO -UG11-2, MAXIMUS COMPLEX, LIGHT HOUSE HILL ROAD, MANGALORE
+– 575001, KARNATAKA
+• Shop No. A2, Basement Floor, Academy Tower, Opposite Corporation Bank, Manipal, Karnataka -
+576104
+• Office No. 503, Buildmore Business Park,New Canca By pass Road, Ximer, Mapusa Goa - 403507
+• F4 - Classic Heritage, Near Axis Bank, Opp. BPS Club, Pajifond, Margao, Goa - 403601
+• 159 / 160 Vikas Bazar Mathura Uttarpradesh - 281001
+• 108, First Floor, Shivam Plaza, Opp. Eves Cinema, Hapur Road, Meerut, Uttarpradesh - 250002
+• First Floor, Subhadra Complex Urban Bank Road, Mehsana, Gujarat, 384002
+• Ground Floor, Canara Bank Building , Dhundhi Katra, Mirzapur Uttarpradesh - 231001
+• Street No 8-9 Center, Aarya Samaj Road, Near Ice Factory. Moga -142 001
+• H 21 - 22, First Floor, Ram Ganga Vihar Shopping Complex, Opposite Sale Tax Office, Moradabad -
+244001
+• 30, Rajabahadur Compound, Opp. Indian Bank, Mumbai Samachar Marg, Fort, Mumbai,
+Maharashtra – 400023
+• No. 235, Patel Nagar, Near Ramlila Ground, New Mandi, Muzaffarnagar - 251001
+• Brahman Toli, Durgasthan Gola Road, Muzaffarpur, Bihar - 842001
+• No. 1, First Floor, CH. 26 7th Main, 5th Cross (Above Trishakthi Medicals), Saraswati Puram,
+Mysore, Karnataka, - 570009
+Page 50 of 54
+• F 142, First Floor, Ghantakarna Complex Gunj Bazar, Nadiad, Gujarat - 387001
+• Amulapatty, V. B. Road, House No. 315, Nagaon, Assam - 782003
+• Fourth Floor, Kalluveettil Shyras Center, 47, Court Road, Nagercoil, Tamilnadu - 629001
+• 145, Lendra, New Ramdaspeth, Nagpur, Maharashtra - 440010
+• No. - 6 - 4 - 80, First Floor, Above Allahabad Bank, Opp. Police Auditorium, V. T. Road, Nalgonda -
+508001
+• 156A / 1, First Floor, Lakshmi Vilas Building, Opp. To District Registrar Office, Trichy Road,
+Namakkal, Tamilnadu - 637001
+• Shop No. 8, 9, Cellar "Raj Mohammed Complex", Main Road, Shri Nagar, Nanded - 431605
+• First Floor, "Shraddha Niketan", Tilak Wadi, Opp Hotel City Pride, Sharanpur Road, Nasik - 422002
+• 214 - 215, Second Floor, Shivani Park, Opp. Shankheswar Complex, Kaliawadi, Navsari, Gujarat –
+396445
+• Shop No. 2, 1st Floor, NSR Complex, James Garden, Near Flower Market, Nellore - 524001
+• CAMS Service Center, 401 to 404, 4th Floor, Kanchan Junga Building, Barakhamba Road, New Delhi
+- 110001
+• 5 - 6 - 208, Saraswathi nagar, Opposite Dr.Bharathi rani nursing home, Nizamabad, Andhra Pradesh
+- 503001
+• Commercial Shop No. GF 10 & GF 38, Ground Floor, Ansal Fortune Arcade, Plot No. K - 82, Sector -
+18, Noida – 201301
+• Shop. No. 1128, First Floor, 3rd Line, Sri Bapuji Market Complex, Ongole - 523001
+• Door No. 18 / 507 (3), Anugraha, Garden Street, College Road, Palakkad, Kerala - 678001
+• Gopal Trade center, Shop No. 13 - 14, Third Floor, Nr. BK Mercantile bank, Opp. Old Gunj, Palanpur
+- 385001
+• SCO 83 - 84, First Floor, Devi Lal Shopping Complex, Opp RBL Bank, G.T.Road , Panipat, Haryana -
+132103
+• 13 - A, First Floor, Gurjeet Market, Dhangu Road, Pathankot, Punjab - 145001
+• No. 35 New Lal Bagh, Opp. Polo Ground, Patiala - 147001
+• 301B, Third Floor, Patna One Plaza, Near Dak bunglow Chowk, Patna 800001
+• Shop No. 2, Model Town, Near Joshi Driving School, Phagwara - 144401.
+• Number G - 8, Ground Floor, Plot No. C - 9, Pearls Best Height - II, Netaji Subhash Place, Pitampura,
+New Delhi – 110034
+• S - 8, 100, Jawaharlal Nehru Street (New Complex, Opp. Indian Coffee House), Pondicherry - 605001
+• C-101/2, 1st floor, near cottage industries, middle point (phoenix Bay), Port Blair, South Andaman,
+Pin: 744101.
+• Opp Dutta Traders, Near Durga Mandir, Balipur Pratapgarh, Uttarpradesh - 230001
+• Vartak Pride, 1st Floor, Survey No. 46, City Survey, No. 1477, Hingne budruk, D.P.Road, Behind
+Dinanath mangeshkar Hospital, Karvenagar, Pune - 411052
+• C/C. Muneshwar Prasad, Sibaji Colony, SBI Main Branch Road, Near - Mobile Tower, Purnea -
+854301
+• "Anand Plaza, Shop No. 06, Second Floor, Sarbananda Sarkar Street
+• Munsifdanga, Purulia, West Bengal - 723101"
+• 17, Anand Nagar Complex, Opposite Moti Lal Nehru Stadium, SAI Hostel Jail Road, Rae Bareilly,
+Uttar pradesh - 229001
+• Rabindra Pally, Beside of Gitanjali Cenema Hall, P O & P S Raiganj, Dist North Dijajpur, Raiganj, West
+Bengal - 733134
+• "First Floor, MIG - 25, Blessed Villa, Lochan Nagar, Raigarh, Chhattisgarh - 496001"
+• HIG, C - 23 Sector - 1, Devendra Nagar, Raipur, Chattisgarh - 492004
+• Door No. 6 - 2 - 12, First Floor, Rajeswari Nilayam, Near Vamsikrishna Hospital, Nyapathi Vari Street,
+T. Nagar, Rajahmundry, Andhra Pradesh - 533101
+• No. 59 A / 1, Railway Feeder Road, (Near Railway Station), Rajapalayam, Tamilnadu - 626117
+Page 51 of 54
+• Office 207 - 210, Everest Building, Harihar Chowk, Opp Shastri Maidan, Limda Chowk, Rajkot,
+Gujarat - 360001
+• 4, HB Road No. 206, Second Floor, Shri Lok Complex, H B Road, Near Firayalal, Ranchi, Jharkhand -
+834001
+• Dafria & Co., No. 18, Ram Bagh, Near Scholar's School, Ratlam, Madhya Pradesh - 457001
+• Orchid Tower, Ground Floor, Gala No. 06, S. V. No. 301 / Paiki, 1 / 2, Nachane Municiple Aat, Arogya
+Mandir, Nachane Link Road, At, Post, Tal. Ratnagiri Dist. Ratnagiri - 415612
+• SCO 06, Ground Floor, MR Complex, Near Sonipat Stand Delhi Road, Rohtak - 124001
+• 22, Civil Lines, Ground Floor, Hotel Krish Residency, Roorkee, Uttara khand - 247667
+• Second Floor, J B S Market Complex, Udit Nagar, Rourkela - 769012
+• Opp. Somani Automobile, S Bhagwanganj Sagar, Madhya Pradesh - 470002
+• First Floor, Krishna Complex, Opp. Hathi Gate Court Road, Saharanpur, Uttarpradesh - 247001
+• No. 2, First Floor, Vivekananda Street, New Fairlands, Salem, Tamilnadu - 636016
+• C/o. Raj Tibrewal & Associates, Opp. Town High School, Sansarak Sambalpur, Orissa - 768001
+• Jiveshwar Krupa Bldg. Shop. No. 2, Ground Floor, Tilak Chowk Harbhat Road, Sangli, Maharashtra
+- 416416
+• 117 / A / 3 / 22, Shukrawar Peth, Sargam Apartment, Satara, Maharashtra - 415002
+• First Floor, Shri Ram Market, Beside Hotel Pankaj, Satna - 485001
+• 208, II Floor Jade Arcade Paradise Circle, Hyderabad, Telangana 500 003.
+• 47 / 5 / 1, Raja Rammohan Roy Sarani, PO. Mallickpara, Dist. Hoogly, Seerampur, West Bengal -
+712203
+• Bijlipura, Near Old Distt Hospital, Jail Road ,Shahjahanpur Uttarpradesh - 242001
+• Third Floor, R P G Complex, Keating Road, Shillong, Meghalaya - 793001
+• First Floor, Opp. Panchayat Bhawan Main gate, Bus stand, Shimla, Himachal Pradesh - 171001
+• No. 65, First Floor, Kishnappa Compound, 1st Cross, Hosmane Extn, Shimoga, Karnataka - 577201
+• C/o. Gopal Sharma & Company, Third Floor Sukhshine Complex, Near Geetanjali Book depot,
+Tapadia Bagichi, Sikar, Rajasthan - 332001
+• House No. 18 B, First Floor, C/O LT, Satyabrata Purkayastha, Opp To Shiv Mandir, Landmark - Sanjay
+Karate Building, Near Iskon Mandir, Ambicabathy, Silchar - 788004
+• No.78, Haren Mukherjee Road, First Floor, Beside SBI Hakimpara, Siliguri - 734001
+• Ground Floor of CA Deepak Gupta, M G Complex, Bhawna Marg, Beside Over Bridge, Bansal
+Cinerma Market, Sirsa Haryana - 125055
+• Arya Nagar, Near Arya Kanya School, Sitapur, Uttarpradesh - 261001
+• First Floor, Above Sharma General Store, Near Sanki Rest house, The Mall, Solan, Himachal Pradesh
+- 173212
+• Flat No 109, First Floor, A Wing, Kalyani Tower126 Siddheshwar Peth, Near Pangal High School,
+Solapur, Maharashtra - 413001
+• S C O - 12, First Floor, Pawan Plaza, Atlas Road, Subhas Chowk, Sonepat - 131001
+• 18 L Block, Sri Ganganagar, Rajasthan - 335001
+• Door No 10-5-65, 1st Floor, Dhanwanthri Complex, Kalinga Road, Opp Chandramouli Departmental
+Store, Near Seven roads Junction, Srikakulam – 532 001
+• Near New Era Public School, Rajbagh, Srinagar, Jammu & Kashmir - 190 008
+• 967, Civil Lines, Near Pant Stadium, Sultanpur, Uttarpradesh - 228001
+• Shop No. G-5, International Commerce Center, Nr. Kadiwala School, Majura Gate, Ring Road, Surat
+- 395002
+• Shop No. 12, M. D. Residency, Swastik Cross Road, Surendranagar - 363001
+• Police Line, Ramakrishnapally, Near Suri Bus Stand, Suri West Bengal - 731101
+• Third Floor, B R Complex, No. 66, Door No. 11 A, Ramakrishna Iyer Street, Opp. National Cinema
+Theatre, West Tambaram, Chennai - 600045
+• Holding No. - 58, First Floor, Padumbasan Ward No. 10, Tamluk Maniktala More, Beside HDFC Bank,
+Page 52 of 54
+Tamluk, Purba Medinipur, Tamluk, West Bengal - 721636
+• Kanak Tower - First Floor Opp. IDBI Bank / ICICI Bank C.K. Das Road, Tezpur Sonitpur, Assam -
+784001
+• Dev Corpora, A Wing, 3rd floor, Office no.301, Cadbury Junction, Eastern Express way, Thane
+(West) - 400 601
+• Bangiya Vidyalaya Road, Near Old post office, Durgabari, Tinsukia, Assam - 786.125
+• No. F4, Magnam Suraksaa Apatments, Tiruvananthapuram Road, Tirunelveli - 627002
+• Shop No. 6, Door No. 19 - 10 - 8, (Opp to Passport Office), AIR Bypass Road, Tirupati, AndhraPradesh
+- 517501
+• 1 (1), Binny Compound, Second Street, Kumaran Road, Tirupur, Tamilnadu - 641601
+• First Floor, Room No. 61 (63), International shopping Mall, Opp. ST Thomas Evangelical Church,
+Above Thomsan Bakery, Manjady, Thiruvalla - 689105
+• Room No. 26 & 27, Dee Pee Plaza, Kokkalai, Trichur, Kerala - 680001
+• No 8, First Floor, 8th Cross West Extn, Thillainagar, Trichy, Tamilnadu - 620018
+• TC NO: 22/902, 1st - Floor "BLOSSOM" BLDG, OPP.NSS KARAYOGAM, SASTHAMANGALAM VILLAGE
+P.O, Thiruvananthapuram Trivandrum-695010. Kerala
+• PID. No. 88268, Second Floor, Second Cross, M. G. Road, Tumkur, Karnataka - 572101
+• 4 B / A 16, Mangal Mall Complex, Ground Floor, Mani Nagar, Tuticorin, Tamilnadu - 628003
+• No.32, Ahinsapuri, Fatehpura Circle, Udaipur - 313001
+• Guru nanak institute, NH - 1 A, Udhampur, J & K - 182101
+• Adjacent to our existing Office at 109, First Floor, Siddhi Vinayak Trade Center, Shahid Park, Ujjain
+- 456010
+• 103, Aries Complex, Bpc Road, Off R.C. Dutt Road, Alkapuri, Vadodara, Gujarat - 390007
+• 3rd floor, Gita Nivas, Opp Head Post Office, Halar Cross Lane Valsad, Gujarat - 396001
+• 208, Second Floor, HEENA ARCADE, Opp. Tirupati Tower, Near G.I.D.C. Char Rasta, Vapi, Gujarat -
+396195
+• Office No. 1, Second Floor, Bhawani Market, Building No. D - 58 / 2 - A1, Rathyatra Beside Kuber
+Complex, Varanasi, Uttarpradesh - 221010
+• No. DU 8, Upper Ground Floor, Behind Techoclean Clinic, Suvidha Complex Near ICICI Bank, Vasco,
+Goa - 403802
+• BSEL Tech Park, B - 505, Plot No. 39 / 5 & 39 / 5 A, Sector 30A, Opp.Vashi Railway Stationm Vashi,
+Navi Mumbai - 400705
+• Door No. 86, BA Complex, 1st Floor Shop No 3, Anna Salai (Officer Line), Tollgate, Vellore - 632 001
+• 40 - 1 - 68, Rao & Ratnam Complex, Near Chennupati Petrol Pump, M.G. Road, Labbipet,
+Vijayawada, Andhra Pradesh - 520010
+• Door. No. 4 - 8 - 73, Beside Sub Post Office, Kothagraharam, Vizianagaram, Andhra Pradesh -
+535001
+• Flat No. GF2, D. No. 47 - 3 - 2 / 2, Vigneswara Plaza, 5th Lane, Dwarakanagar, Visakhapatnam,
+Andhra Pradesh - 530016
+• H. No. 2 - 4 - 641, F - 7, First Floor, A. B. K Mall, Old Bus Depot Road, Ramnagar, Hanamkonda,
+Warangal, Telangana - 506001
+• Opp. Raman Cycle Industries, Krishna Nagar, Wardha, Maharashtra - 442001
+• Second Floor, AFFAS Building, Kalpetta, Wayanad - 673121
+• 124 - B / R, Model Town Yamunanagar, Yamuna Nagar, Haryana - 135001
+• Pushpam, Tilakwadi, Opp. Dr. Shrotri Hospital, Yavatmal, Maharashtra, 445001
+All the authorised MFUI POS designated by MFUI from time to time shall be the Official Points of
+Acceptance of Transactions. In addition to the same, Investors can also submit the transactions
+electronically on the online transaction portal of MFUI (www.mfuonline.com). To know more about MFU
+and the list of authorised MFUI POS, please visit the MFUI website (www.mfuindia.com).
+Page 53 of 54
+Website / Electronic modes – Angel One AMC shall accept transactions through its website
+(www.angelonemf.com). Transactions shall also be accepted through other electronic means including
+through secured internet sites operated by CAMS with specified channel partners (i.e. distributors) with
+whom AMC has entered into specific arrangements. The servers of Angel One AMC and CAMS, where
+such transactions shall be sent shall be the official point of acceptance for all such online / electronic
+transaction facilities offered by the AMC.
+NSE MFSS / BSE STAR / ICEX - Eligible Brokers/Clearing Members/Depository Participants / Distributors
+will be considered as the Official Point of Acceptance for the transactions through NSE MFSS, BSE STAR
+and ICEX platforms.
+MFCentral as Official Point of Acceptance:
+For enhancing Investors’ experience in Mutual Fund transactions / service requests, the Qualified RTAs
+(QRTA’s), Kfin Technologies Private Limited (Kfintech) and Computer Age Management Services Limited
+(CAMS) have jointly developed MFCentral - A digital platform for Mutual Fund Investors. MFCentral is
+created with an intent to be a one stop portal / mobile app for all Mutual fund investments and service-
+related needs that significantly reduces the need for submission of physical documents by enabling
+various digital / phygital services to Mutual fund Investors across fund houses subject to applicable Terms
+& Conditions of the Platform. MFCentral may be accessed using https://mfcentral.com/
+Any registered user of MFCentral, requiring submission of physical document as per the requirements of
+MFCentral, may do so at any of the designated Investor Service Centres or collection centres of Kfintech
+or CAMS.
+**************************************************************************************
+Page 54 of 54
+
