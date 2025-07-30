@@ -1,8 +1,0 @@
-2025-07-30 16:06:46 [NOTICE]: Page fetched successfully
-2025-07-30 16:06:46 [INFO]: Performing _action_: website on .portlet
-2025-07-30 16:06:51 [INFO]: Redirecting to webpage https://bankofindia.co.in/interest-rate/saving-bank-deposit-rate
-2025-07-30 16:06:52 [INFO]: Performing _action_: scrape on .th-boi
-2025-07-30 16:06:52 [INFO]: Scraped data: dict_keys(['Saving_Deposit'])
-2025-07-30 16:06:52 [INFO]: Performing _action_: website on .portlet
-2025-07-30 16:06:57 [INFO]: Redirecting to webpage https://bankofindia.co.in/interest-rate/rupee-term-deposit-rate
-2025-07-30 16:06:57 [INFO]: Performing _action_: scrape on #portlet_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_jtdf .boi-table-struture .card-body

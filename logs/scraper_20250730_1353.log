@@ -1,8 +1,0 @@
-2025-07-30 13:53:56 [NOTICE]: Page fetched successfully
-2025-07-30 13:53:56 [INFO]: Performing _action_: scrape on .main-content
-2025-07-30 13:53:57 [INFO]: Scraped data: dict_keys(['Savings_Term', 'Bulk_Callable', 'Bulk_Non_Callable', 'Fncr_Deposits'])
-2025-07-30 13:53:57 [INFO]: Performing _action_: screenshot on .main-content
-2025-07-30 13:53:57 [INFO]: Saved screenshot: screenshot.png
-2025-07-30 13:53:59 [NOTICE]: Page fetched successfully
-2025-07-30 13:53:59 [INFO]: Performing _action_: scrape on #content
-2025-07-30 13:53:59 [INFO]: Scraped data: dict_keys(['Saving_Term_Deposit', 'Domestic_Term_Deposit'])

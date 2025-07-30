@@ -1,6 +1,0 @@
-2025-07-30 13:54:38 [NOTICE]: Page fetched successfully
-2025-07-30 13:54:38 [INFO]: Performing _action_: scrape on #content
-2025-07-30 13:54:39 [INFO]: Scraped data: dict_keys(['Saving_Term_Deposit', 'Domestic_Term_Deposit'])
-2025-07-30 13:54:44 [NOTICE]: Page fetched successfully
-2025-07-30 13:54:44 [INFO]: Performing _action_: scrape on .randomContent
-2025-07-30 13:54:45 [INFO]: Scraped data: dict_keys(['Retail_Term', 'Green_Retail_Term', 'Bulk_Term'])

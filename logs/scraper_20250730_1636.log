@@ -1,4 +1,0 @@
-2025-07-30 16:37:51 [NOTICE]: Page fetched successfully
-2025-07-30 16:37:51 [INFO]: Performing _action_: scrape on .items
-2025-07-30 16:38:11 [WARNING]: Element not found, skipping: .items
-2025-07-30 16:38:11 [INFO]: Performing _action_: website on #content
