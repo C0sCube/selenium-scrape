@@ -1,0 +1,146 @@
+{
+  metadata: { program: "main.py", timestamp: null, config: "params.json5" },
+  records: [
+    {
+      bank_name: "Bank of India",
+      base_url: "https://bankofindia.co.in/interest-rate",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:20",
+          scrape_data: {
+            Saving_Deposit: "REVISED RATE OF INTEREST (% PER ANNUM)\nW.E.F. 07.07.2025",
+            Rupee_Term_Deposit: "FOR DEPOSIT RS.3 CR AND ABOVE BUT LESS THAN RS.10 CR\n##REVISED W.E.F. 16/06/2025",
+            MCLR: "MCLR w.e.f. 01.07.2025",
+          },
+        },
+      },
+    },
+    {
+      bank_name: "Bank of Maharashtra",
+      base_url: "https://bankofmaharashtra.in/domestic-term-deposits",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:20",
+          scrape_data: {
+            Term_Deposit: "Interest Rate on Domestic Term Deposits/Bulk Term Deposit/ NRO Term Deposits *\n(% per annum w.e.f. 27.06.2025)",
+            NRE_Deposit: "For Amount less than Rs.3.00 Crore\n(% per annum w.e.f. 27.06.2025)",
+          },
+        },
+      },
+    },
+    {
+      bank_name: "Canara Bank",
+      base_url: "https://canarabank.com/pages/deposit-interest-rates",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:20",
+          scrape_data: {
+            Savings_Term: "DOMESTIC/NRO/NRE SAVINGS BANK DEPOSITS - W.E.F. 01.07.2025",
+            Bulk_Callable: "The revised Rates of Interest for Bulk Deposits (Callable) w.e.f 10.07.2025 are as under:",
+            Bulk_Non_Callable: "The revised Rates of Interest for Bulk Deposits (Non-Callable) w.e.f 10.07.2025 are as under:",
+            Fncr_Deposits: "",
+          },
+        },
+      },
+    },
+    {
+      bank_name: "Central Bank of India",
+      base_url: "https://www.centralbankofindia.co.in/en/interest-rates-on-deposit",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:20",
+          scrape_data: {
+            Saving_Term_Deposit: "10.07.2025",
+            Domestic_Term_Deposit: "DOMESTIC TERM DEPOSIT INTEREST RATES % PER ANNUM W.E.F 10.07.2025",
+          },
+        },
+      },
+    },
+    {
+      bank_name: "Indian Bank",
+      base_url: "https://www.indianbank.in/departments/deposit-rates/",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:20",
+          scrape_data: {
+            Retail_Term: "New Retail Term Deposit Product \u201cIND SECURE \u201d  has been introduced w.e.f 08.05.2025 with investment starting from Rs.1000 to less than 3 Crore in the form of FD/MMD with callable options for a maturity tenor of 444 days.",
+            Green_Retail_Term: "Green Retail Term Deposit Product \u201cIND GREEN \u201d has been introduced w.e.f 26.03.2025 specially designed to promote sustainable development while providing guaranteed returns with investment starting from Rs.1000 to less than 3 Crore for a maturity tenor of 555 days in the form of FD/MMD with callable options.",
+            Bulk_Term: "Revision of Interest Rates for Bulk Term Deposits (Rs.3 Cr \u2013 Rs.5 Cr)  w.e.f 29.07.2025",
+          },
+        },
+      },
+    },
+    {
+      bank_name: "Indian Overseas Bank",
+      base_url: "https://www.iob.in/Domestic_Rates",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:20",
+          scrape_data: { Saving_Term_Deposit: "Last Updated on: 15/07/2025" },
+        },
+      },
+    },
+    {
+      bank_name: "Punjab and Sind Bank",
+      base_url: "https://punjabandsindbank.co.in//content/interestdom",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:21",
+          scrape_data: {
+            Saving_Deposit: "Interest Rates on Saving Bank Deposits with effect from 16 June 2025.",
+          },
+        },
+      },
+    },
+    {
+      bank_name: "Punjab National Bank",
+      base_url: "https://www.pnbindia.in/Interest-Rates-Deposit.html",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:21",
+          scrape_data: { Saving_Term_Deposit: "" },
+        },
+      },
+    },
+    {
+      bank_name: "State Bank of India",
+      base_url: "https://sbi.co.in/web/interest-rates/interest-rates/deposit-rates",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:21",
+          scrape_data: {
+            Saving_Term_Deposit: "Interest Rate (w.e.f. 15.06.2025)",
+            Domestic_Term_Deposit: "Revised Rates for Public w.e.f.15/07/2025",
+            Domestic_Term_Deposit_Non_Call: "Revised Interest Rates w.e.f. 15-July-2025",
+          },
+        },
+      },
+    },
+    {
+      bank_name: "Uco Bank",
+      base_url: "https://ucobank.com/interest-rates-on-deposit-schemes",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:21",
+          scrape_data: {
+            saving_rate: "Savings Bank Rate of Interest w.e.f 23-06-2025:-",
+            domestic_term: "Rate(s) of Interest on Domestic Term Deposits less than Rs. 3 Crores (w.e.f 23.06.2025) as under:",
+            bulk_nre: "BULK NRE TERM DEPOSITS Rs.3.00 Cr and above upto & including Rs.10 Cr w.e.f. 06.06.2025",
+          },
+        },
+      },
+    },
+    {
+      bank_name: "Union Bank of India",
+      base_url: "https://www.unionbankofindia.co.in/en/details/rate-of-interest#",
+      response: {
+        block_1: {
+          timestamp: "2025-07-30 19:21",
+          scrape_data: {
+            Deposit_Rate: "The revised rates for different maturities for Domestic/NRO Term Deposits, which will be effective from 07th July 2025 are given below:",
+          },
+        },
+      },
+    },
+  ],
+}

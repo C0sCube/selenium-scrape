@@ -251,9 +251,9 @@
           timeout: 20,
           log_message: "Scraping Term Deposit Rates",
           scrape_fields: {
-            "Retail_Term":"p:nth-child(4)",
-            "Green_Retail_Term": "p:nth-child(9) b",
-            "Bulk_Term": "p:nth-child(12) strong",
+            Retail_Term: "p:nth-child(4)",
+            Green_Retail_Term: "p:nth-child(9) b",
+            Bulk_Term: "p:nth-child(12) strong",
           },
         },
       ],
@@ -336,16 +336,16 @@
           },
         },
         {
-          action:"scrape",
-          by:"css",
-          value:"#fa-tab14",
+          action: "scrape",
+          by: "css",
+          value: "#fa-tab14",
           skip_if_not_found: true,
           timeout: 10,
           log_message: "Scraping Term Deposit Rates",
-          scrape_fields:{
-            Saving_Term_Deposit:"th+ th p"
-          }
-        }
+          scrape_fields: {
+            Saving_Term_Deposit: "th+ th p",
+          },
+        },
       ],
     ],
   },
@@ -379,8 +379,6 @@
             Saving_Term_Deposit: "th+ th",
           },
         },
-      ],
-      [
         {
           action: "website",
           by: "css",
@@ -400,8 +398,6 @@
             Domestic_Term_Deposit: "th:nth-child(3)",
           },
         },
-      ],
-      [
         {
           action: "website",
           by: "css",
@@ -440,9 +436,9 @@
           by: "css",
           value: "#mainbody",
           scrape_fields: {
-            "saving_rate":"h4+ h4",
-            "domestic_term":"h4 strong",
-            "bulk_nre":"p .sub-heading",
+            saving_rate: "h4+ h4",
+            domestic_term: "h4 strong",
+            bulk_nre: "p .sub-heading",
           },
           timeout: 10,
           log_message: "Scraping Fields",

@@ -1,6 +1,5 @@
 from selenium import webdriver
 import json5, datetime, requests
-import certifi
 
 from app.program_logger import setup_logger
 from app.action_executor import ActionExecutor
@@ -17,7 +16,7 @@ with open(r"configs\params.json5") as f:
 options = Options()
 driver = webdriver.Chrome(options=options)
 
-BANK_CODES = ["PSB_1"] #"PSB_1","PSB_2","PSB_3","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"
+BANK_CODES = ["PSB_2","PSB_3","PSB_4","PSB_5","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"] #"PSB_1","PSB_2","PSB_3","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"
 
 final_dict = {
     "metadata":{
@@ -39,30 +38,30 @@ for code in BANK_CODES:
                 "response": {}
             }
     
-    try:
-        req = requests.get(website, timeout=20, verify=certifi.where())
-        if req.status_code == '200':
-            logger.info(f"Scraping From Bank {WEBSITE["bank_name"]}")
-            executor = ActionExecutor(driver, logger)
-            executor.attach_headers(driver,WEBSITE["headers"])
-            driver.get(website)
-            logger.notice("Page fetched successfully")
-            
-            for idx,block in enumerate(WEBSITE["blocks"]):
-                print(f"Running Block: {idx}")
-                data,timestamp = executor.execute_blocks(block)
-                scrape_data["response"].update(
-                    {f"block_{idx+1}":{
-                    "timestamp":timestamp,
-                    "scrape_data":data
-                }})
+    # try:
+        # req = requests.get(website, timeout=20)
+        # if req.status_code == '200':
+    logger.info(f"Scraping From Bank {WEBSITE["bank_name"]}")
+    executor = ActionExecutor(driver, logger)
+    executor.attach_headers(driver,WEBSITE["headers"])
+    driver.get(website)
+    logger.notice("Page fetched successfully")
+    
+    for idx,block in enumerate(WEBSITE["blocks"]):
+        print(f"Running Block: {idx}")
+        data,timestamp = executor.execute_blocks(block)
+        scrape_data["response"].update(
+            {f"block_{idx+1}":{
+            "timestamp":timestamp,
+            "scrape_data":data
+        }})
             
 
 
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Request critical error: {e}")
-        logger.error(f"Skipping Bank {WEBSITE["bank_name"]}")
-        scrape_data["response"] = {"error":e}
+    # except requests.exceptions.RequestException as e:
+    #     logger.error(f"Request critical error: {e}")
+    #     logger.error(f"Skipping Bank {WEBSITE["bank_name"]}")
+    #     scrape_data["response"] = {"error":e}
     
     final_dict["records"].append(scrape_data)
     
