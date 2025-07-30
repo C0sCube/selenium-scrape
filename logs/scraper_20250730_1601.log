@@ -1,0 +1,18 @@
+2025-07-30 16:01:49 [NOTICE]: Page fetched successfully
+2025-07-30 16:01:49 [INFO]: Performing _action_: website on .portlet
+2025-07-30 16:01:54 [INFO]: Redirecting to webpage https://bankofindia.co.in/interest-rate/saving-bank-deposit-rate
+2025-07-30 16:01:55 [INFO]: Performing _action_: scrape on .th-boi
+2025-07-30 16:01:55 [INFO]: Scraped data: dict_keys(['Saving_Deposit'])
+2025-07-30 16:01:55 [INFO]: Performing _action_: website on .portlet
+2025-07-30 16:02:00 [INFO]: Redirecting to webpage https://bankofindia.co.in/interest-rate/rupee-term-deposit-rate
+2025-07-30 16:02:00 [INFO]: Performing _action_: scrape on #portlet_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_jtdf .boi-table-struture .card-body
+2025-07-30 16:02:00 [INFO]: Scraped data: dict_keys(['Rupee_Term_Deposit'])
+2025-07-30 16:02:00 [INFO]: Performing _action_: website on .portlet
+2025-07-30 16:02:05 [INFO]: Redirecting to webpage  https://bankofindia.co.in/interest-rate/interest-rate-mclr/2025
+2025-07-30 16:02:06 [INFO]: Performing _action_: scrape on .accordion-div:nth-child(1) .accordion
+2025-07-30 16:02:06 [INFO]: Scraped data: dict_keys(['MCLR'])
+2025-07-30 16:02:06 [INFO]: Returning to Base Window.
+2025-07-30 16:02:57 [NOTICE]: Page fetched successfully
+2025-07-30 16:02:57 [INFO]: Performing _action_: scrape on .items
+2025-07-30 16:03:56 [WARNING]: Element not found, skipping: .items
+2025-07-30 16:03:56 [INFO]: Performing _action_: website on #content

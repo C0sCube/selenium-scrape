@@ -1,0 +1,2 @@
+2025-07-30 17:06:13 [ERROR]: Request critical error: HTTPSConnectionPool(host='www.bankofbaroda.in', port=443): Max retries exceeded with url: /interest-rate-and-service-charges/deposits-interest-rates (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1028)')))
+2025-07-30 17:06:13 [ERROR]: Skipping Bank Bank of Baroda

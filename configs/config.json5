@@ -1,0 +1,476 @@
+{
+  BOOKY: {
+    base_url: "https://books.toscrape.com",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      "Accept-Language": "en-US,en;q=0.9",
+      // Referer: "https://example.com",
+      // "X-Requested-With": "XMLHttpRequest",
+      // Authorization: "Bearer YOUR_TOKEN_HERE",
+    },
+    blocks: [
+      [
+        {
+          by: "xpath",
+          value: "//a[contains(text(), 'Travel')]",
+          wait: 1,
+          wait_until: "clickable",
+          timeout: 10,
+          action: "click",
+          new_window: false,
+          return_to_base: false,
+          log_message: "Clicked on Travel section",
+        },
+        {
+          by: "css",
+          value: "section ol.row li",
+          wait_until: "visible",
+          timeout: 10,
+          action: "scrape",
+          scrape_fields: {
+            title: "h3 a",
+            price: "p.price_color",
+          },
+          multiple: true,
+          log_message: "Scraped book titles and prices",
+        },
+      ],
+    ],
+  },
+  UCO: {
+    bank_name: "UCO Bank",
+    base_url: "https://ucobank.com/interest-rates-on-deposit-schemes",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: null,
+          by: "id",
+          value: "mainbody",
+          wait_until: "visible",
+          timeout: 10,
+          log_message: "Page Loaded",
+        },
+        {
+          action: "scrape",
+          by: "class",
+          value: "table-responsive",
+          scrape_fields: {
+            row: "tr",
+            cell: "td",
+          },
+          multiple: true,
+          timeout: 10,
+          log_message: "Extracted all rows",
+        },
+      ],
+    ],
+  },
+  BOM: {
+    bank_name: "Bank Of Maharashtra",
+    base_url: "https://bankofmaharashtra.in/domestic-term-deposits",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "scrape",
+          by: "css",
+          value: ".inner_post_content",
+          scrape_fields: {
+            Term_Deposit: "h4 + h4",
+          },
+          timeout: 5,
+          log_message: "Scraping Term Deposit Data",
+        },
+        {
+          action: "website",
+          by: "css",
+          value: ".inner_post_content",
+          url: "https://bankofmaharashtra.in/nre-deposits",
+          wait: 5,
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: ".inner_post_content",
+          scrape_fields: {
+            NRE_Deposit: "th + th",
+          },
+          timeout: 5,
+          log_message: "Scraping NRE Data",
+        },
+      ],
+    ],
+  },
+  BOI: {
+    bank_name: "Bank Of India",
+    base_url: "https://bankofindia.co.in/interest-rate",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "website",
+          by: "css",
+          value: ".portlet",
+          url: "https://bankofindia.co.in/interest-rate/saving-bank-deposit-rate",
+          wait: 5,
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: ".th-boi",
+          scrape_fields: {
+            Saving_Deposit: ".th-exchange+ .th-exchange",
+          },
+          log_message: "Scraping Saving Deposit Data",
+        },
+        {
+          action: "website",
+          by: "css",
+          value: ".portlet",
+          url: "https://bankofindia.co.in/interest-rate/rupee-term-deposit-rate",
+          wait: 5,
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: "#portlet_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_jtdf .boi-table-struture .card-body",
+          scrape_fields: {
+            Rupee_Term_Deposit: ".th-exchange~ .th-exchange+ .th-exchange p",
+          },
+          log_message: "Scraping Rupee Term Deposit Data",
+        },
+        {
+          action: "website",
+          by: "css",
+          value: ".portlet",
+          url: " https://bankofindia.co.in/interest-rate/interest-rate-mclr/2025",
+          wait: 5,
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: ".accordion-div:nth-child(1) .accordion",
+          scrape_fields: {
+            MCLR: ".w-75",
+          },
+          log_message: "Scraping Rupee Term Deposit Data",
+          return_to_base: true,
+        },
+      ],
+    ],
+  },
+  BARODA: {
+    bank_name: "Bank of Baroda",
+    base_url: "https://www.bankofbaroda.in/interest-rate-and-service-charges/deposits-interest-rates",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "scrape",
+          by: "css",
+          value: ".toggle-header",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Extract Fields",
+          scrape_fields: {
+            header: ".field-heading",
+          },
+        },
+      ],
+      [
+        {
+          action: "click",
+          by: "css",
+          value: "#mCSB_2_container a",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Click Next Structure",
+        },
+      ],
+    ],
+  },
+  CANARA: {
+    bank_name: "Canara Bank",
+    base_url: "https://canarabank.com/pages/deposit-interest-rates",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "scrape",
+          by: "css",
+          value: ".main-content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Scraping Data",
+          scrape_fields: {
+            Savings_Term: ".text-sec > p:nth-child(1) strong",
+            Bulk_Callable: "p:nth-child(8) b",
+            Bulk_Non_Callable: "p:nth-child(11) b",
+            Fncr_Deposits: ".MsoNormal span",
+          },
+        },
+        {
+          action: "screenshot",
+          by: "css",
+          value: ".main-content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Screen Shot",
+        },
+      ],
+    ],
+  },
+  INDIAN_BANK: {
+    bank_name: "Indian Bank",
+    base_url: "https://www.indianbank.in/departments/deposit-rates/",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "scrape",
+          by: "css",
+          value: ".container-fluid",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Scraping Term Deposit Rates",
+          scrape_fields: {
+            Bulk_Term: "p:nth-child(12) strong",
+            "Savings Deposit": "p:nth-child(16)",
+          },
+        },
+      ],
+    ],
+  },
+  PUNJAB_SINDH: {
+    bank_name: "Punjab and Sindh Bank",
+    base_url: "https://punjabandsindbank.co.in//content/interestdom",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "scrape",
+          by: "css",
+          value: ".middle-content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Scraping Term Deposit Rates",
+          scrape_fields: {
+            Saving_Deposit: ".middle-content > h2",
+          },
+        },
+      ],
+    ],
+  },
+  PNB: {
+    bank_name: "Punjab National Bank",
+    base_url: "https://www.pnbindia.in/Interest-Rates-Deposit.html",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "scrape",
+          by: "css",
+          value: ".financials-archives",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 10,
+          log_message: "Scraping Term Deposit Rates",
+          scrape_fields: {
+            Saving_Term_Deposit: "#fa-tab14 th",
+            Domestic_Term_Deposit: "#fa-tab132 th",
+            // Domestic_Term_Historical: "h2 a",
+          },
+        },
+      ],
+    ],
+  },
+  IOB: {
+    bank_name: "Indian Overseas Bank",
+    base_url: "https://www.iob.in/Domestic_Rates",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "scrape",
+          by: "css",
+          value: ".date",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 10,
+          log_message: "Checking Updated Data Rates",
+          scrape_fields: {
+            Saving_Term_Deposit: "p",
+            // Domestic_Term_Deposit: "#fa-tab132 th",
+            // Domestic_Term_Historical: "h2 a",
+          },
+        },
+      ],
+    ],
+  },
+  UNION_BANK: {
+    bank_name: "Union Bank of India",
+    base_url: "https://www.unionbankofindia.co.in/en/details/rate-of-interest#",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "scrape",
+          by: "css",
+          value: "#main_content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 10,
+          log_message: "Checking Updated Data Rates",
+          scrape_fields: {
+            Deposit_Rate: "b",
+          },
+        },
+        {
+          action: "table",
+          by: "tag",
+          value: "table",
+          multiple: true,
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 10,
+          log_message: "Extract Tables",
+        },
+      ],
+    ],
+  },
+  CENTRAL_BANK: {
+    bank_name: "Central Bank of India",
+    base_url: "https://www.centralbankofindia.co.in/en/interest-rates-on-deposit",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "scrape",
+          by: "css",
+          value: "#content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 5,
+          log_message: "Checking Updated Data Rates",
+          scrape_fields: {
+            Saving_Term_Deposit: "span+ b span",
+            Domestic_Term_Deposit: ".MsoFooter:nth-child(6) span",
+          },
+        },
+      ],
+    ],
+  },
+  SBI: {
+    bank_name: "State Bank of India",
+    base_url: "https://sbi.co.in/web/interest-rates/interest-rates/deposit-rates",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action: "website",
+          by: "css",
+          value: ".row",
+          url: "https://sbi.co.in/web/interest-rates/savings-bank-deposits",
+          wait: 5,
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: "#content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 5,
+          log_message: "Check for Update",
+          scrape_fields: {
+            Saving_Term_Deposit: "th+ th",
+          },
+        },
+      ],
+      [
+        {
+          action: "website",
+          by: "css",
+          value: ".row",
+          url: "https://sbi.co.in/web/interest-rates/deposit-rates/retail-domestic-term-deposits",
+          wait: 5,
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: ".middle_inner",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 5,
+          log_message: "Checking Updated Data Rates",
+          scrape_fields: {
+            Domestic_Term_Deposit: "th:nth-child(3)",
+          },
+        },
+      ],
+      [
+        {
+          action: "website",
+          by: "css",
+          value: ".row",
+          url: " https://sbi.co.in/web/interest-rates/deposit-rates/domestic-bulk-term-deposits",
+          wait: 5,
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: "#menu_0",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 5,
+          log_message: "Checking Updated Data Rates",
+          scrape_fields: {
+            Domestic_Term_Deposit_Non_Call: "tr:nth-child(1) th+ th",
+          },
+        },
+      ],
+    ],
+  },
+}

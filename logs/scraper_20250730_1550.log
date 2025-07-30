@@ -1,0 +1,5 @@
+2025-07-30 15:50:41 [NOTICE]: Page fetched successfully
+2025-07-30 15:50:41 [INFO]: Performing _action_: scrape on #fa-tab13
+2025-07-30 15:50:51 [WARNING]: Element not found, skipping: #fa-tab13
+2025-07-30 15:50:51 [INFO]: Performing _action_: scrape on #fa-tab14
+2025-07-30 15:50:51 [INFO]: Scraped data: dict_keys(['Saving_Term_Deposit'])

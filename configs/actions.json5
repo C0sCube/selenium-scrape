@@ -1,0 +1,47 @@
+{
+  by_type: {
+    css: "By.CSS_SELECTOR",
+    xpath: "By.XPATH",
+    id: "By.ID",
+    name: "By.NAME",
+    class: "By.CLASS_NAME",
+    tag: "By.TAG_NAME",
+  },
+
+  cond_map: {
+    clickable: "EC.element_to_be_clickable",
+    visible: "EC.visibility_of_element_located",
+    present: "EC.presence_of_element_located",
+    invisible: "EC.invisibility_of_element_located",
+    attached: "EC.element_to_be_selected",
+  },
+
+  action: "click", // type of action: "click", "scrape", "send_keys", "table", "screenshot", or null
+  by: "css", // selector strategy: css, xpath, id, class, tag, name
+  value: "button.submit", // selector value (e.g., CSS or XPath expression)
+
+  wait: 1, // optional: wait n seconds before this action
+  timeout: 10, // optional: max time to wait for a condition to be true
+  wait_until: "clickable", // optional: wait for element to be "clickable", "visible", "present", etc.
+
+  keys: "hello", // used only for send_keys action
+  attribute: "href", // used in scrape to extract attributes like href, src, etc.
+
+  scrape_fields: {
+    // optional: only for "scrape" action, extract multiple subfields
+    title: "h3 a",
+    price: "p.price_color",
+  },
+
+  url: "example.com", //used to open this URL.
+  multiple: true, // optional: if true, selects multiple matching elements (for scrape/table)
+
+  new_window: false, // optional: for click actions, if true, switch to newly opened tab
+  return_to_base: false, // optional: if true, return to base tab and close new one
+
+  skip_if_not_found: true, // optional: if true, skip action if element not found instead of raising error
+
+  screenshot_name: "step1_view", // optional: only for "screenshot" action
+
+  log_message: "Clicked submit button", // optional: helps add readable logs for debugging
+}
