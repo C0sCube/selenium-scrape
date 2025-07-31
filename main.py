@@ -16,7 +16,7 @@ with open(r"configs\params.json5") as f:
 options = Options()
 driver = webdriver.Chrome(options=options)
 
-BANK_CODES = ["PSB_2","PSB_3","PSB_4","PSB_5","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"] #"PSB_1","PSB_2","PSB_3","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"
+BANK_CODES = ["PSB_1","PSB_2","PSB_3","PSB_4","PSB_5","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"] #"PSB_1","PSB_2","PSB_3","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"
 
 final_dict = {
     "metadata":{
@@ -32,20 +32,28 @@ for code in BANK_CODES:
     WEBSITE = config[code]
     website = WEBSITE["base_url"]
     
-    scrape_data = {
-                "bank_name": WEBSITE["bank_name"],
-                "base_url":WEBSITE["base_url"],
-                "response": {}
-            }
+    scrape_data = {"bank_name": WEBSITE["bank_name"],"base_url":WEBSITE["base_url"],"response": {}}
     
-    # try:
-        # req = requests.get(website, timeout=20)
-        # if req.status_code == '200':
     logger.info(f"Scraping From Bank {WEBSITE["bank_name"]}")
     executor = ActionExecutor(driver, logger)
-    executor.attach_headers(driver,WEBSITE["headers"])
-    driver.get(website)
-    logger.notice("Page fetched successfully")
+
+    try:
+        resp = requests.get(website, headers=WEBSITE["headers"], timeout=5)
+        if resp.status_code != 200:
+            logger.warning(f"{website} returned status: {resp.status_code}")
+            continue  # Skip Selenium launch
+        
+        executor.attach_headers(driver,WEBSITE["headers"])
+        driver.get(website)
+        logger.notice("Page fetched successfully")
+        
+    except Exception as e:
+        logger.error(f"Requests error: {e}")
+        logger.notice(f"Skipping for {WEBSITE["bank_name"]}")
+        scrape_data["response"] = {"error": str(e)}
+        final_dict["records"].append(scrape_data)
+        
+        continue
     
     for idx,block in enumerate(WEBSITE["blocks"]):
         print(f"Running Block: {idx}")
@@ -55,16 +63,10 @@ for code in BANK_CODES:
             "timestamp":timestamp,
             "scrape_data":data
         }})
-            
-
-
-    # except requests.exceptions.RequestException as e:
-    #     logger.error(f"Request critical error: {e}")
-    #     logger.error(f"Skipping Bank {WEBSITE["bank_name"]}")
-    #     scrape_data["response"] = {"error":e}
+        # scrape_data["response"].update(data)
     
     final_dict["records"].append(scrape_data)
     
-with open("example.json5","w+") as f:
+with open(f"example.json5","w+") as f:
     json5.dump(final_dict,f)
 driver.quit()

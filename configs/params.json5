@@ -84,6 +84,7 @@
           action: "scrape",
           by: "css",
           value: ".th-boi",
+          wait:5,
           scrape_fields: {
             Saving_Deposit: ".th-exchange+ .th-exchange",
           },
@@ -160,7 +161,7 @@
           scrape_fields: {
             NRE_Deposit: "th + th",
           },
-          timeout: 5,
+          wait: 5,
           log_message: "Scraping NRE Data",
         },
       ],

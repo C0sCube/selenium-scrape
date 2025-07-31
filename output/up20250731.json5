@@ -50,9 +50,7 @@
     {
       bank_name: "Punjab and Sind Bank",
       base_url: "https://punjabandsindbank.co.in//content/interestdom",
-      response: {
-        Saving_Deposit: "Interest Rates on Saving Bank Deposits with effect from 16 June 2025.",
-      },
+      response: { Saving_Deposit: "20250616" },
     },
     {
       bank_name: "Punjab National Bank",
