@@ -4,12 +4,22 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 from datetime import datetime
 import pandas as pd
-import re
+import re, os
+from io import StringIO
+
 
 class ActionExecutor:
-    def __init__(self, driver, logger, base_window=None):
+    def __init__(self, driver, logger, params,paths,base_window=None):
         self.driver = driver
         self.logger = logger
+        self.PARAMS = params
+        self.PATHS = paths
+        
+        self.DATE = datetime.now().strftime("%d%m%Y")
+
+        self.OUTPUT_PATH = os.path.join(paths["output"],paths["folders"]["data"],self.DATE,params["bank_name"])
+        os.makedirs(self.OUTPUT_PATH, exist_ok=True)
+        
         self.window_stack = [base_window or driver.current_window_handle]
         
         self.data = {}
@@ -60,7 +70,9 @@ class ActionExecutor:
         #action
         action_type = _action_.get("action")
         
+        
         #extract vals
+        table_name = _action_.get("table_name","table")
         keys = _action_.get("keys")
         attribute = _action_.get("attribute")
         scrape_fields = _action_.get("scrape_fields")
@@ -98,7 +110,7 @@ class ActionExecutor:
         if action_type == "click":
             elem.click()
             if new_window:
-                WebDriverWait(self.driver, 10).until(lambda d: len(d.window_handles) > len(self.window_stack))
+                WebDriverWait(self.driver, timeout).until(lambda d: len(d.window_handles) > len(self.window_stack))
                 new_tab = [h for h in self.driver.window_handles if h not in self.window_stack][0]
                 self.driver.switch_to.window(new_tab)
                 self.window_stack.append(new_tab)
@@ -151,33 +163,39 @@ class ActionExecutor:
 
         #take a screenshot
         elif action_type == "screenshot":
-            path = f"{_action_.get('screenshot_name', 'screenshot')}.png"
+            
+            path = os.path.join(self.OUTPUT_PATH,f"{_action_.get('screenshot_name', 'screenshot')}.png")
             self.driver.save_screenshot(path)
             self.logger.info(f"Saved screenshot: {path}")
         
         #extract table(s) of webpage
         elif action_type == "table":
-            if multiple:
-                elems = self.driver.find_elements(self.get_by(by), value)
-                all_tables = []
-                for table in elems:
-                    html = table.get_attribute("outerHTML")
-                    df = pd.read_html(html)[0]  # first table in this HTML
-                    all_tables.append(df)
-                combined_df = pd.concat(all_tables, ignore_index=True)
-                output_path = f"output_{int(time.time())}.xlsx"
-                combined_df.to_excel(output_path, index=False)
-                self.logger.info(f"Saved {len(all_tables)} tables to {output_path}")
-            else:
-                elem = self.driver.find_element(self.get_by(by), value)
-                html = elem.get_attribute("outerHTML")
-                df = pd.read_html(html)[0]
-                output_path = f"output_{int(time.time())}.xlsx"
-                df.to_excel(output_path, index=False)
-                self.logger.info(f"Saved table to {output_path}")
             
-            scrape_data.update({"table":output_path})
+            output_path = os.path.join(self.OUTPUT_PATH,f"{table_name}_{datetime.now().strftime("%d%m%Y %H%M")}.xlsx")
+            
+            WebDriverWait(self.driver, timeout).until(
+                EC.presence_of_element_located((self.get_by(by), value))
+            )
+            
+            # if multiple:
+            
+            elems = self.driver.find_elements(self.get_by(by), value) if multiple else [self.driver.find_element(self.get_by(by), value)]
+            all_tables = []
+            for idx,table in enumerate(elems):
+                html = re.sub(r'\t+', '', table.get_attribute("outerHTML"))
+                html = re.sub(r'<th', '<td', html)
+                html = re.sub(r'</th>', '</td>', html)
 
+                df = pd.read_html(StringIO(html),header=None)
+                blank_rows = pd.DataFrame([[""] * df[0].shape[1]] * 3)
+                
+                all_tables.extend(df)
+                all_tables.append(blank_rows)
+            
+            combined_df = pd.concat(all_tables, ignore_index=True)      
+            combined_df.to_excel(output_path, index=False)
+            self.logger.info(f"Saved {len(all_tables)//2} table(s) to {self.OUTPUT_PATH}")
+            
         #open website
         elif action_type == "website":
             try:

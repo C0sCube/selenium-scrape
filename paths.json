@@ -2,5 +2,10 @@
     "root":"C:\\Users\\kaustubh.keny\\Projects\\office-work\\selenium-scrape",
     "configs":"configs\\config.json5",
     "input":"",
-    "output":""
+    "output":"C:\\Users\\kaustubh.keny\\Projects\\JSON25\\scrape_output",
+    "folders":{
+        "cache":"cache",
+        "data":"data",
+        "log":"logs"
+    }
 }
