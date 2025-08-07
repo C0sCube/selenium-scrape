@@ -1,1270 +1,1314 @@
 {
-  "PSB_1": {
-    "bank_name": "Bank of Baroda",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://www.bankofbaroda.in/interest-rate-and-service-charges/deposits-interest-rates",
-    "headers": {
+  PSB_1: {
+    bank_name: "Bank of Baroda",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_1",
+    base_url: "https://www.bankofbaroda.in/interest-rate-and-service-charges/deposits-interest-rates",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
       [
         {
-          "action": "scrape",
-          "by": "css",
-          "value": ".items",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 20,
-          "log_message": "Extract Fields",
-          "scrape_fields": {
-            "domestic_nro_3": ".item:nth-child(1) .field-heading",
-            "bob_green_domestic_nro_3": ".item:nth-child(2) .field-heading",
-            "domestic_nro_3_to_10": ".item:nth-child(3) .field-heading",
-            "bob_green_domestic_nro_3_to_10": ".item:nth-child(4) .field-heading",
-            "nre_3_to_10": ".item:nth-child(5) .field-heading",
-            "domestic_nro_above_10_to_1000": ".item:nth-child(6) .field-heading",
-            "nre_below_3": ".item:nth-child(7) .field-heading",
-            "bob_green_nre_3_to_10": ".item:nth-child(8) .field-heading",
-            "nre_above_10_to_1000": ".item:nth-child(9) .field-heading",
-            "adv_1_3_dom_nre_nro": ".item:nth-child(10) .field-heading",
-            "reg_3_10_dom_nre_nro": ".item:nth-child(11) .field-heading",
-            "green_sub3_dom_nre_nro": ".item:nth-child(12) .field-heading",
-            "green_3_10_dom_nre_nro": ".item:nth-child(13) .field-heading",
-            "adv_10_1000_dom": ".item:nth-child(14) .field-heading",
-            "slab_wise": ".item:nth-child(17) .field-heading"
-          }
+          action: "scrape",
+          by: "css",
+          value: ".items",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Extract Fields",
+          scrape_fields: {
+            domestic_nro_3: ".item:nth-child(1) .field-heading",
+            bob_green_domestic_nro_3: ".item:nth-child(2) .field-heading",
+            domestic_nro_3_to_10: ".item:nth-child(3) .field-heading",
+            bob_green_domestic_nro_3_to_10: ".item:nth-child(4) .field-heading",
+            nre_3_to_10: ".item:nth-child(5) .field-heading",
+            domestic_nro_above_10_to_1000: ".item:nth-child(6) .field-heading",
+            nre_below_3: ".item:nth-child(7) .field-heading",
+            bob_green_nre_3_to_10: ".item:nth-child(8) .field-heading",
+            nre_above_10_to_1000: ".item:nth-child(9) .field-heading",
+            adv_1_3_dom_nre_nro: ".item:nth-child(10) .field-heading",
+            reg_3_10_dom_nre_nro: ".item:nth-child(11) .field-heading",
+            green_sub3_dom_nre_nro: ".item:nth-child(12) .field-heading",
+            green_3_10_dom_nre_nro: ".item:nth-child(13) .field-heading",
+            adv_10_1000_dom: ".item:nth-child(14) .field-heading",
+            slab_wise: ".item:nth-child(17) .field-heading",
+          },
         },
         {
-          "action": "table",
-          "table_name": "Deposit Interest Rates",
-          "by": "css",
-          "value": ".table-resopnsive",
-          "multiple": true,
-          "skip_if_not_found": true,
-          "time": 5,
-          "timeout": 20,
-          "log_message": "Extract Tables"
-        }
+          action: "table",
+          table_name: "Deposit Interest Rates",
+          by: "css",
+          value: ".table-resopnsive",
+          multiple: true,
+          skip_if_not_found: true,
+          time: 5,
+          timeout: 20,
+          log_message: "Extract Tables",
+        },
       ],
       [
         {
-          "action": "website",
-          "url": "https://www.bankofbaroda.in/interest-rate-and-service-charges/retail-loans-interest-rates",
-          "by": "css",
-          "value": "#content",
-          "timeout": 5
+          action: "website",
+          url: "https://www.bankofbaroda.in/interest-rate-and-service-charges/retail-loans-interest-rates",
+          by: "css",
+          value: "#content",
+          timeout: 5,
         },
         {
-          "action": "scrape",
-          "by": "css",
-          "value": "#second-scroll",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 5,
-          "log_message": "Extract Fields",
-          "scrape_fields": {
-            "mclr": "h4+ p"
-          }
+          action: "scrape",
+          by: "css",
+          value: "#second-scroll",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 5,
+          log_message: "Extract Fields",
+          scrape_fields: {
+            mclr: "h4+ p",
+          },
         },
         {
-          "action": "table",
-          "table_name": "Retail Loan Rates",
-          "by": "tag",
-          "value": "table",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "time": 5,
-          "timeout": 20,
-          "log_message": "Extract Tables"
-        }
-      ]
+          action: "table",
+          table_name: "Retail Loan Rates",
+          by: "tag",
+          value: "table",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          time: 5,
+          timeout: 20,
+          log_message: "Extract Tables",
+        },
+      ],
     ],
-    "verify_ssl": false
+    verify_ssl: false,
   },
-  "PSB_2": {
-    "bank_name": "Bank of India",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://bankofindia.co.in/interest-rate",
-    "headers": {
+  PSB_2: {
+    bank_name: "Bank of India",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_2",
+    base_url: "https://bankofindia.co.in/interest-rate",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
       [
         {
-          "action": "website",
-          "by": "css",
-          "value": ".portlet",
-          "url": "https://bankofindia.co.in/interest-rate/saving-bank-deposit-rate",
-          "wait": 5
+          action: "website",
+          by: "css",
+          value: ".portlet",
+          url: "https://bankofindia.co.in/interest-rate/saving-bank-deposit-rate",
+          wait: 5,
         },
         {
-          "action": "scrape",
-          "by": "css",
-          "value": ".th-boi",
-          "wait": 5,
-          "scrape_fields": {
-            "Saving_Deposit": ".th-exchange+ .th-exchange"
+          action: "scrape",
+          by: "css",
+          value: ".th-boi",
+          wait: 5,
+          scrape_fields: {
+            Saving_Deposit: ".th-exchange+ .th-exchange",
           },
-          "log_message": "Scraping Saving Deposit Data"
+          log_message: "Scraping Saving Deposit Data",
         },
         {
-          "action": "table",
-          "table_name": "Saving Deposit",
-          "multiple": true,
-          "by": "tag",
-          "value": "table",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "time": 5,
-          "timeout": 20,
-          "log_message": "Extract Tables"
-        }
+          action: "table",
+          table_name: "Saving Deposit",
+          multiple: true,
+          by: "tag",
+          value: "table",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          time: 5,
+          timeout: 20,
+          log_message: "Extract Tables",
+        },
       ],
       [
         {
-          "action": "website",
-          "by": "css",
-          "value": ".portlet",
-          "url": "https://bankofindia.co.in/interest-rate/rupee-term-deposit-rate",
-          "wait": 5
+          action: "website",
+          by: "css",
+          value: ".portlet",
+          url: "https://bankofindia.co.in/interest-rate/rupee-term-deposit-rate",
+          wait: 5,
         },
         {
-          "action": "scrape",
-          "by": "css",
-          "value": "#portlet_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_jtdf .boi-table-struture .card-body",
-          "scrape_fields": {
-            "Rupee_Term_Deposit": ".th-exchange~ .th-exchange+ .th-exchange p",
-            "Rupee_Term_Non_Call": "#portlet_boi_rupee_term_deposit_web_BoiRupeeTermDepositWebPortlet .normal-text",
-            "Rupee_Term_Call": "#portlet_boi_rupee_term_deposit_web_BoiRupeeTermDepositWebPortlet .normal-text"
+          action: "scrape",
+          by: "css",
+          value: "#portlet_com_liferay_journal_content_web_portlet_JournalContentPortlet_INSTANCE_jtdf .boi-table-struture .card-body",
+          scrape_fields: {
+            Rupee_Term_Deposit: ".th-exchange~ .th-exchange+ .th-exchange p",
+            Rupee_Term_Non_Call: "#portlet_boi_rupee_term_deposit_web_BoiRupeeTermDepositWebPortlet .normal-text",
+            Rupee_Term_Call: "#portlet_boi_rupee_term_deposit_web_BoiRupeeTermDepositWebPortlet .normal-text",
           },
-          "log_message": "Scraping Rupee Term Deposit Data"
+          log_message: "Scraping Rupee Term Deposit Data",
         },
         {
-          "action": "table",
-          "table_name": "Rupee Term Deposit",
-          "multiple": true,
-          "by": "tag",
-          "value": "table",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "time": 5,
-          "timeout": 20,
-          "log_message": "Extract Tables"
-        }
+          action: "table",
+          table_name: "Rupee Term Deposit",
+          multiple: true,
+          by: "tag",
+          value: "table",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          time: 5,
+          timeout: 20,
+          log_message: "Extract Tables",
+        },
       ],
       [
         {
-          "action": "website",
-          "by": "css",
-          "value": ".portlet",
-          "url": " https://bankofindia.co.in/interest-rate/interest-rate-mclr/2025",
-          "wait": 5
+          action: "website",
+          by: "css",
+          value: ".portlet",
+          url: " https://bankofindia.co.in/interest-rate/interest-rate-mclr/2025",
+          wait: 5,
         },
         {
-          "action": "scrape",
-          "by": "css",
-          "value": ".accordion-div:nth-child(1) .accordion",
-          "scrape_fields": {
-            "MCLR": ".w-75"
+          action: "scrape",
+          by: "css",
+          value: ".accordion-div:nth-child(1) .accordion",
+          scrape_fields: {
+            MCLR: ".w-75",
           },
-          "log_message": "Scraping Rupee Term Deposit Data",
-          "return_to_base": true
-        }
-      ]
+          log_message: "Scraping Rupee Term Deposit Data",
+          return_to_base: true,
+        },
+      ],
     ],
-    "verify_ssl": false
+    verify_ssl: false,
   },
-  "PSB_3": {
-    "bank_name": "Bank of Maharashtra",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://bankofmaharashtra.in/domestic-term-deposits",
-    "headers": {
+  PSB_3: {
+    bank_name: "Bank of Maharashtra",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_3",
+    base_url: "https://bankofmaharashtra.in/domestic-term-deposits",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
       [
         {
-          "action": "scrape",
-          "by": "css",
-          "value": ".inner_post_content",
-          "scrape_fields": {
-            "Term_Deposit": "h4 + h4"
+          action: "scrape",
+          by: "css",
+          value: ".inner_post_content",
+          scrape_fields: {
+            Term_Deposit: "h4 + h4",
           },
-          "timeout": 5,
-          "log_message": "Scraping Term Deposit Data"
+          timeout: 5,
+          log_message: "Scraping Term Deposit Data",
         },
         {
-          "action": "table",
-          "table_name": "Term Deposit Data",
-          "multiple": true,
-          "by": "tag",
-          "value": "table",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "time": 5,
-          "timeout": 20,
-          "log_message": "Extract Tables"
-        }
+          action: "table",
+          table_name: "Term Deposit Data",
+          multiple: true,
+          by: "tag",
+          value: "table",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          time: 5,
+          timeout: 20,
+          log_message: "Extract Tables",
+        },
       ],
       [
         {
-          "action": "website",
-          "by": "css",
-          "value": ".inner_post_content",
-          "url": "https://bankofmaharashtra.in/nre-deposits",
-          "wait": 5
+          action: "website",
+          by: "css",
+          value: ".inner_post_content",
+          url: "https://bankofmaharashtra.in/nre-deposits",
+          wait: 5,
         },
         {
-          "action": "scrape",
-          "by": "css",
-          "value": ".inner_post_content",
-          "scrape_fields": {
-            "NRE_Deposit": "th + th"
+          action: "scrape",
+          by: "css",
+          value: ".inner_post_content",
+          scrape_fields: {
+            NRE_Deposit: "th + th",
           },
-          "wait": 5,
-          "log_message": "Scraping NRE Data"
+          wait: 5,
+          log_message: "Scraping NRE Data",
         },
         {
-          "action": "table",
-          "table_name": "NRE Data",
-          "multiple": true,
-          "by": "tag",
-          "value": "table",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "time": 5,
-          "timeout": 20,
-          "log_message": "Extract Tables"
-        }
-      ]
+          action: "table",
+          table_name: "NRE Data",
+          multiple: true,
+          by: "tag",
+          value: "table",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          time: 5,
+          timeout: 20,
+          log_message: "Extract Tables",
+        },
+      ],
     ],
-    "verify_ssl": false
+    verify_ssl: false,
   },
-  "PSB_4": {
-    "bank_name": "Canara Bank",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://canarabank.com/pages/deposit-interest-rates",
-    "headers": {
+  PSB_4: {
+    bank_name: "Canara Bank",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_4",
+    base_url: "https://canarabank.com/pages/deposit-interest-rates",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
       [
         {
-          "action": "scrape",
-          "by": "css",
-          "value": ".main-content",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 20,
-          "log_message": "Scraping Data",
-          "scrape_fields": {
-            "Savings_Term": ".text-sec > p:nth-child(1) strong",
-            "Bulk_Callable": "p:nth-child(8) b",
-            "Bulk_Non_Callable": "p:nth-child(11) b",
-            "Fncr_Deposits": ".MsoNormal span"
-          }
+          action: "scrape",
+          by: "css",
+          value: ".main-content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Scraping Data",
+          scrape_fields: {
+            Savings_Term: ".text-sec > p:nth-child(1) strong",
+            Bulk_Callable: "p:nth-child(8) b",
+            Bulk_Non_Callable: "p:nth-child(11) b",
+            Fncr_Deposits: ".MsoNormal span",
+          },
         },
         {
-          "action": "screenshot",
-          "by": "css",
-          "value": ".main-content",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 20,
-          "log_message": "Screen Shot"
-        }
-      ]
+          action: "screenshot",
+          by: "css",
+          value: ".main-content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Screen Shot",
+        },
+        {
+          action: "table",
+          table_name: "Deposit Interest Rates",
+          by: "css",
+          value: ".table-resopnsive",
+          multiple: true,
+          skip_if_not_found: true,
+          time: 5,
+          timeout: 20,
+          log_message: "Extract Tables",
+        },
+      ],
     ],
-    "verify_ssl": false
+    verify_ssl: false,
   },
-  "PSB_5": {
-    "bank_name": "Central Bank of India",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://www.centralbankofindia.co.in/en/interest-rates-on-deposit",
-    "headers": {
+  PSB_5: {
+    bank_name: "Central Bank of India",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_5",
+    base_url: "https://www.centralbankofindia.co.in/en/interest-rates-on-deposit",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
       [
         {
-          "action": "scrape",
-          "by": "css",
-          "value": "#content",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 5,
-          "log_message": "Checking Updated Data Rates",
-          "scrape_fields": {
-            "Saving_Term_Deposit": "span+ b span",
-            "Domestic_Term_Deposit": ".MsoFooter:nth-child(6) span"
-          }
-        }
-      ]
+          action: "scrape",
+          by: "css",
+          value: "#content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 5,
+          log_message: "Checking Updated Data Rates",
+          scrape_fields: {
+            Saving_Term_Deposit: "span+ b span",
+            Domestic_Term_Deposit: ".MsoFooter:nth-child(6) span",
+          },
+        },
+      ],
     ],
-    "verify_ssl": false
+    verify_ssl: false,
   },
-  "PSB_6": {
-    "bank_name": "Indian Bank",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://www.indianbank.in/departments/deposit-rates/",
-    "headers": {
+  PSB_6: {
+    bank_name: "Indian Bank",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_6",
+    base_url: "https://www.indianbank.in/departments/deposit-rates/",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
       [
         {
-          "action": "scrape",
-          "by": "css",
-          "value": ".randomContent",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 20,
-          "log_message": "Scraping Term Deposit Rates",
-          "scrape_fields": {
-            "Retail_Term": "p:nth-child(4)",
-            "Green_Retail_Term": "p:nth-child(9) b",
-            "Bulk_Term": "p:nth-child(12) strong"
-          }
-        }
-      ]
+          action: "scrape",
+          by: "css",
+          value: ".randomContent",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Scraping Term Deposit Rates",
+          scrape_fields: {
+            Retail_Term: "p:nth-child(4)",
+            Green_Retail_Term: "p:nth-child(9) b",
+            Bulk_Term: "p:nth-child(12) strong",
+          },
+        },
+      ],
     ],
-    "verify_ssl": false
+    verify_ssl: false,
   },
-  "PSB_7": {
-    "bank_name": "Indian Overseas Bank",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://www.iob.in/Domestic_Rates",
-    "headers": {
+  PSB_7: {
+    bank_name: "Indian Overseas Bank",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_7",
+    base_url: "https://www.iob.in/Domestic_Rates",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
       [
         {
-          "action": "scrape",
-          "by": "css",
-          "value": ".date",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 10,
-          "log_message": "Checking Updated Data Rates",
-          "scrape_fields": {
-            "Saving_Term_Deposit": "p"
-          }
-        }
-      ]
+          action: "scrape",
+          by: "css",
+          value: ".date",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 10,
+          log_message: "Checking Updated Data Rates",
+          scrape_fields: {
+            Saving_Term_Deposit: "p",
+          },
+        },
+      ],
     ],
-    "verify_ssl": false
+    verify_ssl: true,
   },
-  "PSB_8": {
-    "bank_name": "Punjab and Sind Bank",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://punjabandsindbank.co.in//content/interestdom",
-    "headers": {
+  PSB_8: {
+    bank_name: "Punjab and Sind Bank",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_8",
+    base_url: "https://punjabandsindbank.co.in//content/interestdom",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
       [
         {
-          "action": "scrape",
-          "by": "css",
-          "value": ".middle-content",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 20,
-          "log_message": "Scraping Term Deposit Rates",
-          "scrape_fields": {
-            "Saving_Deposit": ".middle-content > h2"
-          }
-        }
-      ]
+          action: "scrape",
+          by: "css",
+          value: ".middle-content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Scraping Term Deposit Rates",
+          scrape_fields: {
+            Saving_Deposit: ".middle-content > h2",
+          },
+        },
+      ],
     ],
-    "verify_ssl": false
+    verify_ssl: true,
   },
-  "PSB_9": {
-    "bank_name": "Punjab National Bank",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://www.pnbindia.in/Interest-Rates-Deposit.html",
-    "headers": {
+  PSB_9: {
+    bank_name: "Punjab National Bank",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_9",
+    base_url: "https://www.pnbindia.in/Interest-Rates-Deposit.html",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
+      [
+        // {
+        //   action: "scrape",
+        //   by: "css",
+        //   value: "#fa-tab14 > .detail-page",
+        //   wait_until: "visible",
+        //   skip_if_not_found: true,
+        //   timeout: 20,
+        //   log_message: "Scraping Term Deposit Rates",
+        //   scrape_fields: {
+        //     sd_interest_rate: "table tbody tr:nth-child(2) th:last-of-type",
+        //   },
+        // },
+        {
+          action: "scrape",
+          by: "css",
+          value: "#fa-tab13",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Domestic Term Deposit Rates",
+          scrape_fields: {
+            dtd_below_3cr: "#fa-tab13 .tab_btn:nth-child(1)",
+          },
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: "#fa-tab12",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "PNB Tax Saver Rates",
+          scrape_fields: {
+            pnb_tax_saver: "table tbody tr:nth-child(1) th:nth-child(1) p",
+          },
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: "#fa-tab112",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Scraping NRE Interest Rates",
+          scrape_fields: {
+            nre_term_deposit: "table tbody tr:nth-child(3) th:nth-child(5) p",
+          },
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: "#fa-tab113",
+          skip_if_not_found: true,
+          timeout: 20,
+          log_message: "Scraping FNCR(B) Rates",
+          scrape_fields: {
+            fncrb: "table tbody tr:nth-child(1) th:nth-child(1) p",
+          },
+        },
+      ],
+    ],
+    verify_ssl: false,
+  },
+  PSB_10: {
+    bank_name: "State Bank of India",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_10",
+    base_url: "https://sbi.co.in/web/interest-rates/interest-rates/deposit-rates",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
       [
         {
-          "action": "scrape",
-          "by": "css",
-          "value": "#fa-tab13",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 10,
-          "log_message": "Scraping Term Deposit Rates",
-          "scrape_fields": {
-            "Dom_Term_below_3": ".tab_btn"
-          }
+          action: "website",
+          by: "css",
+          value: ".row",
+          url: "https://sbi.co.in/web/interest-rates/savings-bank-deposits",
+          wait: 5,
         },
         {
-          "action": "scrape",
-          "by": "css",
-          "value": "#fa-tab14",
-          "skip_if_not_found": true,
-          "timeout": 10,
-          "log_message": "Scraping Term Deposit Rates",
-          "scrape_fields": {
-            "Saving_Term_Deposit": "th+ th p"
-          }
-        }
-      ]
+          action: "scrape",
+          by: "css",
+          value: "#content",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 5,
+          log_message: "Check for Update",
+          scrape_fields: {
+            Saving_Term_Deposit: "th+ th",
+          },
+        },
+        {
+          action: "website",
+          by: "css",
+          value: ".row",
+          url: "https://sbi.co.in/web/interest-rates/deposit-rates/retail-domestic-term-deposits",
+          wait: 5,
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: ".middle_inner",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 5,
+          log_message: "Checking Updated Data Rates",
+          scrape_fields: {
+            Domestic_Term_Deposit: "th:nth-child(3)",
+          },
+        },
+        {
+          action: "website",
+          by: "css",
+          value: ".row",
+          url: " https://sbi.co.in/web/interest-rates/deposit-rates/domestic-bulk-term-deposits",
+          wait: 5,
+        },
+        {
+          action: "scrape",
+          by: "css",
+          value: "#menu_0",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 5,
+          log_message: "Checking Updated Data Rates",
+          scrape_fields: {
+            Domestic_Term_Deposit_Non_Call: "tr:nth-child(1) th+ th",
+          },
+        },
+      ],
     ],
-    "verify_ssl": false
+    verify_ssl: false,
   },
-  "PSB_10": {
-    "bank_name": "State Bank of India",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://sbi.co.in/web/interest-rates/interest-rates/deposit-rates",
-    "headers": {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
-    },
-    "blocks": [
-      [
-        {
-          "action": "website",
-          "by": "css",
-          "value": ".row",
-          "url": "https://sbi.co.in/web/interest-rates/savings-bank-deposits",
-          "wait": 5
-        },
-        {
-          "action": "scrape",
-          "by": "css",
-          "value": "#content",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 5,
-          "log_message": "Check for Update",
-          "scrape_fields": {
-            "Saving_Term_Deposit": "th+ th"
-          }
-        },
-        {
-          "action": "website",
-          "by": "css",
-          "value": ".row",
-          "url": "https://sbi.co.in/web/interest-rates/deposit-rates/retail-domestic-term-deposits",
-          "wait": 5
-        },
-        {
-          "action": "scrape",
-          "by": "css",
-          "value": ".middle_inner",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 5,
-          "log_message": "Checking Updated Data Rates",
-          "scrape_fields": {
-            "Domestic_Term_Deposit": "th:nth-child(3)"
-          }
-        },
-        {
-          "action": "website",
-          "by": "css",
-          "value": ".row",
-          "url": " https://sbi.co.in/web/interest-rates/deposit-rates/domestic-bulk-term-deposits",
-          "wait": 5
-        },
-        {
-          "action": "scrape",
-          "by": "css",
-          "value": "#menu_0",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 5,
-          "log_message": "Checking Updated Data Rates",
-          "scrape_fields": {
-            "Domestic_Term_Deposit_Non_Call": "tr:nth-child(1) th+ th"
-          }
-        }
-      ]
-    ],
-    "verify_ssl": false
-  },
-  "PSB_11": {
-    "bank_name": "Uco Bank",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://ucobank.com/interest-rates-on-deposit-schemes",
-    "headers": {
+  PSB_11: {
+    bank_name: "Uco Bank",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_11",
+    base_url: "https://ucobank.com/interest-rates-on-deposit-schemes",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
       [
         {
-          "action": "scrape",
-          "by": "css",
-          "value": "#mainbody",
-          "scrape_fields": {
-            "saving_rate": "h4+ h4",
-            "domestic_term": "h4 strong",
-            "bulk_nre": "p .sub-heading"
+          action: "scrape",
+          by: "css",
+          value: "#mainbody",
+          scrape_fields: {
+            saving_rate: "h4+ h4",
+            domestic_term: "h4 strong",
+            bulk_nre: "p .sub-heading",
           },
-          "timeout": 10,
-          "log_message": "Scraping Fields"
-        }
-      ]
+          timeout: 10,
+          log_message: "Scraping Fields",
+        },
+      ],
     ],
-    "verify_ssl": false
+    verify_ssl: false,
   },
-  "PSB_12": {
-    "bank_name": "Union Bank of India",
-    "bank_type": "PUBLIC SECTOR BANKS",
-    "bank_type_code": "PSB",
-    "base_url": "https://www.unionbankofindia.co.in/en/details/rate-of-interest#",
-    "headers": {
+  PSB_12: {
+    bank_name: "Union Bank of India",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_12",
+    base_url: "https://www.unionbankofindia.co.in/en/details/rate-of-interest#",
+    headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9"
+      "Accept-Language": "en-US,en;q=0.9",
     },
-    "blocks": [
+    blocks: [
       [
         {
-          "action": "scrape",
-          "by": "css",
-          "value": "#main_content",
-          "wait_until": "visible",
-          "skip_if_not_found": true,
-          "timeout": 10,
-          "log_message": "Checking Updated Data Rates",
-          "scrape_fields": {
-            "Deposit_Rate": "b"
-          }
-        }
-      ]
+          action: "scrape",
+          by: "css",
+          value: ".header_data_container",
+          wait_until: "visible",
+          skip_if_not_found: true,
+          timeout: 120,
+          log_message: "Checking Updated Data Rates",
+          scrape_fields: {
+            Deposit_Rate: "p b",
+          },
+        },
+      ],
     ],
-    "verify_ssl": false
-  },
-  "PVB_1": {
-    "bank_name": "Axis Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_2": {
-    "bank_name": "Bandhan Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_3": {
-    "bank_name": "CSB Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_4": {
-    "bank_name": "City Union Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_5": {
-    "bank_name": "DCB Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_6": {
-    "bank_name": "Dhanlaxmi Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_7": {
-    "bank_name": "Federal Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_8": {
-    "bank_name": "HDFC Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_9": {
-    "bank_name": "ICICI Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_10": {
-    "bank_name": "IDBI Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_11": {
-    "bank_name": "IDFC First Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_12": {
-    "bank_name": "IndusInd Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_13": {
-    "bank_name": "Jammu and Kashmir Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_14": {
-    "bank_name": "Karnataka Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_15": {
-    "bank_name": "Karur Vysya Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_16": {
-    "bank_name": "Kotak Mahindra Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_17": {
-    "bank_name": "Lakshmi Vilas Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_18": {
-    "bank_name": "The Nainital Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_19": {
-    "bank_name": "South Indian Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_20": {
-    "bank_name": "Tamilnad Mercantile Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_21": {
-    "bank_name": "RBL Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "PVB_22": {
-    "bank_name": "YES Bank",
-    "bank_type": "PRIVATE SECTOR BANKS",
-    "bank_type_code": "PVB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_1": {
-    "bank_name": "Abu Dhabi Commercial Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_2": {
-    "bank_name": "AB Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_3": {
-    "bank_name": "ANZ Banking Group Ltd",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_4": {
-    "bank_name": "Bank of America N.A.",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_5": {
-    "bank_name": "Bank of Bahrain and Kuwait BSC",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_6": {
-    "bank_name": "Barclays Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_7": {
-    "bank_name": "Bank of Ceylon",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_8": {
-    "bank_name": "BNP Paribas",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_9": {
-    "bank_name": "Citibank India",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_10": {
-    "bank_name": "Credit Agricole Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_11": {
-    "bank_name": "Credit Suisse",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_12": {
-    "bank_name": "CTBC Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_13": {
-    "bank_name": "Commonwealth Bank Of Australia",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_14": {
-    "bank_name": "DBS Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_15": {
-    "bank_name": "Deutsche Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_16": {
-    "bank_name": "Doha Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_17": {
-    "bank_name": "Emirates NBD",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_18": {
-    "bank_name": "FirstRand Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_19": {
-    "bank_name": "HSBC Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_20": {
-    "bank_name": "ICBC Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_21": {
-    "bank_name": "JPMorgan Chase Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_22": {
-    "bank_name": "Krung Thai Bank PCL",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_23": {
-    "bank_name": "Mizuho Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_24": {
-    "bank_name": "MUFG Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_25": {
-    "bank_name": "National Australia Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_26": {
-    "bank_name": "Rabo Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_27": {
-    "bank_name": "Societe Generale Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_28": {
-    "bank_name": "Sumitomo Mitsui Banking Corporation",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_29": {
-    "bank_name": "Scotiabank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_30": {
-    "bank_name": "Shinhan Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_31": {
-    "bank_name": "Standard Chartered Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_32": {
-    "bank_name": "SBM Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_33": {
-    "bank_name": "NatWest Markets Plc",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_34": {
-    "bank_name": "UBS AG",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_35": {
-    "bank_name": "UOB Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_36": {
-    "bank_name": "Westpac Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "FRB_37": {
-    "bank_name": "Woori Bank",
-    "bank_type": "FOREIGN BANKS",
-    "bank_type_code": "FRB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_1": {
-    "bank_name": "Adarsh Co-op. Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_2": {
-    "bank_name": "Apna Sahakari Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_3": {
-    "bank_name": "Abhyudaya Co-op. Bank Ltd",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_4": {
-    "bank_name": "Bharat Co-op Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_5": {
-    "bank_name": "Bassein Catholic Co-operative Bank Ltd",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_6": {
-    "bank_name": "Bombay Mercantile Co-op Bank Ltd.",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_7": {
-    "bank_name": "Citizen Credit Co-operative Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_8": {
-    "bank_name": "Cosmos Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_9": {
-    "bank_name": "Dombivli Nagari Sahakari Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_10": {
-    "bank_name": "Jalgaon Janta Sahakari Bank Ltd.",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_11": {
-    "bank_name": "Janata Sahakari Bank Ltd",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_12": {
-    "bank_name": "Jankalyan Sahakari Bank Ltd.",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_13": {
-    "bank_name": "Kallappanna Awade Ichalkaranji Janata Sahakari Bank Ltd.",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_14": {
-    "bank_name": "Mahesh Sahakari Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_15": {
-    "bank_name": "Mumbai District Central Co-op. Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_16": {
-    "bank_name": "Maharashtra State Co-op. Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_17": {
-    "bank_name": "New India Co-op. Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_18": {
-    "bank_name": "NKGSB Cooperative Bank Ltd.",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_19": {
-    "bank_name": "GP Parsik Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_20": {
-    "bank_name": "Punjab and Maharashtra Co-op. Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_21": {
-    "bank_name": "Rajkot Nagarik Sahakari Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_22": {
-    "bank_name": "Saraswat Co-Op. Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_23": {
-    "bank_name": "Thane Bharat Sahakari Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_24": {
-    "bank_name": "Thane District Central Co-op. Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_25": {
-    "bank_name": "TJSB Sahakari Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_26": {
-    "bank_name": "The Greater Bombay Co-op Bank Ltd.",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_27": {
-    "bank_name": "The Jalgaon People's Co-op. Bank Ltd",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_28": {
-    "bank_name": "The Kalupur Commercial Co-op. Bank",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_29": {
-    "bank_name": "SVC Co-operative Bank Ltd.",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "COB_30": {
-    "bank_name": "The Andhra Pradesh Mahesh Co-operative Urban Bank Ltd.",
-    "bank_type": "CO-OPERATIVE BANKS",
-    "bank_type_code": "COB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_1": {
-    "bank_name": "AU Small Finance Bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_2": {
-    "bank_name": "Capital Small Finance Bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_3": {
-    "bank_name": "ESAF Small Finance Bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_4": {
-    "bank_name": "Fincare Small Finance Bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_5": {
-    "bank_name": "Equitas Small Finance Bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_6": {
-    "bank_name": "Jana Small Finance bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_7": {
-    "bank_name": "North East Small Finance Bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_8": {
-    "bank_name": "Suryoday Small Finance Bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_9": {
-    "bank_name": "Ujjivan Small Finance Bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_10": {
-    "bank_name": "Utkarsh Small Finance Bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_11": {
-    "bank_name": "Unity Small Finance Bank Ltd",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  },
-  "SFB_12": {
-    "bank_name": "Shivalik Small Fincare Bank",
-    "bank_type": "SMALL FINANCE BANK",
-    "bank_type_code": "SFB",
-    "url": "",
-    "verify_ssl": false
-  }
+    verify_ssl: true,
+  },
+  PVB_1: {
+    bank_name: "Axis Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_2: {
+    bank_name: "Bandhan Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_3: {
+    bank_name: "CSB Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_4: {
+    bank_name: "City Union Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_5: {
+    bank_name: "DCB Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_6: {
+    bank_name: "Dhanlaxmi Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_7: {
+    bank_name: "Federal Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_8: {
+    bank_name: "HDFC Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_9: {
+    bank_name: "ICICI Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_10: {
+    bank_name: "IDBI Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_11: {
+    bank_name: "IDFC First Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_12: {
+    bank_name: "IndusInd Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_13: {
+    bank_name: "Jammu and Kashmir Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_14: {
+    bank_name: "Karnataka Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_15: {
+    bank_name: "Karur Vysya Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_16: {
+    bank_name: "Kotak Mahindra Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_17: {
+    bank_name: "Lakshmi Vilas Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_18: {
+    bank_name: "The Nainital Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_19: {
+    bank_name: "South Indian Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_20: {
+    bank_name: "Tamilnad Mercantile Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_21: {
+    bank_name: "RBL Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  PVB_22: {
+    bank_name: "YES Bank",
+    bank_type: "PRIVATE SECTOR BANKS",
+    bank_type_code: "PVB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_1: {
+    bank_name: "Abu Dhabi Commercial Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_2: {
+    bank_name: "AB Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_3: {
+    bank_name: "ANZ Banking Group Ltd",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_4: {
+    bank_name: "Bank of America N.A.",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_5: {
+    bank_name: "Bank of Bahrain and Kuwait BSC",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_6: {
+    bank_name: "Barclays Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_7: {
+    bank_name: "Bank of Ceylon",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_8: {
+    bank_name: "BNP Paribas",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_9: {
+    bank_name: "Citibank India",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_10: {
+    bank_name: "Credit Agricole Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_11: {
+    bank_name: "Credit Suisse",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_12: {
+    bank_name: "CTBC Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_13: {
+    bank_name: "Commonwealth Bank Of Australia",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_14: {
+    bank_name: "DBS Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_15: {
+    bank_name: "Deutsche Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_16: {
+    bank_name: "Doha Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_17: {
+    bank_name: "Emirates NBD",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_18: {
+    bank_name: "FirstRand Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_19: {
+    bank_name: "HSBC Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_20: {
+    bank_name: "ICBC Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_21: {
+    bank_name: "JPMorgan Chase Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_22: {
+    bank_name: "Krung Thai Bank PCL",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_23: {
+    bank_name: "Mizuho Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_24: {
+    bank_name: "MUFG Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_25: {
+    bank_name: "National Australia Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_26: {
+    bank_name: "Rabo Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_27: {
+    bank_name: "Societe Generale Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_28: {
+    bank_name: "Sumitomo Mitsui Banking Corporation",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_29: {
+    bank_name: "Scotiabank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_30: {
+    bank_name: "Shinhan Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_31: {
+    bank_name: "Standard Chartered Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_32: {
+    bank_name: "SBM Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_33: {
+    bank_name: "NatWest Markets Plc",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_34: {
+    bank_name: "UBS AG",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_35: {
+    bank_name: "UOB Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_36: {
+    bank_name: "Westpac Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  FRB_37: {
+    bank_name: "Woori Bank",
+    bank_type: "FOREIGN BANKS",
+    bank_type_code: "FRB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_1: {
+    bank_name: "Adarsh Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_2: {
+    bank_name: "Apna Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_3: {
+    bank_name: "Abhyudaya Co-op. Bank Ltd",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_4: {
+    bank_name: "Bharat Co-op Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_5: {
+    bank_name: "Bassein Catholic Co-operative Bank Ltd",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_6: {
+    bank_name: "Bombay Mercantile Co-op Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_7: {
+    bank_name: "Citizen Credit Co-operative Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_8: {
+    bank_name: "Cosmos Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_9: {
+    bank_name: "Dombivli Nagari Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_10: {
+    bank_name: "Jalgaon Janta Sahakari Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_11: {
+    bank_name: "Janata Sahakari Bank Ltd",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_12: {
+    bank_name: "Jankalyan Sahakari Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_13: {
+    bank_name: "Kallappanna Awade Ichalkaranji Janata Sahakari Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_14: {
+    bank_name: "Mahesh Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_15: {
+    bank_name: "Mumbai District Central Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_16: {
+    bank_name: "Maharashtra State Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_17: {
+    bank_name: "New India Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_18: {
+    bank_name: "NKGSB Cooperative Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_19: {
+    bank_name: "GP Parsik Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_20: {
+    bank_name: "Punjab and Maharashtra Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_21: {
+    bank_name: "Rajkot Nagarik Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_22: {
+    bank_name: "Saraswat Co-Op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_23: {
+    bank_name: "Thane Bharat Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_24: {
+    bank_name: "Thane District Central Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_25: {
+    bank_name: "TJSB Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_26: {
+    bank_name: "The Greater Bombay Co-op Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_27: {
+    bank_name: "The Jalgaon People's Co-op. Bank Ltd",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_28: {
+    bank_name: "The Kalupur Commercial Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_29: {
+    bank_name: "SVC Co-operative Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  COB_30: {
+    bank_name: "The Andhra Pradesh Mahesh Co-operative Urban Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_1: {
+    bank_name: "AU Small Finance Bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_2: {
+    bank_name: "Capital Small Finance Bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_3: {
+    bank_name: "ESAF Small Finance Bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_4: {
+    bank_name: "Fincare Small Finance Bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_5: {
+    bank_name: "Equitas Small Finance Bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_6: {
+    bank_name: "Jana Small Finance bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_7: {
+    bank_name: "North East Small Finance Bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_8: {
+    bank_name: "Suryoday Small Finance Bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_9: {
+    bank_name: "Ujjivan Small Finance Bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_10: {
+    bank_name: "Utkarsh Small Finance Bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_11: {
+    bank_name: "Unity Small Finance Bank Ltd",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
+  SFB_12: {
+    bank_name: "Shivalik Small Fincare Bank",
+    bank_type: "SMALL FINANCE BANK",
+    bank_type_code: "SFB",
+    url: "",
+    verify_ssl: false,
+  },
 }

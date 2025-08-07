@@ -1,4 +1,5 @@
 import os, re, json, json5, string, shutil, inspect
+from datetime import datetime
 import pandas as pd #type:ignore
 from typing import List
 
@@ -110,6 +111,18 @@ class Helper:
             created_paths.append(full_path)
         return created_paths
 
+    @staticmethod
+    def get_timestamp(mode="json"):
+
+        now = datetime.now()
+        
+        if mode == "json":
+            return now.strftime("%H:%M:%S")
+        elif mode == "filename":
+            return now.strftime("%H-%M-%S")
+        else:
+            raise ValueError("Invalid mode. Use 'json' or 'filename'.")
+    
     @staticmethod
     def print_class_info(cls):
         print(f"Class: {cls.__name__}\n")

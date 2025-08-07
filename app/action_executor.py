@@ -8,48 +8,40 @@ import pandas as pd
 import re, os
 from io import StringIO
 
-
 class ActionExecutor:
-    def __init__(self, driver, logger, params,paths,base_window=None):
-        self.driver = driver
+    def __init__(self,logger=None, params=None, paths=None, base_window=None):
         self.logger = logger
-        self.PARAMS = params
-        self.PATHS = paths
-        
-        self.DATE = datetime.now().strftime("%d%m%Y")
+        self.PARAMS = params or {}
+        self.PATHS = paths or {}
+        self.data = {}
 
+        self.DATE = datetime.now().strftime("%d%m%Y")
         self.OUTPUT_PATH = os.path.join(paths["output"],paths["folders"]["data"],self.DATE,params["bank_name"])
         os.makedirs(self.OUTPUT_PATH, exist_ok=True)
-        
-        self.window_stack = [base_window or driver.current_window_handle]
-        
-        self.data = {}
-    
-    def attach_headers(self,driver, config: dict):
-        
-        options = webdriver.ChromeOptions()
 
-        # standard Chrome options
-        for opt in config.get("chrome_options", []):
+        # Create driver if not provided
+        self.driver = self._create_driver()
+        self._attach_headers()
+        self.window_stack = [base_window or self.driver.current_window_handle]
+
+    def _create_driver(self):
+        options = webdriver.ChromeOptions()
+        for opt in self.PARAMS.get("chrome_options", []):
             options.add_argument(opt)
 
-        # experimental options
-        # for key, value in config.get("experimental_options", {}).items():
-        #     options.add_experimental_option(key, value)
-
-        # Add User-Agent if present
-        if "User-Agent" in config.get("headers", {}):
-            options.add_argument(f'user-agent={config["headers"]["User-Agent"]}')
-
-        driver = webdriver.Chrome(options=options)
-
-        # Enable Network domain in DevTools Protocol
-        driver.execute_cdp_cmd("Network.enable", {})
-
-        # Set extra headers
-        driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {
-            "headers": config.get("headers",{})
-        })
+        user_agent = self.PARAMS.get("headers", {}).get("User-Agent")
+        if user_agent:
+            options.add_argument(f'user-agent={user_agent}')
+        
+        return webdriver.Chrome(options=options)
+    
+    def _attach_headers(self):
+        self.driver.execute_cdp_cmd("Network.enable", {})
+        headers = self.PARAMS.get("headers", {})
+        if headers:
+            self.driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {
+                "headers": headers
+            })
 
     def get_by(self, by_string):
         return {
@@ -162,7 +154,16 @@ class ActionExecutor:
                             sub_elem = elem.find_element(self.get_by(by), sub_selector)
                             if sub_elem:
                                 text = sub_elem.text.strip()
+                                if not text: #Hidden Text
+                                    print("Trying extract using textContent .")
+                                    text = sub_elem.get_attribute("textContent").strip()
+                                
+                                if not text:
+                                    print("Trying extract using innerHTML .")
+                                    text = sub_elem.get_attribute("innerHTML").strip()
+                                    
                                 results[key] = text
+                                
                         except Exception as e:
                             self.logger.warning(f"Missing field '{key}': {e}")
                             results[key] = None
