@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium import webdriver 
 import time
 from datetime import datetime
 import pandas as pd
@@ -24,13 +25,30 @@ class ActionExecutor:
         
         self.data = {}
     
-    def attach_headers(self,driver, headers: dict):
+    def attach_headers(self,driver, config: dict):
+        
+        options = webdriver.ChromeOptions()
+
+        # standard Chrome options
+        for opt in config.get("chrome_options", []):
+            options.add_argument(opt)
+
+        # experimental options
+        # for key, value in config.get("experimental_options", {}).items():
+        #     options.add_experimental_option(key, value)
+
+        # Add User-Agent if present
+        if "User-Agent" in config.get("headers", {}):
+            options.add_argument(f'user-agent={config["headers"]["User-Agent"]}')
+
+        driver = webdriver.Chrome(options=options)
+
         # Enable Network domain in DevTools Protocol
         driver.execute_cdp_cmd("Network.enable", {})
 
         # Set extra headers
         driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {
-            "headers": headers
+            "headers": config.get("headers",{})
         })
 
     def get_by(self, by_string):
@@ -137,8 +155,11 @@ class ActionExecutor:
                 if scrape_fields:
                     results = {}
                     for key, sub_selector in scrape_fields.items():
+                        
+                        if "|||" in sub_selector:
+                            sub_selector,by = sub_selector.split("|||")
                         try:
-                            sub_elem = elem.find_element(By.CSS_SELECTOR, sub_selector)
+                            sub_elem = elem.find_element(self.get_by(by), sub_selector)
                             if sub_elem:
                                 text = sub_elem.text.strip()
                                 results[key] = text

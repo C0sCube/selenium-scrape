@@ -6,6 +6,7 @@
     "folders":{
         "cache":"cache",
         "data":"data",
-        "log":"logs"
+        "log":"logs",
+        "processed":"processed"
     }
 }
