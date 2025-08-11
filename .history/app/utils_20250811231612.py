@@ -91,10 +91,12 @@ class Helper:
     def save_text(data,path:str,mode = 'w'):
         if not data:
             raise ValueError("Empty data cannot be saved.")
+        
         if mode not in ('w', 'a'):
             raise ValueError(f"Invalid mode '{mode}'. Use 'w' or 'a'.")
         
         os.makedirs(os.path.dirname(path), exist_ok=True)
+        
         with open(path, mode, encoding='utf-8') as f:
             if isinstance(data, dict):
                 # Write K-V Pair

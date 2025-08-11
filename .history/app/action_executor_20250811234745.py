@@ -59,6 +59,54 @@ class ActionExecutor:
             self.driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {
                 "headers": headers
             })
+            
+    def _table_html_action(self, action):
+        ALLOWED = {"rowspan", "colspan"}
+        by = self.get_by(action.get("by", "css"))
+        value = action["value"]
+        multiple = action.get("multiple", False)
+        html_name = action.get("html_name", "table")
+        
+        elems = self.driver.find_elements(by, value) if multiple else [self.driver.find_element(by, value)]
+
+        for idx, elem in enumerate(elems):
+            raw_html = elem.get_attribute("outerHTML")
+
+            # Clean HTML
+            soup = BeautifulSoup(raw_html, "html.parser")
+            for tag in soup.find_all(True):
+                tag.attrs = {k: v for k, v in tag.attrs.items() if k in ALLOWED}
+
+            clean_html = str(soup)
+            file_path = os.path.join(self.OUTPUT_PATH, f"{html_name}_{idx}.html")
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(clean_html)
+            
+            self.logger.info(f"Saved cleaned table HTML to {file_path}")
+
+    def _table_to_excel_action(self, action):
+        html_files = action.get("html_files", [])
+        output_name = action.get("output_name", "tables.xlsx")
+        all_tables = []
+
+        for file_path in html_files:
+            with open(file_path, "r", encoding="utf-8") as f:
+                html = f.read()
+            
+            html = re.sub(r'\t+', '', html)
+            html = re.sub(r'<th', '<td', html)
+            html = re.sub(r'</th>', '</td>', html)
+            
+            df_list = pd.read_html(StringIO(html), header=None)
+            blank_rows = pd.DataFrame([[""] * df_list[0].shape[1]] * 3)
+            
+            all_tables.extend(df_list)
+            all_tables.append(blank_rows)
+        
+        combined_df = pd.concat(all_tables, ignore_index=True)
+        output_path = os.path.join(self.OUTPUT_PATH, output_name)
+        combined_df.to_excel(output_path, index=False)
+        self.logger.info(f"Saved {len(all_tables)//2} table(s) to {output_path}")
 
     def get_by(self, by_string):
         return {
@@ -164,8 +212,9 @@ class ActionExecutor:
                     file.write(html_content)
                 
                 self.logger.info(f"Saved raw HTML content to {file_path}")
+
         
-        #extract table to excel
+        #extract table(s) of webpage
         elif action_type == "table":
             
             output_path = os.path.join(self.OUTPUT_PATH,f"{table_name}_{self.DATE.strftime("%d%m%Y %H%M")}.xlsx")
@@ -173,6 +222,8 @@ class ActionExecutor:
             WebDriverWait(self.driver, timeout).until(
                 EC.presence_of_element_located((self.get_by(by), value))
             )
+            
+            # if multiple:
             
             elems = self.driver.find_elements(self.get_by(by), value) if multiple else [self.driver.find_element(self.get_by(by), value)]
             all_tables = []
@@ -190,8 +241,7 @@ class ActionExecutor:
             combined_df = pd.concat(all_tables, ignore_index=True)      
             combined_df.to_excel(output_path, index=False)
             self.logger.info(f"Saved {len(all_tables)//2} table(s) to {self.OUTPUT_PATH}")
-        
-        #scrape data
+            
         elif action_type == "scrape":
             by = _action_.get("by", "css")
             
@@ -240,43 +290,6 @@ class ActionExecutor:
             pprint.pprint(data_container)
             scrape_data.update(data_container)
         
-        #table tag html save
-        elif action_type == "table_html":
-            ALLOWED = {"rowspan", "colspan"}
-            by = self.get_by(_action_.get("by", "css"))
-            value = _action_["value"]
-            multiple = _action_.get("multiple", False)
-            all_save = _action_.get("consolidate_save", False)
-            
-            elems = self.driver.find_elements(by, value) if multiple else [self.driver.find_element(by, value)]
-
-            combine_html = []
-            
-            for idx, elem in enumerate(elems):
-                raw_html = elem.get_attribute("outerHTML")
-                raw_html = re.sub(r'<th', '<td', raw_html)
-                raw_html = re.sub(r'</th>', '</td>', raw_html)
-                
-                # Clean HTML
-                soup = BeautifulSoup(raw_html, "html.parser")
-                for tag in soup.find_all(True):
-                    tag.attrs = {k: v for k, v in tag.attrs.items() if k in ALLOWED}
-                clean_html = str(soup)
-                
-                if all_save:
-                    combine_html.append(clean_html)
-                else:
-                    file_path = os.path.join(self.OUTPUT_PATH, f"table_{idx}.html")
-                    with open(file_path, "w", encoding="utf-8") as f:
-                        f.write(clean_html)
-                    self.logger.info(f"Saved cleaned table HTML to {file_path}")
-                        
-            if all_save:
-                file_path = os.path.join(self.OUTPUT_PATH, "table.html")
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.write("<br><br><br>".join(combine_html))
-                self.logger.info(f"Saved combined cleaned table HTML to {file_path}")
-
         #open website
         elif action_type == "website":
             try:
@@ -303,7 +316,6 @@ class ActionExecutor:
         #         time.sleep(0.5)
                 
         elif action_type is None:
-            
             self.logger.info(f"Checked presence of element: {by}={value}")
 
 
@@ -318,13 +330,14 @@ class ActionExecutor:
 
         return scrape_data
 
+    
     def execute_blocks(self, block: list):  
         block_data = {}
         for idx,_action_ in enumerate(block):
             data = self.execute(_action_)
             if data:
                 block_data.update(data)
-        time_stamp = self.DATE.strftime("%Y-%m-%d %H:%M")
+        time_stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
         return block_data,time_stamp
     
     def perform_action():

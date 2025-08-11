@@ -318,6 +318,7 @@ class ActionExecutor:
 
         return scrape_data
 
+    
     def execute_blocks(self, block: list):  
         block_data = {}
         for idx,_action_ in enumerate(block):

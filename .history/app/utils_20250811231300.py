@@ -88,28 +88,20 @@ class Helper:
     
     #WRITE TEXT
     @staticmethod
-    def save_text(data,path:str,mode = 'w'):
+    def save_text(data,path:str):
         if not data:
-            raise ValueError("Empty data cannot be saved.")
-        if mode not in ('w', 'a'):
-            raise ValueError(f"Invalid mode '{mode}'. Use 'w' or 'a'.")
-        
+            print("Empty Data")
+            return
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, mode, encoding='utf-8') as f:
-            if isinstance(data, dict):
-                # Write K-V Pair
-                for k, v in data.items():
-                    f.write(f"{k}:{v}\n")
-            elif isinstance(data, list):
-                # Write New Line
-                for k in data:
-                    f.write(f"{k}\n")
-            elif isinstance(data, str):
-                # Write Single String
-                f.write(data)
-            else:
-                raise ValueError(f"Invalid data type: {type(data)}")
-        
+        with open(path, 'a', encoding='utf-8') as f:
+            if isinstance(data,dict):
+                f.writelines(f"{k}:{v}\n" for k,v in data.items())
+            elif isinstance(data,list):
+                f.writelines(f"{k}\n" for k in data)
+            elif isinstance(data,str):
+                f.writelines(data)
+            else: print("Invalid type")
+     
     @staticmethod        
     def create_dirs(root_path: str, dirs: List[str]) -> List[str]:
         created_paths = []
@@ -124,7 +116,7 @@ class Helper:
         now = datetime.now()
         return now.strftime(f"%H{sep}%M{sep}%S")
     
-    #normal case
+    #normal casing
     @staticmethod
     def is_numeric(text):
         return bool(re.fullmatch(r'[+-]?(\d+(\.\d*)?|\.\d+)', text))

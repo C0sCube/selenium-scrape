@@ -1,4 +1,4 @@
-import os, re, json, json5, string, shutil, inspect, camelot
+import os, re, json, json5, string, shutil, inspect
 from datetime import datetime
 import pandas as pd #type:ignore
 from typing import List
@@ -9,16 +9,16 @@ class Helper:
     def __init__(self):
         pass
     #PARSING UTILS
-    def get_xlsx_in_folder(self,path:str, expected_file_name ="table_data.xlsx" ) -> dict:
+    def get_xlsx_in_folder(self,path:str) -> dict:
         df = pd.DataFrame()
         for root,_,files in os.walk(path):
             for file_name in files:
-                if file_name.endswith(".xlsx") and file_name.lower() == expected_file_name:
+                if file_name.endswith(".xlsx") and file_name.lower() == "table_data.xlsx":
                     self.logger.info(f"Excel sheet containing table data found.")
                     full_path = os.path.join(root, file_name)
                     df = pd.read_excel(full_path)
                     return df
-        # self.logger.warning(f"{expected_file_name} not found !! Returning empty df.")
+        self.logger.warning(f" 'table_data.xlsx' not found !! Returning empty df.")
         return df
 
 
@@ -88,28 +88,20 @@ class Helper:
     
     #WRITE TEXT
     @staticmethod
-    def save_text(data,path:str,mode = 'w'):
+    def save_text(data,path:str):
         if not data:
-            raise ValueError("Empty data cannot be saved.")
-        if mode not in ('w', 'a'):
-            raise ValueError(f"Invalid mode '{mode}'. Use 'w' or 'a'.")
-        
+            print("Empty Data")
+            return
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, mode, encoding='utf-8') as f:
-            if isinstance(data, dict):
-                # Write K-V Pair
-                for k, v in data.items():
-                    f.write(f"{k}:{v}\n")
-            elif isinstance(data, list):
-                # Write New Line
-                for k in data:
-                    f.write(f"{k}\n")
-            elif isinstance(data, str):
-                # Write Single String
-                f.write(data)
-            else:
-                raise ValueError(f"Invalid data type: {type(data)}")
-        
+        with open(path, 'a', encoding='utf-8') as f:
+            if isinstance(data,dict):
+                f.writelines(f"{k}:{v}\n" for k,v in data.items())
+            elif isinstance(data,list):
+                f.writelines(f"{k}\n" for k in data)
+            elif isinstance(data,str):
+                f.writelines(data)
+            else: print("Invalid type")
+     
     @staticmethod        
     def create_dirs(root_path: str, dirs: List[str]) -> List[str]:
         created_paths = []
@@ -124,7 +116,7 @@ class Helper:
         now = datetime.now()
         return now.strftime(f"%H{sep}%M{sep}%S")
     
-    #normal case
+    #match type
     @staticmethod
     def is_numeric(text):
         return bool(re.fullmatch(r'[+-]?(\d+(\.\d*)?|\.\d+)', text))
@@ -179,45 +171,12 @@ class Helper:
         return re.sub(r"\s+", " ", text).strip().lower()
     
     @staticmethod
-    def snake_case(text: str) -> str:
-        text = re.sub(r'([A-Z]+)', r' \1', text).strip()
-        return re.sub(r'[_\s-]+', '_', text).lower()
-
-    @staticmethod
-    def camel_case(text: str) -> str:
-        text = re.sub(r'[_\s-]+', ' ', text)
-        text = text.title()
-        return text[0].lower() + text[1:].replace(' ', '')
-     
-     
-    #file read/write   
-    @staticmethod
-    def read_file(filepath: str) -> str:
-        with open(filepath, 'r') as f:
-            return f.read()
-
-    @staticmethod
-    def write_file(filepath: str, content: str):
-        with open(filepath, 'w') as f:
-            f.write(content)
-
-    @staticmethod
-    def get_file_extension(filename: str) -> str:
-        return os.path.splitext(filename)[1]
-
-    #list chunk
-    @staticmethod
-    def chunk_list(data: list, size: int):
-        return [data[i:i + size] for i in range(0, len(data), size)]
-
-    @staticmethod
-    def flatten_list(list_of_lists: list):
-        return [item for sublist in list_of_lists for item in sublist]
-    
-    @staticmethod
-    def remove_duplicates(data:list):
-        return list(dict.fromkeys(data))
-    
+    def _to_rgb_tuple(color_int):
+        c = color_int & 0xFFFFFF
+        r = (c >> 16) & 0xFF
+        g = (c >> 8) & 0xFF
+        b = c & 0xFF
+        return (r/255.0, g/255.0, b/255.0)
     #PDF CRUD
     # @staticmethod
     # def get_pdf_text(path:str):
@@ -343,14 +302,14 @@ class TableParser:
                 thresh (int): Minimum number of matching cells required per row.
         Returns:list: List of matching row indices. Returns [0] if none found."""
         
-
+        regex = SidKimRegex()
         pattern = re.compile("|".join(keywords), re.IGNORECASE)
         # print(pattern)
         matched_rows = []
         for idx, row in df.iterrows():
             match_count = 0
             for cell in row:
-                cell_text = Helper._normalize_alphanumeric(str(cell))
+                cell_text = regex._normalize_alphanumeric(str(cell))
                 # print(cell_text)
                 if pattern.search(cell_text):  # use .match to anchor to start
                     match_count += 1
@@ -367,10 +326,11 @@ class TableParser:
                 match_start_only (bool): (Unused currently) If True, match only at the start of text.
         Returns:list: List of matching column names. Returns [0] if none found."""
         
+        regex = SidKimRegex()
         pattern = re.compile(rf"({'|'.join(keywords)})", re.IGNORECASE)
         matched_cols = []
         for col in df.columns:
-            col_text = Helper._normalize_alphanumeric(" ".join(map(str, df[col].fillna("").astype(str))))
+            col_text = regex._normalize_alphanumeric(" ".join(map(str, df[col].fillna("").astype(str))))
             match_count = 0
             for _ in pattern.finditer(col_text):
                 match_count += 1
@@ -430,17 +390,3 @@ class TableParser:
         return dfs
     
     def _group_and_collect(self,df, group_col=""):
-        final_dict = {}
-        data_cols = df.columns.drop(group_col)
-        
-        for title, group_df in df.groupby(group_col, sort=False):
-            norm_title = Helper._normalize_alphanumeric(title)
-            values = [
-                cell
-                for _, row in group_df.iterrows()
-                for cell in row[data_cols]
-                if isinstance(cell, str) and cell.strip()
-            ]
-            final_dict[norm_title] = values
-
-        return final_dict

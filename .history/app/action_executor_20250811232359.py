@@ -32,7 +32,7 @@ class ActionExecutor:
         self.PATHS = paths or {}
         self.data = {}
 
-        self.DATE = datetime.now()
+        self.DATE = datetime.now().strftime("%d%m%Y")
         self.OUTPUT_PATH = os.path.join(paths["output"],paths["folders"]["data"],self.DATE,params["bank_name"])
         os.makedirs(self.OUTPUT_PATH, exist_ok=True)
 
@@ -72,11 +72,11 @@ class ActionExecutor:
 
     def get_condition(self, wait_type, by, value):
         cond_map = {
-            "clickable": EC.element_to_be_clickable,
-            "visible": EC.visibility_of_element_located,
-            "present": EC.presence_of_element_located,
-            "invisible": EC.invisibility_of_element_located,
-            "attached": EC.element_to_be_selected
+            WaitCondition.CLICKABLE: EC.element_to_be_clickable,
+            WaitCondition.VISIBLE: EC.visibility_of_element_located,
+            WaitCondition.PRESENT: EC.presence_of_element_located,
+            WaitCondition.INVISIBLE: EC.invisibility_of_element_located,
+            WaitCondition.ATTACHED: EC.element_to_be_selected
         }
 
         locator = (self.get_by(by), value)
@@ -135,7 +135,6 @@ class ActionExecutor:
                 raise e
 
         if action_type == "click":
-            
             elem.click()
             if new_window:
                 WebDriverWait(self.driver, timeout).until(lambda d: len(d.window_handles) > len(self.window_stack))
@@ -143,12 +142,21 @@ class ActionExecutor:
                 self.driver.switch_to.window(new_tab)
                 self.window_stack.append(new_tab)
 
+        # elif action_type == "send_keys":
+        #     elem.clear()
+        #     elem.send_keys(keys)
+        
+        # elif _action_ == "click_all":
+        #     elements = self.driver.find_elements(by, value)
+        #     for el in elements:
+        #         self.river.execute_script("arguments[0].click();", el)
+        #         time.sleep(0.5)
         elif action_type == "html":
-            
             by = _action_.get("by", "css")
-            multiple = _action_.get("multiple", False)
+            print(f"Saving Html Using By={by}")
             value = _action_["value"]
-
+            ALLOWED = {"rowspan", "colspan"}
+            
             elements = self.driver.find_elements(self.get_by(by), value) if multiple else [self.driver.find_element(self.get_by(by), value)] 
             
             for idx, elem in enumerate(elements):
@@ -157,41 +165,22 @@ class ActionExecutor:
                     self.logger.warning(f"No HTML content found for element: {value}")
                     continue
                 
+                soup = BeautifulSoup(html_content, "html.parser")
+
+                for tag in soup.find_all(True):
+                    # keep only the span attributes
+                    tag.attrs = {k: v for k, v in tag.attrs.items() if k in ALLOWED}
+
+                clean_html = str(soup)
                 file_name = f"{_action_.get('html_name', 'html')}_{idx}.html"
                 file_path = os.path.join(self.OUTPUT_PATH, file_name)
                 
                 with open(file_path, "w", encoding="utf-8") as file:
-                    file.write(html_content)
+                    file.write(clean_html)
                 
-                self.logger.info(f"Saved raw HTML content to {file_path}")
+                self.logger.info(f"Saved HTML content to {file_path}")
+            pass
         
-        #extract table to excel
-        elif action_type == "table":
-            
-            output_path = os.path.join(self.OUTPUT_PATH,f"{table_name}_{self.DATE.strftime("%d%m%Y %H%M")}.xlsx")
-            
-            WebDriverWait(self.driver, timeout).until(
-                EC.presence_of_element_located((self.get_by(by), value))
-            )
-            
-            elems = self.driver.find_elements(self.get_by(by), value) if multiple else [self.driver.find_element(self.get_by(by), value)]
-            all_tables = []
-            for idx,table in enumerate(elems):
-                html = re.sub(r'\t+', '', table.get_attribute("outerHTML"))
-                html = re.sub(r'<th', '<td', html)
-                html = re.sub(r'</th>', '</td>', html)
-
-                df = pd.read_html(StringIO(html),header=None)
-                blank_rows = pd.DataFrame([[""] * df[0].shape[1]] * 1)
-                
-                all_tables.extend(df)
-                all_tables.append(blank_rows)
-            
-            combined_df = pd.concat(all_tables, ignore_index=True)      
-            combined_df.to_excel(output_path, index=False)
-            self.logger.info(f"Saved {len(all_tables)//2} table(s) to {self.OUTPUT_PATH}")
-        
-        #scrape data
         elif action_type == "scrape":
             by = _action_.get("by", "css")
             
@@ -239,44 +228,42 @@ class ActionExecutor:
             
             pprint.pprint(data_container)
             scrape_data.update(data_container)
+
+        #take a screenshot
+        elif action_type == "screenshot":
+            
+            path = os.path.join(self.OUTPUT_PATH,f"{_action_.get('screenshot_name', 'screenshot')}.png")
+            self.driver.save_screenshot(path)
+            self.logger.info(f"Saved screenshot: {path}")
         
-        #table tag html save
-        elif action_type == "table_html":
-            ALLOWED = {"rowspan", "colspan"}
-            by = self.get_by(_action_.get("by", "css"))
-            value = _action_["value"]
-            multiple = _action_.get("multiple", False)
-            all_save = _action_.get("consolidate_save", False)
+        #extract table(s) of webpage
+        elif action_type == "table":
             
-            elems = self.driver.find_elements(by, value) if multiple else [self.driver.find_element(by, value)]
-
-            combine_html = []
+            output_path = os.path.join(self.OUTPUT_PATH,f"{table_name}_{datetime.now().strftime("%d%m%Y %H%M")}.xlsx")
             
-            for idx, elem in enumerate(elems):
-                raw_html = elem.get_attribute("outerHTML")
-                raw_html = re.sub(r'<th', '<td', raw_html)
-                raw_html = re.sub(r'</th>', '</td>', raw_html)
-                
-                # Clean HTML
-                soup = BeautifulSoup(raw_html, "html.parser")
-                for tag in soup.find_all(True):
-                    tag.attrs = {k: v for k, v in tag.attrs.items() if k in ALLOWED}
-                clean_html = str(soup)
-                
-                if all_save:
-                    combine_html.append(clean_html)
-                else:
-                    file_path = os.path.join(self.OUTPUT_PATH, f"table_{idx}.html")
-                    with open(file_path, "w", encoding="utf-8") as f:
-                        f.write(clean_html)
-                    self.logger.info(f"Saved cleaned table HTML to {file_path}")
-                        
-            if all_save:
-                file_path = os.path.join(self.OUTPUT_PATH, "table.html")
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.write("<br><br><br>".join(combine_html))
-                self.logger.info(f"Saved combined cleaned table HTML to {file_path}")
+            WebDriverWait(self.driver, timeout).until(
+                EC.presence_of_element_located((self.get_by(by), value))
+            )
+            
+            # if multiple:
+            
+            elems = self.driver.find_elements(self.get_by(by), value) if multiple else [self.driver.find_element(self.get_by(by), value)]
+            all_tables = []
+            for idx,table in enumerate(elems):
+                html = re.sub(r'\t+', '', table.get_attribute("outerHTML"))
+                html = re.sub(r'<th', '<td', html)
+                html = re.sub(r'</th>', '</td>', html)
 
+                df = pd.read_html(StringIO(html),header=None)
+                blank_rows = pd.DataFrame([[""] * df[0].shape[1]] * 3)
+                
+                all_tables.extend(df)
+                all_tables.append(blank_rows)
+            
+            combined_df = pd.concat(all_tables, ignore_index=True)      
+            combined_df.to_excel(output_path, index=False)
+            self.logger.info(f"Saved {len(all_tables)//2} table(s) to {self.OUTPUT_PATH}")
+            
         #open website
         elif action_type == "website":
             try:
@@ -285,29 +272,8 @@ class ActionExecutor:
             except Exception as e:
                 self.logger.error(f"Unable to redirect")
                 
-        #take a screenshot
-        elif action_type == "screenshot":
-            
-            path = os.path.join(self.OUTPUT_PATH,f"{_action_.get('screenshot_name', 'screenshot')}.png")
-            self.driver.save_screenshot(path)
-            self.logger.info(f"Saved screenshot: {path}")
-            
-        # elif action_type == "send_keys":
-        #     elem.clear()
-        #     elem.send_keys(keys)
-        
-        # elif _action_ == "click_all":
-        #     elements = self.driver.find_elements(by, value)
-        #     for el in elements:
-        #         self.river.execute_script("arguments[0].click();", el)
-        #         time.sleep(0.5)
-                
         elif action_type is None:
-            
             self.logger.info(f"Checked presence of element: {by}={value}")
-
-
-
 
         if return_to_base:
             self.logger.info(f"Returning to Base Window.")
@@ -317,14 +283,14 @@ class ActionExecutor:
                 self.driver.switch_to.window(self.window_stack[-1])
 
         return scrape_data
-
+    
     def execute_blocks(self, block: list):  
         block_data = {}
         for idx,_action_ in enumerate(block):
             data = self.execute(_action_)
             if data:
                 block_data.update(data)
-        time_stamp = self.DATE.strftime("%Y-%m-%d %H:%M")
+        time_stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
         return block_data,time_stamp
     
     def perform_action():

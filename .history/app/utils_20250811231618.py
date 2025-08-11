@@ -95,6 +95,7 @@ class Helper:
             raise ValueError(f"Invalid mode '{mode}'. Use 'w' or 'a'.")
         
         os.makedirs(os.path.dirname(path), exist_ok=True)
+        
         with open(path, mode, encoding='utf-8') as f:
             if isinstance(data, dict):
                 # Write K-V Pair

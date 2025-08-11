@@ -88,28 +88,20 @@ class Helper:
     
     #WRITE TEXT
     @staticmethod
-    def save_text(data,path:str,mode = 'w'):
+    def save_text(data,path:str):
         if not data:
-            raise ValueError("Empty data cannot be saved.")
-        if mode not in ('w', 'a'):
-            raise ValueError(f"Invalid mode '{mode}'. Use 'w' or 'a'.")
-        
+            print("Empty Data")
+            return
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, mode, encoding='utf-8') as f:
-            if isinstance(data, dict):
-                # Write K-V Pair
-                for k, v in data.items():
-                    f.write(f"{k}:{v}\n")
-            elif isinstance(data, list):
-                # Write New Line
-                for k in data:
-                    f.write(f"{k}\n")
-            elif isinstance(data, str):
-                # Write Single String
-                f.write(data)
-            else:
-                raise ValueError(f"Invalid data type: {type(data)}")
-        
+        with open(path, 'a', encoding='utf-8') as f:
+            if isinstance(data,dict):
+                f.writelines(f"{k}:{v}\n" for k,v in data.items())
+            elif isinstance(data,list):
+                f.writelines(f"{k}\n" for k in data)
+            elif isinstance(data,str):
+                f.writelines(data)
+            else: print("Invalid type")
+     
     @staticmethod        
     def create_dirs(root_path: str, dirs: List[str]) -> List[str]:
         created_paths = []
@@ -124,7 +116,7 @@ class Helper:
         now = datetime.now()
         return now.strftime(f"%H{sep}%M{sep}%S")
     
-    #normal case
+    #match type
     @staticmethod
     def is_numeric(text):
         return bool(re.fullmatch(r'[+-]?(\d+(\.\d*)?|\.\d+)', text))
@@ -177,47 +169,6 @@ class Helper:
             return text
         text = re.sub(r"[^0-9\.]+", " ", str(text))
         return re.sub(r"\s+", " ", text).strip().lower()
-    
-    @staticmethod
-    def snake_case(text: str) -> str:
-        text = re.sub(r'([A-Z]+)', r' \1', text).strip()
-        return re.sub(r'[_\s-]+', '_', text).lower()
-
-    @staticmethod
-    def camel_case(text: str) -> str:
-        text = re.sub(r'[_\s-]+', ' ', text)
-        text = text.title()
-        return text[0].lower() + text[1:].replace(' ', '')
-     
-     
-    #file read/write   
-    @staticmethod
-    def read_file(filepath: str) -> str:
-        with open(filepath, 'r') as f:
-            return f.read()
-
-    @staticmethod
-    def write_file(filepath: str, content: str):
-        with open(filepath, 'w') as f:
-            f.write(content)
-
-    @staticmethod
-    def get_file_extension(filename: str) -> str:
-        return os.path.splitext(filename)[1]
-
-    #list chunk
-    @staticmethod
-    def chunk_list(data: list, size: int):
-        return [data[i:i + size] for i in range(0, len(data), size)]
-
-    @staticmethod
-    def flatten_list(list_of_lists: list):
-        return [item for sublist in list_of_lists for item in sublist]
-    
-    @staticmethod
-    def remove_duplicates(data:list):
-        return list(dict.fromkeys(data))
-    
     #PDF CRUD
     # @staticmethod
     # def get_pdf_text(path:str):

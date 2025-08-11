@@ -303,7 +303,6 @@ class ActionExecutor:
         #         time.sleep(0.5)
                 
         elif action_type is None:
-            
             self.logger.info(f"Checked presence of element: {by}={value}")
 
 
@@ -318,13 +317,14 @@ class ActionExecutor:
 
         return scrape_data
 
+    
     def execute_blocks(self, block: list):  
         block_data = {}
         for idx,_action_ in enumerate(block):
             data = self.execute(_action_)
             if data:
                 block_data.update(data)
-        time_stamp = self.DATE.strftime("%Y-%m-%d %H:%M")
+        time_stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
         return block_data,time_stamp
     
     def perform_action():
