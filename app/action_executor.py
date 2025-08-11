@@ -2,10 +2,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver 
-import time
+from bs4 import BeautifulSoup
 from datetime import datetime
 import pandas as pd
-import re, os
+import re, os, time
 from io import StringIO
 
 class ActionExecutor:
@@ -134,7 +134,36 @@ class ActionExecutor:
         #     for el in elements:
         #         self.river.execute_script("arguments[0].click();", el)
         #         time.sleep(0.5)
+        elif action_type == "html":
+            by = _action_.get("by", "css")
+            print(f"Saving Html Using By={by}")
+            value = _action_["value"]
+            ALLOWED = {"rowspan", "colspan"}
+            
+            elements = self.driver.find_elements(self.get_by(by), value) if multiple else [self.driver.find_element(self.get_by(by), value)] 
+            
+            for idx, elem in enumerate(elements):
+                html_content = elem.get_attribute("outerHTML")
+                if not html_content:
+                    self.logger.warning(f"No HTML content found for element: {value}")
+                    continue
+                
+                soup = BeautifulSoup(html_content, "html.parser")
 
+                for tag in soup.find_all(True):
+                    # keep only the span attributes
+                    tag.attrs = {k: v for k, v in tag.attrs.items() if k in ALLOWED}
+
+                clean_html = str(soup)
+                file_name = f"{_action_.get('html_name', 'html')}_{idx}.html"
+                file_path = os.path.join(self.OUTPUT_PATH, file_name)
+                
+                with open(file_path, "w", encoding="utf-8") as file:
+                    file.write(clean_html)
+                
+                self.logger.info(f"Saved HTML content to {file_path}")
+            pass
+        
         elif action_type == "scrape":
             by = _action_.get("by", "css")
             

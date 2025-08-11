@@ -12,9 +12,9 @@ paths = Helper.load_json(r"paths.json")
 
 #constants
 BANK_CODES = ["PSB_1","PSB_2","PSB_3","PSB_4","PSB_5","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"]
-BANK_CODES = ["PSB_9"]
+# BANK_CODES = ["PSB_1"]
 
-LOG_DIR,CACHE_DIR,PROCESS_DIR = Helper.create_dirs(paths["output"],[paths["folders"]["log"],paths["folders"]["cache"],paths["folders"]["processed"]])
+LOG_DIR,CACHE_DIR,PROCESS_DIR = Helper.create_dirs(paths["output"],["logs","cache","processed"])
 TODAY = datetime.now().strftime("%d%m%Y")
 
 

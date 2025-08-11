@@ -1,0 +1,220 @@
+# Layered Table Change Detection Workflow
+
+When you’re scraping bank interest‐rate tables that appear, disappear, or shift order, a two‐phase approach works best:
+
+1. **Table Matching**  
+2. **Content Differencing**  
+
+Below is a complete recipe, with code snippets in Python, to reliably match “today’s” tables to “yesterday’s” tables and then measure what’s actually changed.
+
+---
+
+## 1. Extract and Normalize Tables
+
+First, grab all `<table>` elements and load them as pandas DataFrames. Then normalize each schema so you’re comparing apples to apples.
+
+```python
+import pandas as pd
+from bs4 import BeautifulSoup
+
+def extract_tables(html):
+    dfs = pd.read_html(html)              # quick catch-all
+    # Optional: fallback to BeautifulSoup for edge cases
+    # soup = BeautifulSoup(html, "html.parser") ...
+    normalized = []
+    for df in dfs:
+        # Standardize column names: lowercase, strip whitespace
+        df.columns = [c.lower().strip() for c in df.columns]
+        normalized.append(df.fillna("").astype(str))
+    return normalized
+```
+
+---
+
+## 2. Build a Similarity Matrix
+
+Create a bipartite similarity score between every “old” and “new” table based on structure:
+
+- **Column‐Name Jaccard**:  
+  \( \text{Jaccard} = \frac{|C_{\text{old}} \cap C_{\text{new}}|}{|C_{\text{old}} \cup C_{\text{new}}|} \)
+
+- **Size Penalty**: difference in row/column counts  
+
+Combine them into one similarity metric between 0 and 1.
+
+```python
+from itertools import product
+
+def table_similarity(df1, df2):
+    c1, c2 = set(df1.columns), set(df2.columns)
+    jaccard = len(c1 & c2) / len(c1 | c2) if c1 | c2 else 0
+    # Normalize size difference
+    size_diff = abs(df1.shape[0] - df2.shape[0]) / max(df1.shape[0], df2.shape[0], 1)
+    return 0.7 * jaccard + 0.3 * (1 - size_diff)
+
+def build_similarity_matrix(old_tables, new_tables):
+    matrix = [
+        [table_similarity(o, n) for n in new_tables]
+        for o in old_tables
+    ]
+    return matrix
+```
+
+---
+
+## 3. Solve the Assignment (Table Matching)
+
+Use the Hungarian algorithm (a.k.a. linear‐sum assignment) to find the best one‐to‐one mapping that maximizes total similarity.
+
+```python
+from scipy.optimize import linear_sum_assignment
+
+def match_tables(old_tables, new_tables, threshold=0.5):
+    sim_matrix = build_similarity_matrix(old_tables, new_tables)
+    # Hungarian solves a *minimization* – convert to cost
+    cost_matrix = [[1 - s for s in row] for row in sim_matrix]
+    old_idx, new_idx = linear_sum_assignment(cost_matrix)
+    
+    matches, unmatched_old, unmatched_new = [], set(range(len(old_tables))), set(range(len(new_tables)))
+    
+    for i, j in zip(old_idx, new_idx):
+        if sim_matrix[i][j] >= threshold:
+            matches.append((i, j, sim_matrix[i][j]))
+            unmatched_old.discard(i)
+            unmatched_new.discard(j)
+    
+    return matches, list(unmatched_old), list(unmatched_new)
+```
+
+- **`matches`**: pairs of indices with similarity ≥ threshold  
+- **`unmatched_old`**: tables removed  
+- **`unmatched_new`**: new tables added  
+
+---
+
+## 4. Diff Matched Tables
+
+After matching, run a cell-by-cell diff on each pair to quantify change:
+
+```python
+def diff_table(df_old, df_new):
+    # Align on shared columns
+    shared_cols = [c for c in df_old.columns if c in df_new.columns]
+    df1, df2 = df_old[shared_cols], df_new[shared_cols]
+    
+    # Reindex to same shape
+    max_rows = max(len(df1), len(df2))
+    df1_re = df1.reindex(range(max_rows), fill_value="")
+    df2_re = df2.reindex(range(max_rows), fill_value="")
+    
+    # Detect cell changes
+    changes = (df1_re != df2_re)
+    num_changed = changes.values.sum()
+    total_cells = changes.size
+    
+    return {
+        "total_cells": total_cells,
+        "changed_cells": int(num_changed),
+        "change_ratio": num_changed / total_cells,
+        "diff_snapshot": pd.concat([df1_re, df2_re], axis=1, keys=["old","new"])
+            .stack()
+            .loc[lambda s: s.index.get_level_values(1)==0]  # shows mismatches
+    }
+```
+
+---
+
+## 5. Putting It All Together
+
+```python
+# Load yesterday/today HTML
+old_tables = extract_tables(html_yesterday)
+new_tables = extract_tables(html_today)
+
+# Match and diff
+matches, removed, added = match_tables(old_tables, new_tables)
+
+results = []
+for i, j, score in matches:
+    diff = diff_table(old_tables[i], new_tables[j])
+    results.append({
+        "old_idx": i, 
+        "new_idx": j, 
+        "sim_score": score,
+        **diff
+    })
+
+print("Matched and diffed tables:", results)
+print("Removed tables:", removed)
+print("Added tables:", added)
+```
+
+---
+
+## Next Steps & Tips
+
+- Tweak the **similarity threshold** to avoid false matches.  
+- **Pre-filter** tables by known headers (e.g., look for “Interest Rate”) to speed up.  
+- For numerical columns, compute mean/median shifts instead of raw string diffs.  
+- Wrap it in a scheduler (cron/Task Scheduler) and persist past results in a database for auditing.  
+
+With this layered approach—structural matching followed by content diff—you’ll avoid the “waterfall” chaos and reliably track only the **meaningful** shifts in your bank-rate tables.
+
+
+# Understanding Similarity vs Distance in Plain English
+
+When we compare two things—like tables or lists—we often ask “how alike are they?” Similarity measures give a number where higher means more alike. Distance measures flip that around: higher means more different. Cosine and Jaccard are just two ways to score similarity, then we usually turn each into a distance by doing `1 – similarity`.
+
+---
+
+## Cosine Similarity: Comparing Patterns, Not Totals
+
+- Imagine two fruit baskets.  
+  - Basket A has 3 apples and 2 bananas.  
+  - Basket B has 6 apples and 4 bananas.  
+
+- Cosine similarity asks: “Do these baskets have the same mix of fruits?”  
+  - Even though B is twice as big, the mix (apples vs. bananas) is identical.  
+  - Cosine similarity would be 1.0 (perfect match) because the proportions line up exactly.
+
+- In a table context, each column or cell type is like a fruit. Cosine checks if the overall pattern of values matches, ignoring absolute size.
+
+---
+
+## Jaccard Similarity: Comparing Shared Items
+
+- Think of two movie lists:  
+  - List A: {Inception, Titanic, Matrix}  
+  - List B: {Titanic, Matrix, Avatar}  
+
+- Jaccard similarity counts shared titles over total unique titles:  
+  - Shared = 2 (Titanic, Matrix)  
+  - Total unique = 4 (Inception, Titanic, Matrix, Avatar)  
+  - Similarity = 2 ÷ 4 = 0.5
+
+- For tables, treat each unique cell value or token as an item. Jaccard tells you what fraction of those items overlap.
+
+---
+
+## From Similarity to Distance
+
+- Cosine distance = 1 – cosine similarity  
+- Jaccard distance = 1 – Jaccard similarity  
+
+So if two tables are identical under cosine, distance = 0. If they share half their tokens under Jaccard, distance = 0.5.
+
+---
+
+## When to Use Which
+
+- Use Cosine when:  
+  - You care about matching overall patterns or distributions.  
+  - You want to ignore how “big” one table is versus another.
+
+- Use Jaccard when:  
+  - You care about exact shared items or unique tokens.  
+  - Presence vs. absence matters more than counts.
+
+---
+
+Would you like a quick example calculation with your table data or a small code snippet to see these in action?
