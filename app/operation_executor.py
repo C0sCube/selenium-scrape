@@ -1,4 +1,4 @@
-import time ,re
+import time ,re,os
 from datetime import datetime
 import dateutil
 import pandas as pd
@@ -32,6 +32,62 @@ class OperationExecutor:
                 print(f"[ERROR]: {e}")
                 return date_str
         return text
+    
+    def save_tables_to_excel(tables, output_dir="tables", output_file="all_tables.xlsx", separator=True):
+        """
+        Save tables to Excel.
+        If separator=True, saves all tables in one file with multiple sheets.
+        If separator=False, saves each table in a separate Excel file.
+        """
+        if separator:
+            full_path = os.path.join(output_dir, output_file)
+            with pd.ExcelWriter(full_path, engine="openpyxl") as writer:
+                for i, table in enumerate(tables):
+                    df = pd.read_html(str(table))[0]
+                    sheet_name = f"Table_{i+1}"
+                    df.to_excel(writer, sheet_name=sheet_name, index=False)
+                    print(f"Added sheet: {sheet_name}")
+            # return full_path
+        else:
+            saved_files = []
+            for i, table in enumerate(tables):
+                df = pd.read_html(str(table))[0]
+                file_path = os.path.join(output_dir, f"table_{i+1}.xlsx")
+                df.to_excel(file_path, index=False)
+                saved_files.append(file_path)
+                print(f"Saved: {file_path}")
+            # return saved_files
+
+    
+
+    @staticmethod
+    def save_tables_html(tables,output_dir="output_html",output_file="combined.html",separator=None,wrap_html=True):
+        
+        if isinstance(tables,str):tables = [tables]
+        if separator is None:
+            # Save each table separately
+            for i, table in enumerate(tables):
+                filename = f"content_{i+1}.html"
+                path = os.path.join(output_dir, filename)
+                with open(path, "w", encoding="utf-8") as f:
+                    if wrap_html:
+                        f.write("<html><body>\n")
+                    f.write(str(table) + "\n")
+                    if wrap_html:
+                        f.write("</body></html>")
+        else:
+            # Save all tables in one file with separator
+            path = os.path.join(output_dir, output_file)
+            with open(path, "w", encoding="utf-8") as f:
+                if wrap_html:
+                    f.write("<html><body>\n")
+                for i, table in enumerate(tables):
+                    f.write(str(table) + "\n")
+                    if i < len(tables) - 1:
+                        f.write(separator + "\n")
+                if wrap_html:
+                    f.write("</body></html>")
+
     
     def runner(self, data, func_name):
         func = getattr(self, func_name, None)  #get function

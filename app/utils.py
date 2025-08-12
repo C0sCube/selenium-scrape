@@ -1,4 +1,4 @@
-import os, re, json, json5, string, shutil, inspect, camelot
+import os, re, json, json5, string, shutil, inspect, camelot, random
 from datetime import datetime
 import pandas as pd #type:ignore
 from typing import List
@@ -117,14 +117,15 @@ class Helper:
             full_path = os.path.join(root_path, dir_name)
             os.makedirs(full_path, exist_ok=True)
             created_paths.append(full_path)
-        return created_paths
+        
+        return created_paths if len(created_paths)>1 else created_paths[0]
 
     @staticmethod
     def get_timestamp(sep=":"):
         now = datetime.now()
         return now.strftime(f"%H{sep}%M{sep}%S")
     
-    #normal case
+    #normal check
     @staticmethod
     def is_numeric(text):
         return bool(re.fullmatch(r'[+-]?(\d+(\.\d*)?|\.\d+)', text))
@@ -136,7 +137,27 @@ class Helper:
     @staticmethod
     def is_alpha(text):
         return bool(re.fullmatch(r'[A-Za-z]+', text))
-        
+    
+    #normal change
+    @staticmethod
+    def apply_sub(text, pattern, replacement='', ignore_case=True):
+        if not isinstance(text, str):
+            return text
+        flags = re.IGNORECASE if ignore_case else 0
+        return re.sub(pattern, replacement, text, flags=flags)
+    
+    @staticmethod
+    def _remove_newline(text:str)->str:
+        if not isinstance(text, str):
+            return text
+        return text.replace('\n', '')
+    
+    @staticmethod
+    def _remove_tabspace(text:str)->str:
+        if not isinstance(text, str):
+            return text
+        return text.replace('\t', '')
+    
     @staticmethod
     def _remove_non_word_space_chars(text: str) -> str:
         if not isinstance(text, str):
@@ -218,6 +239,15 @@ class Helper:
     def remove_duplicates(data:list):
         return list(dict.fromkeys(data))
     
+    
+    #genrate
+    def generate_code(segment_count=3, segment_length=3):
+        segments = [
+            ''.join(random.choices(string.ascii_uppercase, k=segment_length))
+            for _ in range(segment_count)
+        ]
+        return '-'.join(segments)
+
     #PDF CRUD
     # @staticmethod
     # def get_pdf_text(path:str):

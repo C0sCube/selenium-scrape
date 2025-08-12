@@ -6,13 +6,13 @@ from app.program_logger import setup_logger
 from app.action_executor import ActionExecutor
 from app.operation_executor import OperationExecutor
 
-config = Helper.load_json(r"configs\params.json5", typ="json5")
+config = Helper.load_json(r"configs\param_table.json5", typ="json5")
 paths = Helper.load_json(r"paths.json")
 
 
 #constants
-BANK_CODES = ["PSB_1","PSB_2","PSB_3","PSB_4","PSB_5","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"]
-# BANK_CODES = ["PSB_1"]
+# BANK_CODES = ["PSB_1","PSB_2","PSB_3","PSB_4","PSB_5","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"]
+BANK_CODES = ["PSB_1","PSB_2","PSB_3"]
 
 LOG_DIR,CACHE_DIR,PROCESS_DIR = Helper.create_dirs(paths["output"],["logs","cache","processed"])
 TODAY = datetime.now().strftime("%d%m%Y")
@@ -28,7 +28,7 @@ for code in BANK_CODES:
     logger.info(f"Scraping From Bank {WEBSITE["bank_name"]}")
     website = WEBSITE["base_url"]
     #website specific
-    scrape_data = {"bank_name": WEBSITE["bank_name"],"bank_code":WEBSITE["bank_type_code"],"base_url":WEBSITE["base_url"],"response": {}}
+    scrape_data = {"bank_name": WEBSITE["bank_name"],"bank_code":WEBSITE["bank_type_code"],"base_url":WEBSITE["base_url"],"scraped_data": {}}
     executor = ActionExecutor(logger,WEBSITE,paths)
     try:
         # executor.attach_headers()
@@ -38,11 +38,11 @@ for code in BANK_CODES:
         for idx, block in enumerate(WEBSITE["blocks"]):
             logger.info(f"Running Block: {idx}")
             data, timestamp = executor.execute_blocks(block)
-            scrape_data["response"].update(data)
+            scrape_data["scraped_data"].update(data)
 
     except Exception as e:
         logger.error(f"Error scraping {WEBSITE['bank_name']}: {e}")
-        scrape_data["response"] = {"error": str(e)}
+        scrape_data["scraped_data"] = {"error": str(e)}
 
     finally:
         time.sleep(2)
@@ -51,7 +51,7 @@ for code in BANK_CODES:
 
     final_dict["records"].append(scrape_data)
 
-HRM = Helper.get_timestamp(mode="filename")
+HRM = Helper.get_timestamp(sep="")
 
 Helper.save_json(final_dict,os.path.join(CACHE_DIR,f"cache_{TODAY}_{HRM}.json5"))
 #post scraping ops
