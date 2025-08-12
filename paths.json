@@ -1,8 +1,8 @@
 {
-    "root":"C:\\Users\\kaustubh.keny\\Projects\\office-work\\selenium-scrape",
+    "root":"C:\\Users\\rando\\Office Projects\\selenium-scrape",
     "configs":"configs\\config.json5",
     "input":"",
-    "output":"C:\\Users\\kaustubh.keny\\Projects\\JSON25\\scrape_output",
+    "output":"C:\\Users\\rando\\Office Projects\\outputs\\scrape_output",
     "folders":{
         "cache":"cache",
         "data":"data",

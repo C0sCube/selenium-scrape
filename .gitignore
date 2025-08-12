@@ -1,5 +1,8 @@
 logs/
 __pycache__/
 
+.history
+history
 .history/
-history/
+
+paths.json

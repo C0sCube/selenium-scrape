@@ -135,6 +135,31 @@ class ActionExecutor:
                 new_tab = [h for h in self.driver.window_handles if h not in self.window_stack][0]
                 self.driver.switch_to.window(new_tab)
                 self.window_stack.append(new_tab)
+            
+        elif action_type == "download":
+            file_url = elem.get_attribute("href")
+            if not file_url:
+                try:
+                    link_elem = elem.find_element(By.TAG_NAME, "a")
+                    file_url = link_elem.get_attribute("href")
+                except:
+                    file_url = None
+
+            if file_url and file_url.lower().endswith(".pdf"):
+                import requests
+                cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
+                r = requests.get(file_url, cookies=cookies)
+                if r.status_code == 200:
+                    output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["downloads"])
+                    file_path = os.path.join(output_dir, os.path.basename(file_url))
+                    with open(file_path, "wb") as f:
+                        f.write(r.content)
+                    self.logger.info(f"Downloaded PDF to {file_path}")
+                else:
+                    self.logger.error(f"Failed to download file: {file_url}")
+            else:
+                elem.click()
+                self.logger.info("Triggered click for file download.")
 
         elif action_type == "html":
             html_name = _action_.get('html_name', 'html')
@@ -169,18 +194,18 @@ class ActionExecutor:
             cleaned_tables, table_scrape = [], {}
             for idx, elem in enumerate(elements):
                 raw_html = elem.get_attribute("outerHTML")
-                raw_html = Helper.apply_sub(raw_html, r'<th\b', '<td', ignore_case=True)
-                raw_html = Helper.apply_sub(raw_html, r'</th\b', '</td', ignore_case=True)
-                raw_html = Helper.apply_sub(raw_html, r'\<strong\>|\</strong\>|\<sup\>|\</sup\>|\<b\>|\</b\>',ignore_case=True)
-                raw_html = Helper.apply_sub(raw_html, r'[\n\t]+')
-                raw_html = Helper._normalize_whitespace(raw_html)
-
                 soup = BeautifulSoup(raw_html, "html.parser")
-                ALLOWED = {"rowspan", "colspan"}
+                
+                for th in soup.find_all("th"):
+                    th.name = "td"
+                    
                 for tag in soup.find_all(True):
-                    for attr in list(tag.attrs):
-                        if attr not in ALLOWED:
-                            del tag.attrs[attr]
+                    if tag.name not in ("td", "tr"):
+                        tag.unwrap() 
+                    else:
+                        for attr in list(tag.attrs):
+                            if attr not in {"rowspan", "colspan"}:
+                                del tag.attrs[attr]
 
                 cleaned_tables.append(str(soup))
                 table_scrape[f"table_{idx}"] = str(soup)
