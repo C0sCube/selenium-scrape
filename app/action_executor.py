@@ -27,17 +27,7 @@ class ActionExecutor:
         self.driver = self._create_driver()
         self._attach_headers()
         self.window_stack = [base_window or self.driver.current_window_handle]
-
-    # def _create_driver(self):
-    #     options = webdriver.ChromeOptions()
-    #     # for opt in self.PARAMS.get("chrome_options", []):
-    #     #     options.add_argument(opt)
-
-    #     user_agent = self.PARAMS.get("headers", {}).get("User-Agent")
-    #     if user_agent:
-    #         options.add_argument(f'user-agent={user_agent}')
         
-    #     return webdriver.Chrome(options=options)
     def _create_driver(self):
         options = webdriver.ChromeOptions()
 
@@ -119,42 +109,38 @@ class ActionExecutor:
         time.sleep(random.uniform(0, self.DEFAULT_WAIT))
         
         try:
-            # Logging
             self.logger.info(f"Performing _action_: {self.ACTION_TYPE} on {self.VALUE}")
-            elem = None
             if self.WAIT_UNTIL:
                 condition = self.get_condition(self.WAIT_UNTIL, self.BY, self.VALUE)
                 elem = WebDriverWait(self.driver, self.TIMEOUT).until(condition)
             else:
                 elem = self.driver.find_element(self.BY, self.VALUE)
-        except Exception as e:
-            if _action_.get("skip_if_not_found"):
-                self.logger.warning(f"Element not found, skipping: {self.VALUE}")
-                return
-            else:
-                raise e
+        except Exception:
+            self.logger.warning(f"Element not found: {self.BY}={self.VALUE}. Skipping this action.")
+            return self._generate_packet({"skip":"Element Not Found Hence Skipped."}) # skip quietly
 
         content = None
-                
-        if self.ACTION_TYPE == "click":self._action_click(elem=elem)
+        try:
+            if self.ACTION_TYPE == "click":
+                self._action_click(elem=elem)
+            elif self.ACTION_TYPE == "html":
+                content = self._action_html_scrape()
+            elif self.ACTION_TYPE == "table":
+                content = self._action_table_scrape()
+            elif self.ACTION_TYPE == "scrape":
+                content = self._action_text_scrape()
+            elif self.ACTION_TYPE == "website":
+                self._action_redirect()
+            elif self.ACTION_TYPE == "screenshot":
+                self._action_screenshot()
+            elif not self.ACTION_TYPE:
+                self.logger.info(f"Checked presence of element: {self.BY}={self.VALUE}")
+        except Exception as e:
+            self.logger.error(f"Error executing action '{self.ACTION_TYPE}': {e}", exc_info=True)
+            return self._generate_packet({"error": e}) # skip further execution
 
-        elif self.ACTION_TYPE == "html":content = self._action_html_scrape()
-        
-        elif self.ACTION_TYPE == "table":content = self._action_table_scrape()
-            
-        elif self.ACTION_TYPE == "scrape":content = self._action_text_scrape()
-            
-        elif self.ACTION_TYPE == "website":self._action_redirect()
-            
-        elif self.ACTION_TYPE == "screenshot":self._action_screenshot()
-                
-        elif  not self.ACTION_TYPE: self.logger.info(f"Checked presence of element: {self.BY}={self.VALUE}")
-        
-        else:
-            pass
-        
         if self.RETURN_TO_BASE:
-            self.logger.info(f"Returning to Base Window.")
+            self.logger.info("Returning to Base Window.")
             if len(self.window_stack) > 1:
                 self.driver.close()
                 self.window_stack.pop()
@@ -162,7 +148,8 @@ class ActionExecutor:
 
         return self._generate_packet(content)
 
-    def _action_text_scrape(self):
+    # ===================== ACTION ===================== 
+    def _action_text_scrape(self)->dict:
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
         elements = self.driver.find_elements(self.BY, self.VALUE)
 
@@ -205,7 +192,7 @@ class ActionExecutor:
         pprint.pprint(data_container)
         return data_container
     
-    def _action_table_scrape(self):
+    def _action_table_scrape(self)->dict:
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
         elements = self.driver.find_elements(self.BY, self.VALUE) if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)]
 
@@ -250,7 +237,7 @@ class ActionExecutor:
         
         return table_scrape
     
-    def _action_html_scrape(self):
+    def _action_html_scrape(self)->dict:
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
         elements = self.driver.find_elements(self.BY, self.VALUE) if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)] 
             
@@ -299,7 +286,6 @@ class ActionExecutor:
         self.logger.info(f"Clicking Element {elem}")
         
     def _generate_packet(self,content):
-        
         return {
             "action":self.ACTION_TYPE,
             "webpage": self.driver.current_url,
