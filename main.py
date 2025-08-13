@@ -1,4 +1,5 @@
 import  requests,os, warnings,time
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # TensorFlow-specific
 warnings.filterwarnings('ignore') 
 from datetime import datetime
 from app.utils import Helper
@@ -12,7 +13,7 @@ paths = Helper.load_json(r"paths.json")
 
 #constants
 BANK_CODES = ["PSB_1","PSB_2","PSB_3","PSB_4","PSB_5","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12"]
-# BANK_CODES = ["PSB_1","PSB_2","PSB_3"]
+# BANK_CODES = ["PSB_1"]
 
 LOG_DIR,CACHE_DIR,PROCESS_DIR = Helper.create_dirs(paths["output"],["logs","cache","processed"])
 TODAY = datetime.now().strftime("%d%m%Y")
@@ -28,7 +29,7 @@ for code in BANK_CODES:
     logger.info(f"Scraping From Bank {WEBSITE["bank_name"]}")
     website = WEBSITE["base_url"]
     #website specific
-    scrape_data = {"bank_name": WEBSITE["bank_name"],"bank_code":WEBSITE["bank_type_code"],"base_url":WEBSITE["base_url"],"scraped_data": {}}
+    scrape_data = {"bank_name": WEBSITE["bank_name"],"bank_code":WEBSITE["bank_type_code"],"base_url":WEBSITE["base_url"],"scraped_data": []}
     executor = ActionExecutor(logger,WEBSITE,paths)
     try:
         # executor.attach_headers()
@@ -38,7 +39,9 @@ for code in BANK_CODES:
         for idx, block in enumerate(WEBSITE["blocks"]):
             logger.info(f"Running Block: {idx}")
             data, timestamp = executor.execute_blocks(block)
-            scrape_data["scraped_data"].update(data)
+            
+            for d in data:
+                scrape_data["scraped_data"].append(d)
 
     except Exception as e:
         logger.error(f"Error scraping {WEBSITE['bank_name']}: {e}")

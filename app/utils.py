@@ -111,7 +111,7 @@ class Helper:
                 raise ValueError(f"Invalid data type: {type(data)}")
         
     @staticmethod        
-    def create_dirs(root_path: str, dirs: List[str]) -> List[str]:
+    def create_dirs(root_path: str, dirs: list) -> list:
         created_paths = []
         for dir_name in dirs:
             full_path = os.path.join(root_path, dir_name)
@@ -119,6 +119,16 @@ class Helper:
             created_paths.append(full_path)
         
         return created_paths if len(created_paths)>1 else created_paths[0]
+    
+    @staticmethod        
+    def create_dir(root_path: str, *args) -> str:
+        full_path = os.path.join(root_path, *args)
+        os.makedirs(full_path, exist_ok=True)
+        return full_path
+
+    @staticmethod
+    def create_path(path:str,*args)->str:
+        return os.path.join(path, *args)
 
     @staticmethod
     def get_timestamp(sep=":"):
@@ -210,7 +220,14 @@ class Helper:
         text = text.title()
         return text[0].lower() + text[1:].replace(' ', '')
      
-     
+    @staticmethod
+    def fix_mojibake(text:str)->str:
+        try:
+            return text.encode("latin1").decode("utf-8")
+        except:
+            return text  # If it fails, return original
+
+    
     #file read/write   
     @staticmethod
     def read_file(filepath: str) -> str:
@@ -241,7 +258,7 @@ class Helper:
     
     
     #genrate
-    def generate_code(segment_count=3, segment_length=3):
+    def generate_uid(segment_count=3, segment_length=3):
         segments = [
             ''.join(random.choices(string.ascii_uppercase, k=segment_length))
             for _ in range(segment_count)
