@@ -1,0 +1,88 @@
+{
+  "metadata": {
+    "program": "main.py",
+    "timestamp": "14082025",
+    "config": "params.json5",
+    "filename": "up14082025.json5"
+  },
+  "records": [
+    {
+      "bank_name": "Uco Bank",
+      "bank_code": "PSB_11",
+      "base_url": "https://ucobank.com/interest-rates-on-deposit-schemes",
+      "scraped_data": [
+        {
+          "action": "table",
+          "uid": "EZB-BXO-KUL",
+          "timestamp": "14082025 13:11:01",
+          "webpage": "https://ucobank.com/interest-rates-on-deposit-schemes",
+          "data_present": true,
+          "log_message": "Save Html Tables.",
+          "response": [
+            {
+              "sha256": "2414db9ab3d6910a005e843057cce62c386d9c390a2c82f7e830af576ca70ca9",
+              "sha1": "e66a9f1b830126d12797c02bf29e0100e0320e18",
+              "original_value": "<table> <tbody> <tr> <td colspan=\"2\">Existing Rate</td> <td colspan=\"2\">Revised Rate</td> </tr> <tr> <td>Balance</td> <td>Rate Of Interest</td> <td>Balance</td> <td>Rate Of Interest</td> </tr> <tr> <td>Upto Rs. 10.00 lacs</td> <td>2.60%</td> <td>Upto Rs. 10.00 lacs</td> <td>2.50%</td> </tr> <tr> <td>Over Rs. 10.00 Lacs</td> <td>2.75%</td> <td>Over Rs. 10.00 Lacs</td> <td>2.50%</td> </tr> </tbody> </table>"
+            },
+            {
+              "sha256": "f3f3fa9af8a8f99e8db15ce647e51dee2d201d7d09c965677a7f5fb0acf841ba",
+              "sha1": "6212cd51a0dae3320c1442f9fffe4ef0ac2b6413",
+              "original_value": "<table> <tbody> <tr> <td rowspan=\"2\">Maturity Period</td> <td colspan=\"2\">Existing ROI for General \u00a0Customer</td> <td colspan=\"2\">Revised ROI for General Customer</td> </tr> <tr> <td>Rate % p.a.</td> <td>Yield in %</td> <td>Rate % p.a.</td> <td>Yield in %</td> </tr> <tr> <td>7-14 days</td> <td>2.90%</td> <td>2.90%</td> <td>2.90%</td> <td>2.90%</td> </tr> <tr> <td>15-29 days</td> <td>2.90%</td> <td>2.90%</td> <td>2.90%</td> <td>2.90%</td> </tr> <tr> <td>30-45 days</td> <td>3.00%</td> <td>3.00%</td> <td>3.00%</td> <td>3.00%</td> </tr> <tr> <td>46-60 days</td> <td>3.50%</td> <td>3.50%</td> <td>3.50%</td> <td>3.50%</td> </tr> <tr> <td>61-90 days</td> <td>3.50%</td> <td>3.50%</td> <td>3.50%</td> <td>3.50%</td> </tr> <tr> <td>91-120 days</td> <td>4.50%</td> <td>4.50%</td> <td>4.25%</td> <td>4.25%</td> </tr> <tr> <td>121-150 days</td> <td>4.50%</td> <td>4.51%</td> <td>4.25%</td> <td>4.26%</td> </tr> <tr> <td>151-180 days</td> <td>5.00%</td> <td>5.02%</td> <td>4.75%</td> <td>4.77%</td> </tr> <tr> <td>181-332 days</td> <td>5.50%</td> <td>5.54%</td> <td>5.00%</td> <td>5.03%</td> </tr> <tr> <td>333 days</td> <td>6.85%</td> <td>7.01%</td> <td>6.30%</td> <td>6.44%</td> </tr> <tr> <td>334 \u2013 364 days</td> <td>5.50%</td> <td>5.60%</td> <td>5.00%</td> <td>5.09%</td> </tr> <tr> <td>1 year</td> <td>6.50%</td> <td>6.66%</td> <td>6.25%</td> <td>6.40%</td> </tr> <tr> <td>Above 1Yr \u2013 443 days</td> <td>6.40%</td> <td>6.56%</td> <td>6.20%</td> <td>6.35%</td> </tr> <tr> <td>444 Days</td> <td>6.90%</td> <td>7.14%</td> <td>6.60%</td> <td>6.82%</td> </tr> <tr> <td>445 days upto 2 yrs</td> <td>6.40%</td> <td>6.61%</td> <td>6.20%</td> <td>6.39%</td> </tr> <tr> <td>Above 2yrs \u2013 3 yrs</td> <td>6.30%</td> <td>6.66%</td> <td>6.15%</td> <td>6.49%</td> </tr> <tr> <td>Above 3yrs - 5yrs</td> <td>6.20%</td> <td>6.76%</td> <td>6.10%</td> <td>6.64%</td> </tr> <tr> <td>Above 5 yrs</td> <td>6.10%</td> <td>7.07%</td> <td>6.00%</td> <td>6.94%</td> </tr> </tbody> </table>"
+            },
+            {
+              "sha256": "bb04e17dd4911d6c2610c82d873f315c0432a9556b8817ca004225ef657463da",
+              "sha1": "e4d42680e819044c86b46a518446ac06e5fd4f39",
+              "original_value": "<table> <tbody> <tr> <td>\u00a0</td> <td>Tenor Up to One Year</td> <td>Tenor above One Year</td> </tr> <tr> <td>Staff</td> <td colspan=\"2\">1.00%</td> </tr> <tr> <td>Senior Citizen</td> <td>0.25%</td> <td>0.50%</td> </tr> <tr> <td>Retired staff Senior Citizen</td> <td>1.25%</td> <td>1.50%</td> </tr> </tbody> </table>"
+            },
+            {
+              "sha256": "e90fdb692ca2ac5216d1b4c7a7390e88f9d5ec79cd1f50397f40e1fdf45b0008",
+              "sha1": "c6382f50caf814a4d26178a6c9fa410f7cf7da86",
+              "original_value": "<table> <thead> <tr> <td colspan=\"3\">Rate of Interest</td> </tr> </thead> <tbody> <tr> <td colspan=\"3\">Rate of Interest (General) For Retail Deposits (&lt; Rs. 3 Cr):</td> </tr> <tr> <td>Tenor</td> <td>Rate</td> <td>Rate of Interest</td> </tr> <tr> <td>12 Months</td> <td>Applicable Card Rate for Retail Deposits + 0.20%</td> <td>6.45% (Card Rate + 20 bps)</td> </tr> <tr> <td>1000 Days</td> <td>\u00a0</td> <td>6.35% (Card Rate + 20 bps)</td> </tr> <tr> <td>2000 Days</td> <td>\u00a0</td> <td>6.20% (Card Rate + 20 bps)</td> </tr> <tr> <td>3000 Days</td> <td>\u00a0</td> <td>6.20% (Card Rate + 20 bps)</td> </tr> </tbody> </table>"
+            },
+            {
+              "sha256": "f603b0ff1629e1b494ada9eacae504a51bdfd3ed3cd8938918dd3e6c10057689",
+              "sha1": "b26ac99b0ae07c58e461e7c25fad124b71162114",
+              "original_value": "<table> <thead> <tr> <td colspan=\"3\">Rate of Interest for Senior Citizen / Staff / Ex-Staff / Senior Citizen &amp; Ex-Staff</td> </tr> </thead> <tbody> <tr> <td>Category</td> <td>Additional Interest Up to 1 Yr</td> <td>Additional Interest Above 1 Yr</td> </tr> <tr> <td>Senior Citizen</td> <td>0.25%</td> <td>0.50%</td> </tr> <tr> <td>Staff Member</td> <td>1.00%</td> <td>1.00%</td> </tr> <tr> <td>Ex-staff &amp; Senior Citizen</td> <td>1.25%</td> <td>1.50%</td> </tr> <tr> <td colspan=\"3\">Effective ROI will be set accordingly for the above tenure of deposit.</td> </tr> </tbody> </table>"
+            },
+            {
+              "sha256": "1329d1ee8cc3b7a54a1f49198113733bf4f56916740d12b79d8bc79473ee2ecf",
+              "sha1": "2836e26954a6aa6a2cdb307a0eeb13d0d70e2e6d",
+              "original_value": "<table> <colgroup> <col/> <col/> <col/> <col/> </colgroup> <thead> <tr> <td rowspan=\"2\">Sl. No.</td> <td rowspan=\"2\">Deposit period</td> <td colspan=\"1\">Single Term Deposit Rs. 3 Cr and above and upto &amp; including Rs. 10.00 Cr</td> <td colspan=\"1\">Single Non-Callable Bulk Term Deposit Rs. 3 Cr &amp; above upto and including Rs. 10.00 Cr</td> </tr> <tr> <td>Rate of Interest</td> <td>Rate of Interest</td> </tr> </thead> <tbody> <tr> <td>1</td> <td>7 \u2013 14 Days</td> <td>4.00</td> <td>4.00</td> </tr> <tr> <td>2</td> <td>15 \u2013 30 Days</td> <td>4.00</td> <td>4.00</td> </tr> <tr> <td>3</td> <td>31 \u2013 45 Days</td> <td>4.25</td> <td>4.25</td> </tr> <tr> <td>4</td> <td>46 \u2013 90 Days</td> <td>4.50</td> <td>4.55</td> </tr> <tr> <td>5</td> <td><span>91 \u2013 180 Days</span></td> <td>4.75</td> <td>4.80</td> </tr> <tr> <td>6</td> <td><span>181 \u2013 210 Days</span></td> <td>5.00</td> <td>5.05</td> </tr> <tr> <td>7</td> <td>211 Days to 270 Days</td> <td>5.00</td> <td>5.05</td> </tr> <tr> <td>8</td> <td>271 Days to 1 Year</td> <td>5.50</td> <td>5.55</td> </tr> <tr> <td>9</td> <td>&gt; 1 Year to 2 Years</td> <td>5.25</td> <td>5.30</td> </tr> <tr> <td>10</td> <td>&gt; 2 Years to 3 Years</td> <td>5.25</td> <td>5.30</td> </tr> <tr> <td>11</td> <td>&gt; 3 Years to 5 Years</td> <td>4.75</td> <td>4.80</td> </tr> <tr> <td>12</td> <td>Above 5 Years</td> <td>4.75</td> <td>\u2014</td> </tr> </tbody> <tfoot> <tr> </tr> </tfoot> </table>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "bank_name": "NSE Equity India",
+      "bank_code": "PSB_13",
+      "base_url": "https://www.nseindia.com/market-data/equity-derivatives-watch",
+      "scraped_data": [
+        {
+          "action": "click",
+          "uid": "FRZ-JNL-CTJ",
+          "timestamp": "14082025 13:11:11",
+          "webpage": "https://www.nseindia.com/market-data/equity-derivatives-watch",
+          "data_present": false,
+          "log_message": "Click to Lakhs Equity",
+          "response": null
+        },
+        {
+          "action": "table",
+          "uid": "HEP-LOP-SCZ",
+          "timestamp": "14082025 13:11:13",
+          "webpage": "https://www.nseindia.com/market-data/equity-derivatives-watch",
+          "data_present": true,
+          "log_message": "Save Html Tables.",
+          "response": [
+            {
+              "sha256": "90396297bf2ebee3df4678fede550505c274e4ca4fe1aa8bfc4ed4c84736b014",
+              "sha1": "4f4072d8a01ab6474a1c88f8c13417612b13d0a9",
+              "original_value": "<table><thead><tr><td><a><span>InstrumentType</span></a></td><td><a><span>Symbol</span></a></td><td><a><span>Expiry Date</span></a></td><td><span>OptionType </span></td><td><span>Strike </span></td><td><a><span>LTP</span></a></td><td><a><span>Chng</span></a></td><td><a><span>%Chng</span></a></td><td><span>Open </span></td><td><span>High </span></td><td><span>Low </span></td><td><a><span>Volume</span><span>(Contracts)</span></a></td><td><a><span>Value</span><span>(\u20b9 Lakhs)</span></a></td><td><a><span>OpenInterest</span></a></td><td><span>Underlying Value </span></td></tr></thead><tbody><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Put</td><td>24,600.00</td><td>9.45</td><td>-30.95</td><td>-76.61</td><td>36.20</td><td>47.20</td><td>8.60</td><td>1,31,64,205</td><td>2,41,003.68</td><td>5,63,467</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Call</td><td>24,700.00</td><td>14.65</td><td>-20.25</td><td>-58.02</td><td>27.40</td><td>39.25</td><td>8.35</td><td>1,21,13,746</td><td>1,80,706.81</td><td>5,38,285</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Call</td><td>24,650.00</td><td>33.05</td><td>-22.55</td><td>-40.56</td><td>54.00</td><td>66.00</td><td>18.25</td><td>1,20,08,867</td><td>3,21,897.68</td><td>3,78,461</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Put</td><td>24,650.00</td><td>20.20</td><td>-41.35</td><td>-67.18</td><td>62.00</td><td>73.65</td><td>18.55</td><td>95,53,650</td><td>3,01,871.46</td><td>4,15,301</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Call</td><td>24,600.00</td><td>72.00</td><td>-11.55</td><td>-13.82</td><td>80.20</td><td>102.00</td><td>40.65</td><td>71,61,488</td><td>3,56,373.55</td><td>2,00,567</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Put</td><td>24,550.00</td><td>4.75</td><td>-22.00</td><td>-82.24</td><td>14.95</td><td>29.70</td><td>4.30</td><td>64,64,987</td><td>67,009.59</td><td>2,51,594</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Call</td><td>24,750.00</td><td>6.40</td><td>-15.10</td><td>-70.23</td><td>21.05</td><td>22.80</td><td>4.15</td><td>58,90,810</td><td>47,052.84</td><td>2,55,376</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Put</td><td>24,500.00</td><td>2.80</td><td>-15.20</td><td>-84.44</td><td>9.95</td><td>18.40</td><td>2.70</td><td>57,73,900</td><td>37,198.35</td><td>3,29,635</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Call</td><td>24,800.00</td><td>3.15</td><td>-9.60</td><td>-75.29</td><td>9.40</td><td>13.00</td><td>2.35</td><td>50,79,871</td><td>23,545.20</td><td>2,64,989</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Put</td><td>24,700.00</td><td>52.10</td><td>-39.00</td><td>-42.81</td><td>91.10</td><td>108.85</td><td>46.70</td><td>44,69,145</td><td>2,54,204.97</td><td>1,73,099</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Put</td><td>24,450.00</td><td>1.75</td><td>-10.50</td><td>-85.71</td><td>7.85</td><td>12.85</td><td>1.70</td><td>29,05,088</td><td>11,351.63</td><td>1,58,612</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Call</td><td>24,850.00</td><td>1.60</td><td>-5.95</td><td>-78.81</td><td>4.00</td><td>7.15</td><td>1.45</td><td>26,68,698</td><td>6,805.18</td><td>1,37,864</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Put</td><td>24,400.00</td><td>1.30</td><td>-7.80</td><td>-85.71</td><td>8.60</td><td>8.60</td><td>1.30</td><td>26,07,586</td><td>6,923.14</td><td>1,99,018</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Call</td><td>24,900.00</td><td>1.00</td><td>-3.55</td><td>-78.02</td><td>2.90</td><td>3.85</td><td>0.95</td><td>19,80,258</td><td>3,148.61</td><td>1,66,277</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Call</td><td>24,550.00</td><td>117.55</td><td>-1.90</td><td>-1.59</td><td>116.20</td><td>144.75</td><td>74.00</td><td>17,61,850</td><td>1,39,908.51</td><td>50,430</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Call</td><td>25,000.00</td><td>0.60</td><td>-1.60</td><td>-72.73</td><td>1.40</td><td>1.80</td><td>0.60</td><td>16,61,629</td><td>1,483.00</td><td>2,34,591</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Put</td><td>24,350.00</td><td>1.05</td><td>-5.75</td><td>-84.56</td><td>6.90</td><td>6.90</td><td>1.05</td><td>15,54,121</td><td>2,913.98</td><td>1,22,861</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Put</td><td>24,300.00</td><td>1.05</td><td>-4.25</td><td>-80.19</td><td>2.95</td><td>3.55</td><td>0.95</td><td>13,62,129</td><td>1,992.11</td><td>1,19,752</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Call</td><td>24,500.00</td><td>165.50</td><td>4.65</td><td>2.89</td><td>158.20</td><td>189.65</td><td>116.10</td><td>11,70,034</td><td>1,32,392.27</td><td>52,891</td><td>24,652.95</td></tr><tr><td>Index Options</td><td><a>NIFTY</a></td><td>14-Aug-2025</td><td>Put</td><td>24,200.00</td><td>0.85</td><td>-2.70</td><td>-76.06</td><td>2.00</td><td>2.10</td><td>0.75</td><td>11,61,401</td><td>1,167.21</td><td>1,45,633</td><td>24,652.95</td></tr><tr><td>Total</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>10,05,13,463</td><td>21,38,949.77</td><td>47,58,703</td><td></td></tr></tbody></table>"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

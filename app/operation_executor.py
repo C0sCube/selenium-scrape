@@ -1,4 +1,4 @@
-import time ,re,os
+import time ,re,os, hmac, hashlib
 from datetime import datetime
 import dateutil
 import pandas as pd
@@ -32,6 +32,21 @@ class OperationExecutor:
                 print(f"[ERROR]: {e}")
                 return date_str
         return text
+    
+    
+    def boomerang(self,data):
+        return data
+    
+    def _generate_hash_sha256(self,text:str)->str:
+        if not isinstance(text,str):
+            return "sha256 input non str"
+        return hashlib.sha256(text.encode()).hexdigest()
+
+    def _generate_hash_sha1(self,text:str)->str:
+        if not isinstance(text,str):
+            return "sha1 input non str"
+        return hashlib.sha1(text.encode()).hexdigest()
+
     
     @staticmethod
     def save_tables_to_excel(tables, output_dir="tables", output_file="all_tables.xlsx", consolidate_save=True):
@@ -87,23 +102,42 @@ class OperationExecutor:
                 if wrap_html:
                     f.write("</body></html>")
 
-    @staticmethod
-    def _generate_hash():
-        pass
-    def runner(self, data, func_name):
-        func = getattr(self, func_name, None)  #get function
-        if not callable(func): 
-            raise ValueError(f"Function '{func_name}' not found in class.")
-
+    def runner(self, data, function_to_execute):
+        
+        #check if all functions exist
+        for key, function_name in function_to_execute.items():
+            func = getattr(self, function_name, None)
+            if not callable(func):
+                raise ValueError(f"Function '{function_name}' not found in class.")
+            function_to_execute[key] = func
+        
+        function_to_execute["original_value"] = getattr(self, "boomerang", None)
+        
+        #copy + perform tasks
         p_dict = data.copy()
         records = p_dict.get("records", [])
         for record in records:
-            
             print(f"Processing for Bank :{record["bank_name"]}")
-            response_data = record.get("response", {})
+            response_data = record.get("scraped_data", [])
             if not response_data:
                 continue
-            post_func_data = {key: func(value) for key, value in response_data.items() if value}
-            record["response"] = post_func_data
+            
+            for action in response_data:
+                if not action.get("data_present"):
+                    continue
+                
+                #execute functions on values
+                response = action.get("response")
+                if not response or not isinstance(response, dict):
+                    continue
+
+                processed_data = []
+                for key, value in response.items():
+                    processed_item = {
+                        k: f(value) for k, f in function_to_execute.items()
+                    }
+                    processed_data.append(processed_item)
+
+                action["response"] = processed_data
             
         return p_dict

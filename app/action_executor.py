@@ -93,6 +93,7 @@ class ActionExecutor:
         self.html_name = _action_.get('html_name', 'html')
         self.screenshot_name = _action_.get('screenshot_name', 'screenshot')
         self.export_format = _action_.get("export_format", None)  # default to Excel
+        self.LOG_MESSAGE = _action_.get("log_message", "Log Msg For Action Not Attached.")
         
         #field
         self.ATTRIBUTE = _action_.get("attribute")
@@ -133,6 +134,10 @@ class ActionExecutor:
                 self._action_redirect()
             elif self.ACTION_TYPE == "screenshot":
                 self._action_screenshot()
+            # elif self.ACTION_TYPE == "download":
+            #     self._action_download()
+            # elif self.ACTION_TYPE == "pdf":
+            #     self._action_pdf()
             elif not self.ACTION_TYPE:
                 self.logger.info(f"Checked presence of element: {self.BY}={self.VALUE}")
         except Exception as e:
@@ -195,6 +200,10 @@ class ActionExecutor:
     def _action_table_scrape(self)->dict:
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
         elements = self.driver.find_elements(self.BY, self.VALUE) if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)]
+        
+        #mandatory filter
+        if self.BY == By.CSS_SELECTOR:
+            elements = [elem for elem in elements if elem.tag_name.lower() == "table"]
 
         self.logger.info(f"Total Elements Found By={self.BY} and Value={self.VALUE} are {len(elements)}")
         
@@ -203,9 +212,8 @@ class ActionExecutor:
             raw_html = elem.get_attribute("outerHTML")
             raw_html = Helper.apply_sub(raw_html, r'<th\b', '<td', ignore_case=True)
             raw_html = Helper.apply_sub(raw_html, r'</th\b', '</td', ignore_case=True)
-            raw_html = Helper.apply_sub(raw_html, r'\<\/?(strong|sup|b|p|br)\s*\/?\>',ignore_case=True)
-            raw_html = Helper.apply_sub(raw_html,r'[^\x00-\x7F]+', ignore_case=True) #Non-ASCII
-            raw_html = Helper.apply_sub(raw_html,r'[\₹\$\#\*\@\n\t]+', ignore_case=True)
+            raw_html = Helper.apply_sub(raw_html, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>",ignore_case=True)
+            raw_html = Helper.apply_sub(raw_html,r'[#*@\n\t]+', ignore_case=True)
             raw_html = Helper._normalize_whitespace(raw_html)
 
             soup = BeautifulSoup(raw_html, "html.parser")
@@ -274,7 +282,7 @@ class ActionExecutor:
             self.logger.info(f"Redirecting to webpage {self.URL}")
             self.driver.get(self.URL)
         except Exception as e:
-            self.logger.error(f"Unable to redirect | {e}")
+            self.logger.error(f"Unable to redirect: {e}")
                
     def _action_click(self,elem):
         elem.click()
@@ -288,9 +296,11 @@ class ActionExecutor:
     def _generate_packet(self,content):
         return {
             "action":self.ACTION_TYPE,
-            "webpage": self.driver.current_url,
             "uid": Helper.generate_uid(),
             "timestamp":datetime.now().strftime("%d%m%Y %H:%M:%S"),
+            "webpage": self.driver.current_url,
+            "data_present":bool(content and not any(k in content for k in ["skip", "error"])),
+            "log_message":self.LOG_MESSAGE,
             "response":content if content else None
         }
     

@@ -25,7 +25,7 @@
         },
       ],
     ],
-    verify_ssl: false,
+    
   },
   PSB_2: {
     bank_name: "Bank of India",
@@ -60,7 +60,7 @@
         },
       ],
     ],
-    verify_ssl: false,
+    
   },
   PSB_3: {
     bank_name: "Bank of Maharashtra",
@@ -88,7 +88,7 @@
         },
       ],
     ],
-    verify_ssl: false,
+    
   },
   PSB_4: {
     bank_name: "Canara Bank",
@@ -116,7 +116,7 @@
         },
       ],
     ],
-    verify_ssl: false,
+    
   },
   PSB_5: {
     bank_name: "Central Bank of India",
@@ -144,7 +144,7 @@
         },
       ],
     ],
-    verify_ssl: false,
+    
   },
   PSB_6: {
     bank_name: "Indian Bank",
@@ -172,7 +172,7 @@
         },
       ],
     ],
-    verify_ssl: false,
+    
   },
   PSB_7: {
     bank_name: "Indian Overseas Bank",
@@ -256,7 +256,7 @@
         },
       ],
     ],
-    verify_ssl: false,
+    
   },
   PSB_10: {
     bank_name: "State Bank of India",
@@ -284,7 +284,7 @@
         },
       ],
     ],
-    verify_ssl: false,
+    
   },
   PSB_11: {
     bank_name: "Uco Bank",
@@ -312,7 +312,7 @@
         },
       ],
     ],
-    verify_ssl: false,
+    
   },
   PSB_12: {
     bank_name: "Union Bank of India",
@@ -342,711 +342,750 @@
     ],
     verify_ssl: true,
   },
+
+  PSB_13: {
+    bank_name: "NSE Equity India",
+    bank_type: "PUBLIC SECTOR BANKS",
+    bank_type_code: "PSB_13",
+    base_url: "https://www.nseindia.com/market-data/equity-derivatives-watch",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+      "Accept-Language": "en-US,en;q=0.9",
+    },
+    blocks: [
+      [
+        {
+          action:"click",
+          by:"css",
+          value:"#market-lakh",
+          wait_until:"clickable",
+          time: 5,
+          timeout: 20,
+          log_message: "Click to Lakhs Equity",
+        },
+        {
+          action: "table",
+          html_name: "equity",
+          by: "css",
+          value: "#eqderivativesTable",
+          wait_until:"present",
+          multiple: true,
+          export_format: "html",
+          consolidate_save: false,
+          skip_if_not_found: true,
+          time: 10,
+          timeout: 30,
+          log_message: "Save Html Tables.",
+        },
+      ],
+    ],
+    verify_ssl: true,
+  },
   PVB_1: {
     bank_name: "Axis Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_2: {
     bank_name: "Bandhan Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_3: {
     bank_name: "CSB Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_4: {
     bank_name: "City Union Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_5: {
     bank_name: "DCB Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_6: {
     bank_name: "Dhanlaxmi Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_7: {
     bank_name: "Federal Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_8: {
     bank_name: "HDFC Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_9: {
     bank_name: "ICICI Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_10: {
     bank_name: "IDBI Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_11: {
     bank_name: "IDFC First Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_12: {
     bank_name: "IndusInd Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_13: {
     bank_name: "Jammu and Kashmir Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_14: {
     bank_name: "Karnataka Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_15: {
     bank_name: "Karur Vysya Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_16: {
     bank_name: "Kotak Mahindra Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_17: {
     bank_name: "Lakshmi Vilas Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_18: {
     bank_name: "The Nainital Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_19: {
     bank_name: "South Indian Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_20: {
     bank_name: "Tamilnad Mercantile Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_21: {
     bank_name: "RBL Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   PVB_22: {
     bank_name: "YES Bank",
     bank_type: "PRIVATE SECTOR BANKS",
     bank_type_code: "PVB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_1: {
     bank_name: "Abu Dhabi Commercial Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_2: {
     bank_name: "AB Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_3: {
     bank_name: "ANZ Banking Group Ltd",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_4: {
     bank_name: "Bank of America N.A.",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_5: {
     bank_name: "Bank of Bahrain and Kuwait BSC",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_6: {
     bank_name: "Barclays Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_7: {
     bank_name: "Bank of Ceylon",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_8: {
     bank_name: "BNP Paribas",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_9: {
     bank_name: "Citibank India",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_10: {
     bank_name: "Credit Agricole Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_11: {
     bank_name: "Credit Suisse",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_12: {
     bank_name: "CTBC Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_13: {
     bank_name: "Commonwealth Bank Of Australia",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_14: {
     bank_name: "DBS Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_15: {
     bank_name: "Deutsche Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_16: {
     bank_name: "Doha Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_17: {
     bank_name: "Emirates NBD",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_18: {
     bank_name: "FirstRand Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_19: {
     bank_name: "HSBC Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_20: {
     bank_name: "ICBC Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_21: {
     bank_name: "JPMorgan Chase Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_22: {
     bank_name: "Krung Thai Bank PCL",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_23: {
     bank_name: "Mizuho Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_24: {
     bank_name: "MUFG Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_25: {
     bank_name: "National Australia Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_26: {
     bank_name: "Rabo Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_27: {
     bank_name: "Societe Generale Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_28: {
     bank_name: "Sumitomo Mitsui Banking Corporation",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_29: {
     bank_name: "Scotiabank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_30: {
     bank_name: "Shinhan Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_31: {
     bank_name: "Standard Chartered Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_32: {
     bank_name: "SBM Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_33: {
     bank_name: "NatWest Markets Plc",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_34: {
     bank_name: "UBS AG",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_35: {
     bank_name: "UOB Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_36: {
     bank_name: "Westpac Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   FRB_37: {
     bank_name: "Woori Bank",
     bank_type: "FOREIGN BANKS",
     bank_type_code: "FRB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_1: {
     bank_name: "Adarsh Co-op. Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_2: {
     bank_name: "Apna Sahakari Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_3: {
     bank_name: "Abhyudaya Co-op. Bank Ltd",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_4: {
     bank_name: "Bharat Co-op Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_5: {
     bank_name: "Bassein Catholic Co-operative Bank Ltd",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_6: {
     bank_name: "Bombay Mercantile Co-op Bank Ltd.",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_7: {
     bank_name: "Citizen Credit Co-operative Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_8: {
     bank_name: "Cosmos Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_9: {
     bank_name: "Dombivli Nagari Sahakari Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_10: {
     bank_name: "Jalgaon Janta Sahakari Bank Ltd.",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_11: {
     bank_name: "Janata Sahakari Bank Ltd",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_12: {
     bank_name: "Jankalyan Sahakari Bank Ltd.",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_13: {
     bank_name: "Kallappanna Awade Ichalkaranji Janata Sahakari Bank Ltd.",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_14: {
     bank_name: "Mahesh Sahakari Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_15: {
     bank_name: "Mumbai District Central Co-op. Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_16: {
     bank_name: "Maharashtra State Co-op. Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_17: {
     bank_name: "New India Co-op. Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_18: {
     bank_name: "NKGSB Cooperative Bank Ltd.",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_19: {
     bank_name: "GP Parsik Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_20: {
     bank_name: "Punjab and Maharashtra Co-op. Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_21: {
     bank_name: "Rajkot Nagarik Sahakari Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_22: {
     bank_name: "Saraswat Co-Op. Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_23: {
     bank_name: "Thane Bharat Sahakari Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_24: {
     bank_name: "Thane District Central Co-op. Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_25: {
     bank_name: "TJSB Sahakari Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_26: {
     bank_name: "The Greater Bombay Co-op Bank Ltd.",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_27: {
     bank_name: "The Jalgaon People's Co-op. Bank Ltd",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_28: {
     bank_name: "The Kalupur Commercial Co-op. Bank",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_29: {
     bank_name: "SVC Co-operative Bank Ltd.",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   COB_30: {
     bank_name: "The Andhra Pradesh Mahesh Co-operative Urban Bank Ltd.",
     bank_type: "CO-OPERATIVE BANKS",
     bank_type_code: "COB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_1: {
     bank_name: "AU Small Finance Bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_2: {
     bank_name: "Capital Small Finance Bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_3: {
     bank_name: "ESAF Small Finance Bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_4: {
     bank_name: "Fincare Small Finance Bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_5: {
     bank_name: "Equitas Small Finance Bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_6: {
     bank_name: "Jana Small Finance bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_7: {
     bank_name: "North East Small Finance Bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_8: {
     bank_name: "Suryoday Small Finance Bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_9: {
     bank_name: "Ujjivan Small Finance Bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_10: {
     bank_name: "Utkarsh Small Finance Bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_11: {
     bank_name: "Unity Small Finance Bank Ltd",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
   SFB_12: {
     bank_name: "Shivalik Small Fincare Bank",
     bank_type: "SMALL FINANCE BANK",
     bank_type_code: "SFB",
     url: "",
-    verify_ssl: false,
+    
   },
 }

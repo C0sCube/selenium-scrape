@@ -2,7 +2,7 @@ import os, re, json, json5, string, shutil, inspect, camelot, random
 from datetime import datetime
 import pandas as pd #type:ignore
 from typing import List
-
+import unicodedata
 
 class Helper:
     
@@ -174,6 +174,14 @@ class Helper:
             return text
         text = re.sub("[^\w\s]", "", text).strip()
         return text
+    
+    @staticmethod
+    def normalize_unicode_via_nkfc(text:str)->str:
+        if not isinstance(text,str):
+            return text
+        # Normalize Unicode
+        return unicodedata.normalize("NFKC", text)
+
     
     @staticmethod
     def _normalize_whitespace(text: str) -> str:
