@@ -6,7 +6,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from datetime import datetime
 import pandas as pd
-import re, os, time, logging ,pprint
+import re, os, time, logging ,pprint, requests, base64
 from io import StringIO
 
 
@@ -87,11 +87,14 @@ class ActionExecutor:
         self.DEFAULT_WAIT = _action_.get("wait", 2)
         self.TIMEOUT = _action_.get("timeout", 20)
         self.WAIT_UNTIL = _action_.get("wait_until")
+        self.WAIT_BY = _action_.get("wait_by", self.BY) #dependent
+        self.WAIT_VALUE = _action_.get("wait_value", self.VALUE) #dependent
             
         #name 
         self.table_name = _action_.get("table_name","table")
         self.html_name = _action_.get('html_name', 'html')
         self.screenshot_name = _action_.get('screenshot_name', 'screenshot')
+        self.pdf_name = _action_.get('pdf_name', 'webpage_pdf')
         self.export_format = _action_.get("export_format", None)  # default to Excel
         self.LOG_MESSAGE = _action_.get("log_message", "Log Msg For Action Not Attached.")
         
@@ -103,6 +106,10 @@ class ActionExecutor:
         self.CONSOLIDATE_SAVE = _action_.get("consolidate_save", False)
         self.MULTIPLE = _action_.get("multiple",False)
         
+        #page pdf
+        self.LANDSCAPE = _action_.get("landscape",False)
+        self.PRINT_BACKGROUND = _action_.get("print_background",False)
+        
         #window
         self.NEW_WINDOW = _action_.get("new_window", False)
         self.RETURN_TO_BASE = _action_.get("return_to_base", False)
@@ -111,8 +118,9 @@ class ActionExecutor:
         
         try:
             self.logger.info(f"Performing _action_: {self.ACTION_TYPE} on {self.VALUE}")
+            
             if self.WAIT_UNTIL:
-                condition = self.get_condition(self.WAIT_UNTIL, self.BY, self.VALUE)
+                condition = self.get_condition(self.WAIT_UNTIL, self.WAIT_BY, self.WAIT_VALUE)
                 elem = WebDriverWait(self.driver, self.TIMEOUT).until(condition)
             else:
                 elem = self.driver.find_element(self.BY, self.VALUE)
@@ -136,8 +144,8 @@ class ActionExecutor:
                 self._action_screenshot()
             # elif self.ACTION_TYPE == "download":
             #     self._action_download()
-            # elif self.ACTION_TYPE == "pdf":
-            #     self._action_pdf()
+            elif self.ACTION_TYPE == "pdf":
+                self._action_page_pdf()
             elif not self.ACTION_TYPE:
                 self.logger.info(f"Checked presence of element: {self.BY}={self.VALUE}")
         except Exception as e:
@@ -276,6 +284,63 @@ class ActionExecutor:
         path = Helper.create_path(self.OUTPUT_PATH,f"{self.screenshot_name}.png")
         self.driver.save_screenshot(path)
         self.logger.save(f"Saved screenshot: {path}")
+    
+    def _action_page_pdf(self):
+        try:
+            last_height = self.driver.execute_script("return document.body.scrollHeight")
+            while True:
+                self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(2)
+                new_height = self.driver.execute_script("return document.body.scrollHeight")
+                if new_height == last_height:
+                    break
+                last_height = new_height
+
+            result = self.driver.execute_cdp_cmd("Page.printToPDF", {
+            "printBackground": self.PRINT_BACKGROUND,
+            "landscape": self.LANDSCAPE
+            })
+
+            #save + output
+            pdf_data = result['data']
+            file_path = Helper.create_path(self.OUTPUT_PATH, f"{self.pdf_name}.pdf")
+            Helper.write_binary_file(file_path, base64.b64decode(pdf_data)
+)
+            self.logger.info(f"Saved printed PDF to {file_path}")
+
+        except Exception as e:
+            self.logger.error(f"Failed to print page to PDF: {str(e)}")
+
+    def _action_download(self):
+        
+        elem = self.driver.find_elements(self.BY, self.VALUE)
+        
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", elem)
+        
+        file_url = elem.get_attribute("href")
+        if not file_url:
+            try:
+                link_elem = elem.find_element(By.TAG_NAME, "a")
+                file_url = link_elem.get_attribute("href")
+            except:
+                file_url = None
+
+        if file_url and file_url.lower().endswith(".pdf"):
+            import requests
+            cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
+            r = requests.get(file_url, cookies=cookies)
+            if r.status_code == 200:
+                output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["downloads"])
+                file_path = os.path.join(output_dir, os.path.basename(file_url))
+                with open(file_path, "wb") as f:
+                    f.write(r.content)
+                self.logger.info(f"Downloaded PDF to {file_path}")
+            else:
+                self.logger.error(f"Failed to download file: {file_url}")
+        else:
+            elem.click()
+            self.logger.info("Triggered click for file download.")
+
     
     def _action_redirect(self):
         try:

@@ -13,7 +13,7 @@ paths = Helper.load_json(r"paths.json")
 
 #constants
 BANK_CODES = ["PSB_1","PSB_2","PSB_3","PSB_4","PSB_5","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12","PSB_13"]
-BANK_CODES = ["PSB_13"]
+BANK_CODES = ["PSB_1"]
 
 LOG_DIR,CACHE_DIR,PROCESS_DIR = Helper.create_dirs(paths["output"],["logs","cache","processed"])
 TODAY = datetime.now().strftime("%d%m%Y")
@@ -57,16 +57,16 @@ for code in BANK_CODES:
 HRM = Helper.get_timestamp(sep="")
 
 Helper.save_json(final_dict,os.path.join(CACHE_DIR,f"cache_{TODAY}_{HRM}.json5"))
-#post scraping ops
-ops = OperationExecutor()
+# #post scraping ops
+# ops = OperationExecutor()
 
-function_to_execute= {
-    "sha256":"_generate_hash_sha256",
-    "sha1":"_generate_hash_sha1",
-    "original_value":"boomerang" #default
-}
+# function_to_execute= {
+#     "sha256":"_generate_hash_sha256",
+#     "sha1":"_generate_hash_sha1",
+#     "original_value":"boomerang" #default
+# }
 
-date_dict = ops.runner(final_dict,function_to_execute)
+# date_dict = ops.runner(final_dict,function_to_execute)
 
-#save the data
-Helper.save_json(date_dict,os.path.join(PROCESS_DIR,f"process_{TODAY}_{HRM}.json5"))
+# #save the data
+# Helper.save_json(date_dict,os.path.join(PROCESS_DIR,f"process_{TODAY}_{HRM}.json5"))

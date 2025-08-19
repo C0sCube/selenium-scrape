@@ -246,6 +246,12 @@ class Helper:
     def write_file(filepath: str, content: str):
         with open(filepath, 'w') as f:
             f.write(content)
+            
+    @staticmethod
+    def write_binary_file(filepath: str, binary_content: bytes):
+        with open(filepath, 'wb') as f:
+            f.write(binary_content)
+
 
     @staticmethod
     def get_file_extension(filename: str) -> str:
