@@ -13,7 +13,7 @@ paths = Helper.load_json(r"paths.json")
 
 #constants
 BANK_CODES = ["PSB_1","PSB_2","PSB_3","PSB_4","PSB_5","PSB_6","PSB_7","PSB_8","PSB_9","PSB_10","PSB_11","PSB_12","PSB_13"]
-BANK_CODES = ["PSB_1"]
+BANK_CODES = ["PSB_11"]
 
 LOG_DIR,CACHE_DIR,PROCESS_DIR = Helper.create_dirs(paths["output"],["logs","cache","processed"])
 TODAY = datetime.now().strftime("%d%m%Y")
@@ -26,15 +26,16 @@ final_dict = {"metadata":{"program":"main.py","timestamp":TODAY,"config":"params
 for code in BANK_CODES:
     
     WEBSITE = config[code]
-    logger.info(f"Scraping From Bank {WEBSITE["bank_name"]}")
     website = WEBSITE["base_url"]
     #website specific
     scrape_data = {"bank_name": WEBSITE["bank_name"],"bank_code":WEBSITE["bank_type_code"],"base_url":WEBSITE["base_url"],"scraped_data": []}
-    executor = ActionExecutor(logger,WEBSITE,paths)
     try:
+        executor = ActionExecutor(logger,WEBSITE,paths)
         executor.create_driver()
+        logger.info("Driver Created.")
         executor.driver.get(website)
         logger.info("Page fetched successfully")
+        logger.info(f"Scraping From Bank {WEBSITE["bank_name"]}")
 
         for idx, block in enumerate(WEBSITE["blocks"]):
             logger.info(f"Running Block: {idx}")
@@ -48,7 +49,6 @@ for code in BANK_CODES:
         scrape_data["scraped_data"] = {"error": str(e)}
 
     finally:
-        time.sleep(2)
         executor.driver.quit()
         time.sleep(2)
 
