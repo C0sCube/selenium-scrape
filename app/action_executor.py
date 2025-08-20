@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver 
 from bs4 import BeautifulSoup
@@ -24,21 +25,38 @@ class ActionExecutor:
         self.OUTPUT_PATH = Helper.create_dir(paths["output"],paths["folders"]["data"],self.DATE.strftime("%d%m%Y"),params["bank_name"])
 
         # Create driver if not provided
-        self.driver = self._create_driver()
-        self._attach_headers()
-        self.window_stack = [base_window or self.driver.current_window_handle]
+        self.driver = None
+        # self._attach_headers()
+        self.window_stack = [base_window]
         
-    def _create_driver(self):
+    def create_driver(self):
         options = webdriver.ChromeOptions()
+        options.add_argument("--no-first-run")
+        options.add_argument("--no-default-browser-check")
+        options.add_argument("--disable-default-apps")
+        options.add_argument("--disable-infobars")
+        options.add_argument(rf"--user-data-dir={self.PATHS["profile_path"]}") #e.g. C:\Users\You\AppData\Local\Google\Chrome\User Data
+        options.add_argument(rf"--profile-directory={self.PATHS["profile_name"]}")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-popup-blocking") 
 
-        user_agent = self.PARAMS.get("headers", {}).get("User-Agent")
-        if user_agent:
-            options.add_argument(f'user-agent={user_agent}')
+        # user_agent = self.PARAMS.get("headers", {}).get("User-Agent")
+        # if user_agent:
+        #     options.add_argument(f'user-agent={user_agent}')
 
         # Manual Add
-        driver_path = self.PATHS.get("driver_path")
-        service = Service(driver_path)
-        return webdriver.Chrome(service=service, options=options)
+        try:
+            driver_path = self.PATHS.get("driver_path")
+            service = Service(driver_path)
+            
+            self.driver = webdriver.Chrome(service=service, options=options)
+            self.window_stack = [self.driver.current_window_handle]
+            self.driver.get("https://www.cogencis.com/")
+            self._attach_headers()
+        except FileNotFoundError:
+            raise FileNotFoundError(f"WebDriver not found at {self.PATHS.get('driver_path')}. Please check the path.")        
+        except Exception as e:
+            raise RuntimeError(f"Failed to create WebDriver: {e}")
 
     
     def _attach_headers(self):

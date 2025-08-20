@@ -32,7 +32,7 @@ for code in BANK_CODES:
     scrape_data = {"bank_name": WEBSITE["bank_name"],"bank_code":WEBSITE["bank_type_code"],"base_url":WEBSITE["base_url"],"scraped_data": []}
     executor = ActionExecutor(logger,WEBSITE,paths)
     try:
-        # executor.attach_headers()
+        executor.create_driver()
         executor.driver.get(website)
         logger.info("Page fetched successfully")
 

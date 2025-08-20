@@ -3,38 +3,38 @@
     bank_name: "Bank of Baroda",
     bank_type: "PUBLIC SECTOR BANKS",
     bank_type_code: "PSB_1",
-    base_url: "https://www.bankofbaroda.in/interest-rate-and-service-charges/retail-loans-interest-rates",
+    base_url: "https://www.bankofbaroda.in/interest-rate-and-service-charges/deposits-interest-rates",
     headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
       "Accept-Language": "en-US,en;q=0.9",
     },
     blocks: [
-      // [
-      //   {
-      //     action: "table",
-      //     html_name: "Bank_of_Baroda",
-      //     by: "tag",
-      //     value: "table",
-      //     multiple: true,
-      //     export_format: "both",
-      //     consolidate_save: false,
-      //     skip_if_not_found: true,
-      //     time: 5,
-      //     timeout: 20,
-      //     log_message: "Save Html Tables.",
-      //   },
-      // ],
       [
         {
-        action:"download",
-        by:"css",
-        value:"#second-scroll li:nth-child(1) a",
-        skip_if_not_found: true,
-        time: 5,
-        timeout: 20,
-        log_message: "Save Html Tables.",
-      },
-      ]
+          action: "table",
+          html_name: "Bank_of_Baroda",
+          by: "tag",
+          value: "table",
+          multiple: true,
+          export_format: "both",
+          consolidate_save: false,
+          skip_if_not_found: true,
+          time: 5,
+          timeout: 20,
+          log_message: "Save Html Tables.",
+        },
+      ],
+      // [
+      //   {
+      //   action:"download",
+      //   by:"css",
+      //   value:"#second-scroll li:nth-child(1) a",
+      //   skip_if_not_found: true,
+      //   time: 5,
+      //   timeout: 20,
+      //   log_message: "Save Html Tables.",
+      // },
+      // ]
     ],
   },
   PSB_2: {
