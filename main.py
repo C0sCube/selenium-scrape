@@ -97,7 +97,7 @@ final_dict = {
 }
 
 BANK_CODES = [f"PSB_{i}" for i in range(1,13)]
-# BANK_CODES = ["PSB_5"]
+BANK_CODES = ["PSB_5"]
 
 for code in BANK_CODES:
     bank_params = config[code]

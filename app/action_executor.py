@@ -26,8 +26,7 @@ class ActionExecutor:
 
         # Create driver if not provided
         self.driver = None
-        # self._attach_headers()
-        self.window_stack = [base_window]
+        self.window_stack = None
         
     # def create_driver(self):
     #     options = webdriver.ChromeOptions()
@@ -88,7 +87,9 @@ class ActionExecutor:
         options.add_argument("--disable-extensions")
         
         self.driver = uc.Chrome(options=options)
-        self.driver.implicitly_wait(5)
+        self.driver.implicitly_wait(2)
+        self.driver.get("https://www.cogencis.com/")
+        time.sleep(3)
         
         self.window_stack = [self.driver.current_window_handle]
         
