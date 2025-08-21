@@ -1,13 +1,23 @@
-import time ,re,os, hmac, hashlib
+import time ,re,os, hmac, hashlib, inspect
 from datetime import datetime
 import dateutil
 import pandas as pd
 from dateutil.parser import parse
-
+from io import StringIO
+from bs4 import BeautifulSoup
 
 class OperationExecutor:
     
     def __init__(self):
+        
+        self.procedures = {
+            "ext_date": self.extract_date,
+            "sha256": self._generate_hash_sha256,
+            "sha1": self._generate_hash_sha1,
+            "normalize_df": self._generalize_table_df,
+            "original":self.boomerang
+        }
+        
         pass
     
     @staticmethod
@@ -33,19 +43,47 @@ class OperationExecutor:
                 return date_str
         return text
     
-    
+    def _clean_html_thead(self,html_text):
+        html_text = re.sub(r"\<thead",r"\<tbody",html_text, re.IGNORECASE)
+        html_text = re.sub(r"\</thead",r"\</tbody",html_text, re.IGNORECASE)
+        return html_text
+
     def boomerang(self,data):
         return data
     
     def _generate_hash_sha256(self,text:str)->str:
         if not isinstance(text,str):
-            return "sha256 input non str"
+            return f"{inspect.currentframe().f_code.co_name}: input non str"
         return hashlib.sha256(text.encode()).hexdigest()
 
     def _generate_hash_sha1(self,text:str)->str:
         if not isinstance(text,str):
-            return "sha1 input non str"
+            return f"{inspect.currentframe().f_code.co_name}: input non str"
         return hashlib.sha1(text.encode()).hexdigest()
+    
+    def _generalize_table_df(self,html_string)->str:
+        MAX_COLUMN=15
+        cols = [f"column_{i}" for i in range(1, MAX_COLUMN + 1)]
+        dfs = pd.read_html(StringIO(html_string), flavor='html5lib')
+
+        all_dfs = []
+        for df in dfs:
+            if df.empty:
+                continue
+
+            df = df.iloc[:, :MAX_COLUMN].copy()  # truncate if too many columns
+            df.columns = cols[:df.shape[1]]      # rename existing columns
+            for i in range(df.shape[1], MAX_COLUMN):
+                df[cols[i]] = ""                 # fill missing columns with empty strings
+
+            df = df.reindex(columns=cols)        # ensure consistent column order
+            all_dfs.append(df)
+
+        final_df = pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame(columns=cols)
+        
+        normalized_df = final_df.to_csv(index=False,header=False, sep='|', lineterminator='\n')
+        return self._generate_hash_sha256(normalized_df)
+
 
     
     @staticmethod
@@ -111,13 +149,13 @@ class OperationExecutor:
                 raise ValueError(f"Function '{function_name}' not found in class.")
             function_to_execute[key] = func
         
-        function_to_execute["original_value"] = getattr(self, "boomerang", None)
+        function_to_execute["original"] = getattr(self, "boomerang", None)
         
         #copy + perform tasks
         p_dict = data.copy()
         records = p_dict.get("records", [])
         for record in records:
-            print(f"Processing for Bank :{record["bank_name"]}")
+            print(f"\nProcessing for Bank :{record["bank_name"]}\n==============================\n")
             response_data = record.get("scraped_data", [])
             if not response_data:
                 continue

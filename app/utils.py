@@ -256,6 +256,13 @@ class Helper:
     @staticmethod
     def get_file_extension(filename: str) -> str:
         return os.path.splitext(filename)[1]
+    
+   
+    # @staticmethod
+    # def current_runnin_func():
+    #     current_func = inspect.currentframe().f_code.co_name
+    #     return current_func
+
 
     #list chunk
     @staticmethod

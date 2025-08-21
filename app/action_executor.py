@@ -9,7 +9,7 @@ from datetime import datetime
 import pandas as pd
 import re, os, time, logging ,pprint, requests, base64
 from io import StringIO
-
+import undetected_chromedriver as uc
 
 from app.operation_executor import *
 from app.utils import *
@@ -78,6 +78,23 @@ class ActionExecutor:
 
         return self.driver
 
+    
+    def create_uc_driver(self):
+        options = uc.ChromeOptions()
+        # options.add_argument(f"--user-data-dir={profile_path}")
+        # options.add_argument(f"--profile-directory={profile_dir}")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--start-maximized")
+        options.add_argument("--disable-extensions")
+        
+        self.driver = uc.Chrome(options=options)
+        self.driver.implicitly_wait(5)
+        
+        self.window_stack = [self.driver.current_window_handle]
+        
+        # self._attach_headers()
+        
+        return self.driver
     
     def _attach_headers(self):
         self.driver.execute_cdp_cmd("Network.enable", {})
@@ -256,8 +273,15 @@ class ActionExecutor:
         cleaned_tables, table_scrape = [], {}
         for idx, elem in enumerate(elements):
             raw_html = elem.get_attribute("outerHTML")
+            
             raw_html = Helper.apply_sub(raw_html, r'<th\b', '<td', ignore_case=True)
             raw_html = Helper.apply_sub(raw_html, r'</th\b', '</td', ignore_case=True)
+            
+            #tbody
+            raw_html = re.sub(r"<thead\b",r"<tbody",raw_html, re.IGNORECASE)
+            raw_html = re.sub(r"</thead\b",r"</tbody",raw_html, re.IGNORECASE)
+            
+            #other tags
             raw_html = Helper.apply_sub(raw_html, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>",ignore_case=True)
             raw_html = Helper.apply_sub(raw_html,r'[#*@\n\t]+', ignore_case=True)
             raw_html = Helper._normalize_whitespace(raw_html)
