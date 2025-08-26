@@ -44,4 +44,6 @@
   screenshot_name: "step1_view", // optional: only for "screenshot" action
 
   log_message: "Clicked submit button", // optional: helps add readable logs for debugging
+
 }
+

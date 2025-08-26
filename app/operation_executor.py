@@ -1,24 +1,24 @@
-import time ,re,os, hmac, hashlib, inspect
-from datetime import datetime
-import dateutil
+import time ,re,os, hmac, hashlib, inspect, dateutil
 import pandas as pd
 from dateutil.parser import parse
 from io import StringIO
-from bs4 import BeautifulSoup
+from openpyxl import Workbook
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.styles import PatternFill
 
 class OperationExecutor:
     
-    def __init__(self):
+    def __init__(self, logger = None):
         
+        self.logger = logger
         self.procedures = {
             "ext_date": self.extract_date,
             "sha256": self._generate_hash_sha256,
             "sha1": self._generate_hash_sha1,
             "normalize_df": self._generalize_table_df,
-            "original":self.boomerang
+            "original":self._boomerang
         }
         
-        pass
     
     @staticmethod
     def extract_date(text: str) -> str:
@@ -43,12 +43,7 @@ class OperationExecutor:
                 return date_str
         return text
     
-    def _clean_html_thead(self,html_text):
-        html_text = re.sub(r"\<thead",r"\<tbody",html_text, re.IGNORECASE)
-        html_text = re.sub(r"\</thead",r"\</tbody",html_text, re.IGNORECASE)
-        return html_text
-
-    def boomerang(self,data):
+    def _boomerang(self,data):
         return data
     
     def _generate_hash_sha256(self,text:str)->str:
@@ -61,11 +56,13 @@ class OperationExecutor:
             return f"{inspect.currentframe().f_code.co_name}: input non str"
         return hashlib.sha1(text.encode()).hexdigest()
     
-    def _generalize_table_df(self,html_string)->str:
+    def _generalize_table_df(self,html_str)->str:
         MAX_COLUMN=15
         cols = [f"column_{i}" for i in range(1, MAX_COLUMN + 1)]
-        dfs = pd.read_html(StringIO(html_string), flavor='html5lib')
-
+        dfs = pd.read_html(StringIO(html_str), flavor='html5lib')
+        if not dfs:
+            return pd.DataFrame(columns=cols)
+        
         all_dfs = []
         for df in dfs:
             if df.empty:
@@ -81,8 +78,8 @@ class OperationExecutor:
 
         final_df = pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame(columns=cols)
         
-        normalized_df = final_df.to_csv(index=False,header=False, sep='|', lineterminator='\n')
-        return self._generate_hash_sha256(normalized_df)
+        norm_df = final_df.to_csv(index=False,header=False, sep='|', lineterminator='\n')
+        return norm_df
 
 
     
@@ -140,42 +137,197 @@ class OperationExecutor:
                 if wrap_html:
                     f.write("</body></html>")
 
+    
+    #Core Functionality
     def runner(self, data, function_to_execute):
-        
-        #check if all functions exist
-        for key, function_name in function_to_execute.items():
-            func = getattr(self, function_name, None)
-            if not callable(func):
-                raise ValueError(f"Function '{function_name}' not found in class.")
-            function_to_execute[key] = func
-        
-        function_to_execute["original"] = getattr(self, "boomerang", None)
-        
-        #copy + perform tasks
         p_dict = data.copy()
         records = p_dict.get("records", [])
+
         for record in records:
-            print(f"\nProcessing for Bank :{record["bank_name"]}\n==============================\n")
+            print(f"Processing : {record['bank_name']}")
             response_data = record.get("scraped_data", [])
             if not response_data:
                 continue
-            
+
+            new_scraped_data = []
+
             for action in response_data:
                 if not action.get("data_present"):
                     continue
-                
-                #execute functions on values
+
                 response = action.get("response")
                 if not response or not isinstance(response, dict):
                     continue
 
-                processed_data = []
                 for key, value in response.items():
-                    processed_item = {
-                        k: f(value) for k, f in function_to_execute.items()
+                    packet = {
+                        "original_name": key,
+                        "original_value": value
                     }
-                    processed_data.append(processed_item)
 
-                action["response"] = processed_data
-            
+                    # Apply each stage dynamically
+                    for stage_name, operations in function_to_execute.items():
+                        for func_name, source_key, target_key in operations:
+                            func = self.procedures.get(func_name)
+                            if not func:
+                                raise ValueError(f"Function '{func_name}' not found in procedures.")
+
+                            input_value = packet.get(source_key)
+                            if input_value is None:
+                                continue
+
+                            packet[target_key] = func(input_value)
+
+                    new_scraped_data.append(packet)
+
+            record["scraped_data"] = new_scraped_data
+
         return p_dict
+    
+    def process_comparison(self, old_json: dict, new_json: dict, key: str = "hash256") -> dict:
+    
+        def __extract_scraped_items(data, bank_code):
+            for record in data.get("records", []):
+                if record.get("bank_code") == bank_code:
+                    return [entry for entry in record.get("scraped_data", []) if key in entry]
+            return []
+
+        def __build_comparison_result(result):
+            return {
+                "comparison_result": {
+                    "new": result["new_packets"],
+                    "removed": result["removed_packets"],
+                    "unchanged": list(result["unchanged_keys"]),
+                    "summary": {
+                        "old_total": result["old_total"],
+                        "new_total": result["new_total"],
+                        "new_count": len(result["new_packets"]),
+                        "removed_count": len(result["removed_packets"]),
+                        "unchanged_count": len(result["unchanged_keys"])
+                    }
+                }
+            }
+
+        for new_record in new_json.get("records", []):
+            bank_code = new_record.get("bank_code")
+            old_items = __extract_scraped_items(old_json, bank_code)
+            new_items = __extract_scraped_items(new_json, bank_code)
+
+            old_keys = {item[key] for item in old_items}
+            new_keys = {item[key] for item in new_items}
+
+            new_only_keys = new_keys - old_keys
+            removed_keys = old_keys - new_keys
+            unchanged_keys = old_keys & new_keys
+
+            result = {
+                "key": key,
+                "new_keys": new_only_keys,
+                "removed_keys": removed_keys,
+                "unchanged_keys": unchanged_keys,
+                "new_packets": [item for item in new_items if item[key] in new_only_keys],
+                "removed_packets": [item for item in old_items if item[key] in removed_keys],
+                "old_total": len(old_items),
+                "new_total": len(new_items)
+            }
+
+            new_record.update(__build_comparison_result(result))
+            new_record.pop("scraped_data", None)
+
+        return new_json
+
+    
+    #Report Generation
+    def _write_summary(self, ws, summary, start_row, bank_name="", bank_link=""):
+        
+        ws.cell(row=start_row, column=1, value="Bank Name")
+        ws.cell(row=start_row, column=2, value=bank_name)
+
+        ws.cell(row=start_row + 1, column=1, value="Bank Link")
+        ws.cell(row=start_row + 1, column=2, value=bank_link)
+
+        ws.cell(row=start_row + 2, column=1, value="Summary")
+        headers = ["Old Total", "New Total", "New Count", "Removed Count", "Unchanged Count", "Change %"]
+        values = [
+            summary.get("old_total", 0),
+            summary.get("new_total", 0),
+            summary.get("new_count", 0),
+            summary.get("removed_count", 0),
+            summary.get("unchanged_count", 0),
+            round((summary.get("new_count", 0) + summary.get("removed_count", 0)) / max(summary.get("old_total", 1), 1) * 100, 2)
+        ]
+
+        for col, header in enumerate(headers, start=1):
+            ws.cell(row=start_row + 3, column=col, value=header)
+        for col, val in enumerate(values, start=1):
+            ws.cell(row=start_row + 4, column=col, value=val)
+
+        return start_row + 6
+
+    def _parse_html_table(self,html):
+        try:
+            return pd.read_html(StringIO(html))[0]
+        except:
+            return pd.DataFrame([["Failed to parse table"]])
+
+    def _write_side_by_side_tables(self, ws, new_df, removed_df, start_row, gap=2):
+        new_col_start = 1
+        removed_col_start = new_df.shape[1] + new_col_start + gap
+        comparison_col_start = removed_col_start + removed_df.shape[1] + gap
+
+        # Define fills
+        SKY_BLUE_FILL = PatternFill(start_color="99ff99", end_color="99ff99", fill_type="solid")
+        GOLD_YELLOW_FILL = PatternFill(start_color="ff9966", end_color="ff9966", fill_type="solid")
+
+        max_rows = max(len(new_df), len(removed_df))
+        max_cols = max(new_df.shape[1], removed_df.shape[1])
+
+        # Write new_df table with sky blue fill
+        for r_idx, row in enumerate(dataframe_to_rows(new_df, index=False, header=True)):
+            for c_idx, val in enumerate(row):
+                cell = ws.cell(row=start_row + r_idx, column=new_col_start + c_idx, value=val)
+                cell.fill = SKY_BLUE_FILL
+
+        # Write removed_df table with gold yellow fill
+        for r_idx, row in enumerate(dataframe_to_rows(removed_df, index=False, header=True)):
+            for c_idx, val in enumerate(row):
+                cell = ws.cell(row=start_row + r_idx, column=removed_col_start + c_idx, value=val)
+                cell.fill = GOLD_YELLOW_FILL
+
+        # Write cell-by-cell comparison formulas
+        for r in range(start_row + 1, start_row + max_rows + 1):  # Skip header
+            for c in range(max_cols):
+                comp_cell = ws.cell(row=r, column=comparison_col_start + c)
+
+                # Create formula like =A2=G2
+                new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
+                removed_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
+                comp_cell.value = f"={new_col_letter}{r}={removed_col_letter}{r}"
+
+        return start_row + max_rows + 2
+
+    def generate_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
+        with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
+            for record in comparison_json.get("records", []):
+                bank_name = record.get("bank_name")
+                bank_code = record.get("bank_code")
+                bank_link = record.get("base_url")
+                sheet_name = f"{bank_name} ({bank_code})"[:31]
+
+                summary = record.get("comparison_result", {}).get("summary", {})
+                new_entries = record.get("comparison_result", {}).get("new", [])
+                removed_entries = record.get("comparison_result", {}).get("removed", [])
+
+                pd.DataFrame().to_excel(writer, sheet_name=sheet_name, index=False)
+                ws = writer.sheets[sheet_name]
+                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=bank_name, bank_link=bank_link)
+
+
+                max_tables = max(len(new_entries), len(removed_entries))
+                for i in range(max_tables):
+                    new_df = self._parse_html_table(new_entries[i].get("original_value")) if i < len(new_entries) else pd.DataFrame()
+                    removed_df = self._parse_html_table(removed_entries[i].get("original_value")) if i < len(removed_entries) else pd.DataFrame()
+                    row_cursor = self._write_side_by_side_tables(ws, new_df, removed_df, start_row=row_cursor)
+
+        return output_path
+    

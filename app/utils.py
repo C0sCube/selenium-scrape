@@ -286,72 +286,21 @@ class Helper:
         ]
         return '-'.join(segments)
 
-    #PDF CRUD
+    
+    #try-catch #redacted failed
     # @staticmethod
-    # def get_pdf_text(path:str):
-    
-    #     doc = fitz.open(path)
-    #     text_data = {}
-    #     for pgn in range(doc.page_count):
-    #         page = doc[pgn]
-    #         text = page.get_text("text")
-    #         text = text.encode('utf-8', 'ignore').decode('utf-8')
-    #         data = text.split('\n')
-    #         text_data [pgn] = data
-    #     return text_data
-    
-    # @staticmethod
-    # def get_clipped_data(input:str, bboxes:list[set]):
-    
-    #     document = fitz.open(input)
-    #     final_list = []
-        
-    #     for pgn in range(document.page_count):
-    #         page = document[pgn]
+    # def safe_execute(default=None, log_func=None):
+    #     def decorator(func):
+    #         def wrapper(*args, **kwargs):
+    #             try:
+    #                 return func(*args, **kwargs)
+    #             except Exception as e:
+    #                 if log_func:
+    #                     log_func(f"Error in {func.__name__}: {e}")
+    #                 return default
+    #         return wrapper
+    #     return decorator
 
-    #         blocks = []
-    #         for bbox in bboxes:
-    #             blocks.extend(page.get_text('dict', clip = bbox)['blocks']) #get all blocks
-            
-    #         filtered_blocks = [block for block in blocks if block['type']== 0 and 'lines' in block]
-    #         sorted_blocks = sorted(filtered_blocks, key= lambda x: (x['bbox'][1], x['bbox'][0]))
-            
-    #         final_list.append({
-    #         "pgn": pgn,
-    #         "block": sorted_blocks
-    #         })
-            
-            
-    #     document.close()
-    #     return final_list
-    
-    # @staticmethod
-    # def get_all_pdf_data(path:str):
-    
-    #     doc = fitz.open(path)
-    #     count = doc.page_count
-    #     all_blocks = list()
-
-    #     for pgn in range(count):
-    #         page = doc[pgn]
-            
-    #         blocks = page.get_text('dict')['blocks']
-    #         images = page.get_images()
-    #         filtered_blocks = [block for block in blocks if block['type']== 0]
-    #         sorted_blocks = sorted(filtered_blocks, key=lambda x: x['bbox'][1])
-    #         all_blocks.append({
-    #             "pgn":pgn,
-    #             "blocks":sorted_blocks,
-    #             "images": images
-    #         })
-            
-    #         #draw lines
-            
-    #         lines = fitz.Rect()
-            
-    #     doc.close()
-        
-    #     return all_blocks
     
     
 class TableParser:
