@@ -6,6 +6,19 @@
     },
   },
 
+  GENERIC_ACTION_PACKETS: {
+    action_table: {
+      action: "table",
+      by: "tag",
+      value: "table",
+      wait_until: "present",
+      multiple: true,
+      skip_if_not_found: true,
+      time: 10,
+      timeout: 30,
+      log_message: "Save Html Tables.",
+    },
+  },
   PSB_1: {
     bank_name: "Bank of Baroda",
     bank_type: "PUBLIC SECTOR BANKS",
@@ -795,9 +808,9 @@
     blocks: [
       [
         {
-          action:"tablist",
-          by:"css",
-          value:".owl-nav-carousel li a",
+          action: "tablist",
+          by: "css",
+          value: ".owl-nav-carousel li a",
           skip_if_not_found: true,
           time: 5,
           timeout: 20,

@@ -1,9 +1,11 @@
-import time ,re,os, hmac, hashlib, inspect, dateutil
+import time ,re,os, hmac, hashlib, inspect, dateutil, base64, pdfplumber
 import pandas as pd
+from bs4 import BeautifulSoup
 from dateutil.parser import parse
-from io import StringIO
+from io import StringIO, BytesIO
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.formatting.rule import FormulaRule
 from openpyxl.styles import PatternFill
 
 class OperationExecutor:
@@ -20,6 +22,8 @@ class OperationExecutor:
         }
         
     
+    
+    #============ PROCEDURES ==============
     @staticmethod
     def extract_date(text: str) -> str:
         if not isinstance(text, str):
@@ -136,8 +140,7 @@ class OperationExecutor:
                         f.write(separator + "\n")
                 if wrap_html:
                     f.write("</body></html>")
-
-    
+  
     #Core Functionality
     def runner(self, data, function_to_execute):
         p_dict = data.copy()
@@ -148,40 +151,33 @@ class OperationExecutor:
             response_data = record.get("scraped_data", [])
             if not response_data:
                 continue
-
             new_scraped_data = []
 
             for action in response_data:
                 if not action.get("data_present"):
                     continue
-
                 response = action.get("response")
-                if not response or not isinstance(response, dict):
+                if not response:
                     continue
-
-                for key, value in response.items():
-                    packet = {
-                        "original_name": key,
-                        "original_value": value
-                    }
-
-                    # Apply each stage dynamically
+                for _packet_ in response:
+                    check_packet = _packet_.copy()
+                    # stage dynamic
                     for stage_name, operations in function_to_execute.items():
                         for func_name, source_key, target_key in operations:
+                            if target_key in check_packet:
+                                raise ValueError(f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}")
+                            
                             func = self.procedures.get(func_name)
                             if not func:
                                 raise ValueError(f"Function '{func_name}' not found in procedures.")
 
-                            input_value = packet.get(source_key)
+                            input_value = _packet_.get(source_key)
                             if input_value is None:
                                 continue
 
-                            packet[target_key] = func(input_value)
-
-                    new_scraped_data.append(packet)
-
+                            _packet_[target_key] = func(input_value)
+                    new_scraped_data.append(_packet_)
             record["scraped_data"] = new_scraped_data
-
         return p_dict
     
     def process_comparison(self, old_json: dict, new_json: dict, key: str = "hash256") -> dict:
@@ -236,7 +232,6 @@ class OperationExecutor:
 
         return new_json
 
-    
     #Report Generation
     def _write_summary(self, ws, summary, start_row, bank_name="", bank_link=""):
         
@@ -263,39 +258,61 @@ class OperationExecutor:
             ws.cell(row=start_row + 4, column=col, value=val)
 
         return start_row + 6
-
-    def _parse_html_table(self,html):
+    
+    def _parse_table(self, entry):
+        # print(entry)
+        content_type = entry.get("type", "str")  # default to html
+        raw_content = entry.get("value","")
+        
         try:
-            return pd.read_html(StringIO(html))[0]
+            if content_type == "table_html":
+                return pd.read_html(StringIO(raw_content))[0]
+            
+            elif content_type == "html":      
+                soup = BeautifulSoup(raw_content, "html.parser")
+                return  pd.DataFrame({"text":soup.get_text()})
+            
+            elif content_type == "pdf":
+                pdf_bytes = base64.b64decode(raw_content)
+                pdf_file = BytesIO(pdf_bytes)
+                all_rows = []
+                with pdfplumber.open(pdf_file) as pdf:
+                    for page in pdf.pages:
+                        table = page.extract_table()
+                        if table:
+                            all_rows.extend(table)
+                return pd.DataFrame(all_rows)
+                
+            else:
+                return pd.DataFrame()  # fallback
         except:
             return pd.DataFrame([["Failed to parse table"]])
-
+             
     def _write_side_by_side_tables(self, ws, new_df, removed_df, start_row, gap=2):
         new_col_start = 1
         removed_col_start = new_df.shape[1] + new_col_start + gap
         comparison_col_start = removed_col_start + removed_df.shape[1] + gap
 
-        # Define fills
-        SKY_BLUE_FILL = PatternFill(start_color="99ff99", end_color="99ff99", fill_type="solid")
-        GOLD_YELLOW_FILL = PatternFill(start_color="ff9966", end_color="ff9966", fill_type="solid")
-
+        SKY_BLUE_FILL = PatternFill(start_color="B3E5FC", end_color="B3E5FC", fill_type="solid")
+        GOLD_YELLOW_FILL = PatternFill(start_color="FFE599", end_color="FFE599", fill_type="solid")
+        
         max_rows = max(len(new_df), len(removed_df))
         max_cols = max(new_df.shape[1], removed_df.shape[1])
 
-        # Write new_df table with sky blue fill
+        # Write new_df
         for r_idx, row in enumerate(dataframe_to_rows(new_df, index=False, header=True)):
             for c_idx, val in enumerate(row):
                 cell = ws.cell(row=start_row + r_idx, column=new_col_start + c_idx, value=val)
                 cell.fill = SKY_BLUE_FILL
 
-        # Write removed_df table with gold yellow fill
+        # Write removed_df
         for r_idx, row in enumerate(dataframe_to_rows(removed_df, index=False, header=True)):
             for c_idx, val in enumerate(row):
                 cell = ws.cell(row=start_row + r_idx, column=removed_col_start + c_idx, value=val)
                 cell.fill = GOLD_YELLOW_FILL
 
         # Write cell-by-cell comparison formulas
-        for r in range(start_row + 1, start_row + max_rows + 1):  # Skip header
+        for r in range(start_row + 1, start_row + max_rows + 1):
             for c in range(max_cols):
                 comp_cell = ws.cell(row=r, column=comparison_col_start + c)
 
@@ -303,10 +320,22 @@ class OperationExecutor:
                 new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
                 removed_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
                 comp_cell.value = f"={new_col_letter}{r}={removed_col_letter}{r}"
+                
 
+        RED_FILL = PatternFill(start_color="FF9999", end_color="FF9999", fill_type="solid")  # Soft red
+
+        #Conditional Formatting 
+        for c in range(max_cols):
+            col_letter = ws.cell(row=1, column=comparison_col_start + c).column_letter
+            formula = f'{col_letter}{start_row + 1}=FALSE'  # Start from first data row
+            ws.conditional_formatting.add(
+                f'{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}',
+                FormulaRule(formula=[formula], fill=RED_FILL)
+            )
         return start_row + max_rows + 2
 
     def generate_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
+        
         with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
             for record in comparison_json.get("records", []):
                 bank_name = record.get("bank_name")
@@ -325,8 +354,8 @@ class OperationExecutor:
 
                 max_tables = max(len(new_entries), len(removed_entries))
                 for i in range(max_tables):
-                    new_df = self._parse_html_table(new_entries[i].get("original_value")) if i < len(new_entries) else pd.DataFrame()
-                    removed_df = self._parse_html_table(removed_entries[i].get("original_value")) if i < len(removed_entries) else pd.DataFrame()
+                    new_df = self._parse_table(new_entries[i]) if i < len(new_entries) else pd.DataFrame()
+                    removed_df = self._parse_table(removed_entries[i]) if i < len(removed_entries) else pd.DataFrame()
                     row_cursor = self._write_side_by_side_tables(ws, new_df, removed_df, start_row=row_cursor)
 
         return output_path
