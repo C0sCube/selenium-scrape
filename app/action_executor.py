@@ -96,10 +96,10 @@ class ActionExecutor:
         #field
         self.ATTRIBUTE = _action_.get("attribute")
         self.SCRAPE_FIELDS = _action_.get("scrape_fields")
+        self.FOLLOW_UP_ACTIONS =  _action_.get("steps")
         
         self.RUN_FUNCTION = _action_.get("execute",None)
-        self.TAB_NAME = None
-        self.TAB_FIELDS = _action_.get("imp_tabs",[])
+        self.ALLOWED_TABS = _action_.get("allowed_tabs",[])
         
         #save
         self.CONSOLIDATE_SAVE = _action_.get("consolidate_save", False)
@@ -138,13 +138,16 @@ class ActionExecutor:
             self.logger.error(f"Error executing action '{self.ACTION_TYPE}': {e}", exc_info=True)
             return self._generate_packet({"Error": e}) # skip further execution
 
-        if self.RETURN_TO_BASE:
-            self.logger.info("Returning to Base Window.")
-            if len(self.window_stack) > 1:
-                self.driver.close()
-                self.window_stack.pop()
-                self.driver.switch_to.window(self.window_stack[-1])
+        # if self.RETURN_TO_BASE:
+        #     self.logger.info("Returning to Base Window.")
+        #     if len(self.window_stack) > 1:
+        #         self.driver.close()
+        #         self.window_stack.pop()
+        #         self.driver.switch_to.window(self.window_stack[-1])
 
+        if content is None:
+            return self._generate_packet({"status": "no_content"})
+        
         return self._generate_packet(content)
 
     def __get_by(self, by_string):
@@ -332,8 +335,8 @@ class ActionExecutor:
         cleaned_tables, return_content = [], {}
         scrape_content = []
         for idx, elem in enumerate(elements):
-            header = self.__find_nearest_preceding_label(elem)
-            print(f"Table: {idx} has header:: {header}")
+            # header = self.__find_nearest_preceding_label(elem)
+            # print(f"Table: {idx} has header:: {header}")
             raw_html = elem.get_attribute("outerHTML")
             
             raw_html = Helper.apply_sub(raw_html, r'<th\b', '<td', ignore_case=True)
@@ -360,7 +363,7 @@ class ActionExecutor:
             # return_content[f"table_{idx}"] = final_html
             
             #trial
-            scrape_content.append(self.__generate_resp_packet(name=f"{self.table_name}_{idx}",value=final_html,header=header,type="table_html"))
+            scrape_content.append(self.__generate_resp_packet(name=f"{self.table_name}_{idx}",value=final_html,header="NOT SET",type="table_html"))
 
         # export format + save
 
@@ -424,28 +427,35 @@ class ActionExecutor:
         tabList = self.driver.find_elements(self.BY, self.VALUE)  #if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)]
         self.logger.info(f"Total Elements Found By={self.BY} and Value={self.VALUE} are {len(tabList)}")
         
-        # if self.BY == By.CSS_SELECTOR:
-        #     tabList = [elem for elem in tabList if elem.tag_name.lower() == "table"]
-            
-        cleaned_content,content_scrape = [],{}
-        for tab in tabList:
+        for i in range(len(tabList)):
             try:
+                # re-find tabs each iteration (DOM may refresh)
+                tabs = self.driver.find_elements(self.BY, self.VALUE)
+                tab = tabs[i]
+
                 self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", tab)
-                time.sleep(random.uniform(0, 2))
                 ActionChains(self.driver).move_to_element(tab).perform()
-                
-                WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(tab))
-                
-                print(tab.get_attribute("innerText"))
+
+                self.logger.info(f"Clicking tab[{i}] = {tab.text.strip()}")
                 tab.click()
-                time.sleep(random.uniform(0, 2))
-                
-                
-                
+
+                # wait for table(s) after click
+                WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.TAG_NAME, "table"))
+                )
+
+                tables = self.driver.find_elements(By.TAG_NAME, "table")
+                self.logger.info(f"Found {len(tables)} table(s) in tab[{i}]")
+
+                for idx, table in enumerate(tables):
+                    html = table.get_attribute("outerHTML")
+                    self.logger.info(f"--- Table {idx} from tab[{i}] ---")
+                    pprint.pprint(html)
+
             except Exception as e:
-                print(f"Failed to click tab: {e}")
-            
-        return content_scrape
+                self.logger.warning(f"Failed on tab[{i}]: {e}")
+
+        return {}
         
     #Non-Data Actions
     def _action_screenshot(self):
@@ -563,7 +573,8 @@ class ActionExecutor:
     
     #Packet Functions    
     def _generate_packet(self,content):
-        return {
+        
+        packet = {
             "action":self.ACTION_TYPE,
             "uid": Helper.generate_uid(),
             "timestamp":datetime.now().strftime("%d%m%Y %H:%M:%S"),
@@ -572,6 +583,13 @@ class ActionExecutor:
             "log_message":self.LOG_MESSAGE,
             "response":content if content else None
         }
+        
+        if hasattr(self, "CURRENT_TAB") and self.CURRENT_TAB:
+            packet["tab"] = self.CURRENT_TAB
+        if hasattr(self, "CURRENT_VIA") and self.CURRENT_VIA:
+            packet["via"] = self.CURRENT_VIA
+        
+        return packet
     
     def __generate_resp_packet(self, name = "",header="",value = None,type = ""):
         return {

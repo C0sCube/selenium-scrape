@@ -22,8 +22,9 @@ logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
 
 
 
-BANK_CODES = [f"PSB_{i}" for i in range(1,13)]
-BANK_CODES = ["PVB_1"]
+# BANK_CODES = [f"PSB_{i}" for i in range(1,13)]
+BANK_CODES = ["PVB_1","PVB_2","PVB_3","PVB_4","PVB_5","PVB_6","PVB_8","PVB_10","PVB_11","PVB_13","PVB_14","PVB_15","PVB_16","PVB_18","PVB_20"]
+
 final_dict = BankScraper.get_final_struct(TODAY,FILE_NAME)
 for code in BANK_CODES:
     bank_params = config[code]
