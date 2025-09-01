@@ -8,7 +8,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-import re, os, time, logging ,pprint, requests, base64
+import re, os, time, logging ,pprint, requests, base64, traceback
 from io import StringIO
 from urllib.parse import urlparse
 import undetected_chromedriver as uc
@@ -54,10 +54,8 @@ class ActionExecutor:
         options.add_argument("--start-maximized")
         options.add_argument("--disable-extensions")
         
-        self.driver = uc.Chrome(options=options)
-        # time.sleep(2)
-        # self.driver.get("https://www.cogencis.com/")
-        time.sleep(2)
+        self.driver = uc.Chrome(options=options)  # self.driver.get("https://www.cogencis.com/")
+        time.sleep(random.randint(0,2))
         
         self.window_stack = [self.driver.current_window_handle]
         return self.driver
@@ -72,7 +70,6 @@ class ActionExecutor:
         
     def execute(self, _action_: dict):
         self.ACTION_TYPE = _action_.get("action",None)
-        
         #get
         self.BY = self.__get_by(_action_.get("by", "css"))
         self.VALUE = _action_.get("value")
@@ -123,20 +120,16 @@ class ActionExecutor:
             
             if self.WAIT_UNTIL:
                 condition = self.__get_condition(self.WAIT_UNTIL, self.WAIT_BY, self.WAIT_VALUE)
-                self.ELEMENT = WebDriverWait(self.driver, self.TIMEOUT).until(condition)
-            else:
-                self.ELEMENT = self.driver.find_element(self.BY, self.VALUE)
-        except Exception:
-            self.logger.warning(f"Element not found: {self.BY}={self.VALUE}. Skipping this action.")
-            return self._generate_packet({"skip":"Element Not Found Hence Skipped."}) # skip quietly
-
-        try:
-            content = None
-            content = self.__perform_action(action_type = self.ACTION_TYPE)
+                WebDriverWait(self.driver, self.TIMEOUT).until(condition)
         
+            self.ELEMENT = self.driver.find_element(self.BY, self.VALUE)
+            content = self.__perform_action(action_type = self.ACTION_TYPE)
         except Exception as e:
-            self.logger.error(f"Error executing action '{self.ACTION_TYPE}': {e}", exc_info=True)
-            return self._generate_packet({"Error": e}) # skip further execution
+            error_type = type(e).__name__
+            error_msg = str(e)
+            self.logger.error(f"Error in self.execute: [{error_type}] {error_msg}")
+            self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
+            return self.__generate_packet([{"Error_Type": error_type, "Error_Message": error_msg}]) # skip further execution
 
         # if self.RETURN_TO_BASE:
         #     self.logger.info("Returning to Base Window.")
@@ -145,11 +138,36 @@ class ActionExecutor:
         #         self.window_stack.pop()
         #         self.driver.switch_to.window(self.window_stack[-1])
 
-        if content is None:
-            return self._generate_packet({"status": "no_content"})
+        if content is None: #IMPORTANT CONDITION in __generate_packet regarding other values
+            return self.__generate_packet([{"status": None}])
         
-        return self._generate_packet(content)
+        return self.__generate_packet(content)
 
+    def __perform_action(self,action_type = None):
+        action_map = {
+            "click": self._action_click,
+            "html": self._action_html_scrape,
+            "table": self._action_table_scrape,
+            "scrape": self._action_text_scrape,
+            "website": self._action_redirect,
+            "screenshot": self._action_screenshot,
+            "download": self._action_download,
+            "pdf": self._action_pdf,
+            "tablist": self._action_tab_list,
+        }
+
+        if not action_type:
+            self.logger.info(f"Checked presence of element: {self.BY}={self.VALUE}")
+            return
+
+        action = action_map.get(action_type)
+        if action:
+            result = action()
+            if result is not None:
+                return result
+        else:
+            self.logger.warning(f"Unknown action type: {self.ACTION_TYPE}")
+    
     def __get_by(self, by_string):
         return {
             "css": By.CSS_SELECTOR,
@@ -175,30 +193,34 @@ class ActionExecutor:
             raise ValueError(f"Unknown wait condition: {wait_type}")
         return condition_func(locator)
     
-    def __perform_action(self,action_type = None):
-        action_map = {
-            "click": self._action_click,
-            "html": self._action_html_scrape,
-            "table": self._action_table_scrape,
-            "scrape": self._action_text_scrape,
-            "website": self._action_redirect,
-            "screenshot": self._action_screenshot,
-            "download": self._action_download,
-            "pdf": self._action_pdf,
-            "tablist": self._action_tab_list,
+     #Packet Functions    
+    
+    def __generate_packet(self,content):
+        packet = {
+            "action":self.ACTION_TYPE,
+            "uid": Helper.generate_uid(),
+            "timestamp":datetime.now().strftime("%d%m%Y %H:%M:%S"),
+            "webpage": self.driver.current_url,
+            "data_present":not any(key in entity for entity in content for key in ["status", "error_type", "error_message","error"]),
+            "log_message":self.LOG_MESSAGE,
+            "response":content if content else None
         }
-
-        if not action_type:
-            self.logger.info(f"Checked presence of element: {self.BY}={self.VALUE}")
-            return
-
-        action = action_map.get(action_type)
-        if action:
-            result = action()
-            if result is not None:
-                return result
-        else:
-            self.logger.warning(f"Unknown action type: {self.ACTION_TYPE}")
+        
+        # if hasattr(self, "CURRENT_TAB") and self.CURRENT_TAB:
+        #     packet["tab"] = self.CURRENT_TAB
+        # if hasattr(self, "CURRENT_VIA") and self.CURRENT_VIA:
+        #     packet["via"] = self.CURRENT_VIA
+        
+        return packet
+    
+    def __generate_resp_packet(self, name = "",header="",value = None,type = ""):
+        return {
+            "name":name,
+            "title":header,
+            "value":value,
+            "type":type,
+            "data_present": bool(value)
+        }
     
     
     # ===================== ACTION =====================
@@ -324,15 +346,14 @@ class ActionExecutor:
     def _action_table_scrape(self)->dict:
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
         elements = self.driver.find_elements(self.BY, self.VALUE) if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)]
-        
+            
         #mandatory filter
         if self.BY == By.CSS_SELECTOR:
             elements = [elem for elem in elements if elem.tag_name.lower() == "table"]
 
-
         self.logger.info(f"Total Elements Found By={self.BY} and Value={self.VALUE} are {len(elements)}")
         
-        cleaned_tables, return_content = [], {}
+        cleaned_tables = []
         scrape_content = []
         for idx, elem in enumerate(elements):
             # header = self.__find_nearest_preceding_label(elem)
@@ -360,9 +381,6 @@ class ActionExecutor:
                         del tag.attrs[attr]
             final_html = str(soup)
             cleaned_tables.append(final_html)
-            # return_content[f"table_{idx}"] = final_html
-            
-            #trial
             scrape_content.append(self.__generate_resp_packet(name=f"{self.table_name}_{idx}",value=final_html,header="NOT SET",type="table_html"))
 
         # export format + save
@@ -424,36 +442,61 @@ class ActionExecutor:
     
     def _action_tab_list(self)->dict:
         self.logger.info(f"Tab List Loop Using BY={self.BY} and VALUE={self.VALUE}")
-        tabList = self.driver.find_elements(self.BY, self.VALUE)  #if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)]
+        tabList = self.driver.find_elements(self.BY, self.VALUE)
         self.logger.info(f"Total Elements Found By={self.BY} and Value={self.VALUE} are {len(tabList)}")
         
-        for i in range(len(tabList)):
+        follow_ups = self.FOLLOW_UP_ACTIONS
+
+        for tab in tabList:
             try:
-                # re-find tabs each iteration (DOM may refresh)
-                tabs = self.driver.find_elements(self.BY, self.VALUE)
-                tab = tabs[i]
-
-                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", tab)
-                ActionChains(self.driver).move_to_element(tab).perform()
-
-                self.logger.info(f"Clicking tab[{i}] = {tab.text.strip()}")
+                tab_text = tab.get_attribute("innerText").strip()
+                self.logger.info(f"Clicking tab: {tab_text}")
                 tab.click()
 
-                # wait for table(s) after click
+                # Optional: wait for table to load
                 WebDriverWait(self.driver, 10).until(
                     EC.presence_of_element_located((By.TAG_NAME, "table"))
                 )
 
+                # Scrape the table here
                 tables = self.driver.find_elements(By.TAG_NAME, "table")
-                self.logger.info(f"Found {len(tables)} table(s) in tab[{i}]")
-
-                for idx, table in enumerate(tables):
-                    html = table.get_attribute("outerHTML")
-                    self.logger.info(f"--- Table {idx} from tab[{i}] ---")
-                    pprint.pprint(html)
+                self.logger.info(f"Found {len(tables)} tables under tab: {tab_text}")
+                pprint.pprint(tables)
 
             except Exception as e:
-                self.logger.warning(f"Failed on tab[{i}]: {e}")
+                self.logger.warning(f"Failed on tab '{tab_text}': {e}")
+
+        
+        # for i in range(len(tabList)):
+        #     try:
+        #         # re-find tabs each iteration (DOM may refresh)
+        #         tabs = self.driver.find_elements(self.BY, self.VALUE)
+        #         tab = tabs[i]
+
+        #         self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", tab)
+        #         ActionChains(self.driver).move_to_element(tab).perform()
+
+        #         # self.logger.info(f"Clicking tab[{i}] = {tab.text.strip()}")
+        #         self.driver.execute_script("arguments[0].click();", tab)
+
+                
+        #         tab_text = tab.get_attribute("innerText")
+        #         print(tab_text)
+        #         time.sleep(0.5)
+                # for idx,step in enumerate(follow_ups):
+                    
+                #     if step.get("wait_until"):
+                #         condition = self.__get_condition(step.get("wait_until"), step.get("by"), step.get("value"))
+                #         WebDriverWait(self.driver, step.get("timeout")).until(condition)
+                    
+                #     result = self.execute(step)
+                #     if not result:
+                #         continue
+                #     pprint.pprint(result.get("data_present"))
+                #     pprint.pprint(len(result.get("response")))
+
+            # except Exception as e:
+            #     self.logger.warning(f"Failed on tab[{i}]: {e}")
 
         return {}
         
@@ -477,7 +520,6 @@ class ActionExecutor:
         
         elements = self.driver.find_elements(self.BY, self.VALUE) if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)]
         self.logger.info(f"Total Elements Found By={self.BY} and Value={self.VALUE} are {len(elements)}")
-        scrape_data = {}
         scrape_content = []
         for idx, elem in enumerate(elements):
             self.driver.execute_script("arguments[0].scrollIntoView(true);", elem)
@@ -502,7 +544,6 @@ class ActionExecutor:
 
                 if file_type:
                     file_content = self.__download_file(file_url, output_dir, idx, file_type)
-                    # scrape_data.update(file_content)
                     scrape_content.append(self.__generate_resp_packet(name=f"{self.pdf_name}_{idx}",header=header,value=file_content,type="pdf"))
                 else:
                     elem.click()
@@ -514,7 +555,7 @@ class ActionExecutor:
 
     def __download_file(self, file_url, output_dir, idx, extension):
         cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
-        r = requests.get(file_url, cookies=cookies)
+        r = requests.get(file_url, cookies=cookies, timeout=10)
         if r.status_code == 200:
             file_path = os.path.join(output_dir, os.path.basename(file_url))
             file_data = r.content
@@ -571,39 +612,9 @@ class ActionExecutor:
         except Exception as e:
             self.logger.error(f"Failed to print page to PDF: {str(e)}")
     
-    #Packet Functions    
-    def _generate_packet(self,content):
-        
-        packet = {
-            "action":self.ACTION_TYPE,
-            "uid": Helper.generate_uid(),
-            "timestamp":datetime.now().strftime("%d%m%Y %H:%M:%S"),
-            "webpage": self.driver.current_url,
-            "data_present":bool(content and not any(k in content for k in ["skip", "error"])),
-            "log_message":self.LOG_MESSAGE,
-            "response":content if content else None
-        }
-        
-        if hasattr(self, "CURRENT_TAB") and self.CURRENT_TAB:
-            packet["tab"] = self.CURRENT_TAB
-        if hasattr(self, "CURRENT_VIA") and self.CURRENT_VIA:
-            packet["via"] = self.CURRENT_VIA
-        
-        return packet
-    
-    def __generate_resp_packet(self, name = "",header="",value = None,type = ""):
-        return {
-            "name":name,
-            "title":header,
-            "value":value,
-            "type":type,
-            "data_present": bool(value)
-        }
-        pass
-    
     def execute_blocks(self, block: list):  
         block_data = []
-        for idx,_action_ in enumerate(block):
+        for _,_action_ in enumerate(block):
             data = self.execute(_action_)
             if data:
                 block_data.append(data)

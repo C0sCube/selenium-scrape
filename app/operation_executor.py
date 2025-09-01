@@ -21,6 +21,15 @@ class OperationExecutor:
             "original":self._boomerang
         }
         
+        self.type_compatibility = {
+            "normalize_df": ["table_html"],
+            "sha1": ["table_html", "html", "pdf"],
+            "sha256": ["table_html", "html", "pdf"],
+            "ext_date": ["html"],
+            "original": ["pdf", "html", "table_html"]
+        }
+
+        
     
     
     #============ PROCEDURES ==============
@@ -151,22 +160,34 @@ class OperationExecutor:
             response_data = record.get("scraped_data", [])
             if not response_data:
                 continue
+
             new_scraped_data = []
 
             for action in response_data:
                 if not action.get("data_present"):
                     continue
+
                 response = action.get("response")
                 if not response:
                     continue
+
                 for _packet_ in response:
                     check_packet = _packet_.copy()
-                    # stage dynamic
+
                     for stage_name, operations in function_to_execute.items():
-                        for func_name, source_key, target_key in operations:
+                        for operation in operations:
+                            # Unpack operation with optional expected_type
+                            if len(operation) == 4:
+                                func_name, source_key, target_key, expected_type = operation
+                            else:
+                                func_name, source_key, target_key = operation
+                                expected_type = None
+
                             if target_key in check_packet:
-                                raise ValueError(f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}")
-                            
+                                raise ValueError(
+                                    f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}"
+                                )
+
                             func = self.procedures.get(func_name)
                             if not func:
                                 raise ValueError(f"Function '{func_name}' not found in procedures.")
@@ -175,10 +196,50 @@ class OperationExecutor:
                             if input_value is None:
                                 continue
 
+                            # Apply type check only in primary stage
+                            if stage_name == "primary" and expected_type:
+                                packet_type = _packet_.get("type", "").lower()
+                                if isinstance(expected_type, list):
+                                    if packet_type not in [t.lower() for t in expected_type]:
+                                        continue
+                                elif packet_type != expected_type.lower():
+                                    continue
+
                             _packet_[target_key] = func(input_value)
+
                     new_scraped_data.append(_packet_)
+
             record["scraped_data"] = new_scraped_data
+
         return p_dict
+                    
+                    # stage dynamic
+            #         for stage_name, operations in function_to_execute.items():
+            #             for func_name, source_key, target_key in operations:
+            #                 if target_key in check_packet:
+            #                     raise ValueError(f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}")
+                            
+            #                 func = self.procedures.get(func_name)
+            #                 if not func:
+            #                     raise ValueError(f"Function '{func_name}' not found in procedures.")
+                            
+            #                 input_value = _packet_.get(source_key)
+            #                 if input_value is None:
+            #                     continue
+                            
+            #                 if stage_name == "primary":
+            #                     packet_type = _packet_.get("type", "").lower()
+            #                     allowed_types = self.type_compatibility.get(func_name, [])
+            #                     if packet_type not in allowed_types:
+            #                         self.logger and self.logger.debug(f"[Primary] Skipped '{func_name}' for packet type '{packet_type}'")
+            #                         continue
+
+            #                 _packet_[target_key] = func(input_value)
+
+            #         new_scraped_data.append(_packet_)
+            # record["scraped_data"] = new_scraped_data
+            
+        
     
     def process_comparison(self, old_json: dict, new_json: dict, key: str = "hash256") -> dict:
     

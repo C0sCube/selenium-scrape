@@ -1,5 +1,5 @@
 from app.action_executor import ActionExecutor
-import time
+import time, traceback
 
 class BankScraper:
     def __init__(self, bank_params, logger, paths):
@@ -23,6 +23,7 @@ class BankScraper:
                 "config": "params_table.json5",
                 "filename": file_name
             },
+            "registry":{},
             "records": []
         }
     
@@ -41,10 +42,11 @@ class BankScraper:
                 self.scrape_data["scraped_data"].extend(data)
 
         except Exception as e:
-            self.logger.error(f"Error scraping {self.bank_params['bank_name']}: {e}")
-            self.scrape_data["scraped_data"] = [{"Error": str(e)}]
-            
+            error_type = type(e).__name__
+            error_msg = str(e)
+            self.logger.error(f"Error in BankScraper.py {self.bank_params['bank_name']}:[{error_type}] {error_msg}")
+            self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
+            self.scrape_data["scraped_data"] = [{"Error_Type": error_type, "Error_Message": error_msg}]
         finally:
             self.executor.driver.quit()
-            time.sleep(5)
         return self.scrape_data
