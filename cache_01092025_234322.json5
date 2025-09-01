@@ -1,0 +1,44 @@
+{
+  "metadata": {
+    "program": "main.py",
+    "timestamp": "01092025",
+    "config": "params_table.json5",
+    "filename": "cache_01092025_234322.json5"
+  },
+  "registry": {
+    "PSB_8": "Punjab and Sind Bank"
+  },
+  "records": [
+    {
+      "bank_name": "Punjab and Sind Bank",
+      "bank_code": "PSB_8",
+      "base_url": "https://punjabandsindbank.co.in//content/interestdom",
+      "scraped_data": [
+        {
+          "action": "table",
+          "uid": "PYR-CAW-GUX",
+          "timestamp": "01092025 23:43:52",
+          "webpage": "https://punjabandsind.bank.in//content/interestdom",
+          "data_present": true,
+          "log_message": "Save Html Tables.",
+          "response": [
+            {
+              "name": "P&SB_0",
+              "title": "NOT SET",
+              "value": "<table> <tbody> <tr> <!-- <td>Particular</td>--> <td>Particular</td> <td>Rate of Interest</td> </tr> <tr><td>Saving Bank Deposit including NRE/NRO</td><td>Revised Ratesw.e.f 18.08.2025 (% p.a)</td> </tr> <tr><td>Upto 1 Crore</td><td>2.40%</td> </tr> <tr><td> Above 1 Crore to upto 50 Crore</td><td>2.60%</td> </tr> <tr><td> Above 50 Crore to upto 100 Crore</td><td>4.22%</td> </tr><tr><td> Above 100 Crore to upto 500 Crore </td><td>4.25%</td> </tr><tr><td> Above 500 Crore </td><td>4.70%</td> </tr> <!--<tr> <td>Saving Bank Deposit including NRE/NRO</td> <td></td> </tr>--> <!-- <tr> <td>Upto 20 Lakhs</td> <td>3.00% p.a.</td> </tr> --> <!-- <tr> <td>Above 20 Lakhs</td> <td>3.00</td> </tr> --> </tbody> </table>",
+              "type": "table_html",
+              "data_present": true
+            },
+            {
+              "name": "P&SB_1",
+              "title": "NOT SET",
+              "value": "<table> <tbody> <tr> <td>Maturity</td> <td>Fixed Deposit Less than Rs.3 Cr</td> </tr> <tr> <td>7\u00a0\u2013\u00a014\u00a0Days</td> <td>3.00 ()</td> </tr> <tr> <td>15\u00a0\u2013\u00a030\u00a0Days</td> <td>3.00</td> </tr> <tr> <td>31\u00a0\u2013\u00a045\u00a0Days</td> <td>3.00</td> </tr> <tr> <td>46\u00a0\u2013\u00a090\u00a0Days</td> <td>3.50</td> </tr> <tr> <td>91\u00a0\u2013\u00a0120\u00a0Days</td> <td>3.50</td> </tr> <tr> <td>121\u00a0\u2013\u00a0150\u00a0Days</td> <td>3.50</td> </tr> <tr> <td>151\u00a0\u2013\u00a0179\u00a0Days</td> <td>5.00</td> </tr> <tr> <td>180\u00a0\u2013\u00a0364\u00a0Days</td> <td>5.00</td> </tr> <tr> <td>1\u00a0Year</td> <td>6.00</td> </tr> <tr> <td>&gt;1\u00a0Year\u00a0\u2013\u00a0374\u00a0Days</td> <td>5.75</td> </tr> <tr> <td>375\u00a0Days\u00a0(Callable)</td> <td>6.65</td> </tr> <tr> <td>375\u00a0Days\u00a0(Non\u2011Callable)</td> <td>6.75</td> </tr> <tr> <td>376\u00a0\u2013\u00a0443\u00a0Days</td> <td>5.75</td> </tr> <tr> <td>444\u00a0Days\u00a0(Callable)</td> <td>6.70</td> </tr> <tr> <td>444\u00a0Days\u00a0(Non\u2011Callable)</td> <td>6.80</td> </tr> <tr> <td>445\u00a0Days\u00a0\u2013\u00a0\u2264\u00a022\u00a0Months</td> <td>6.00</td> </tr> <tr> <td>22\u00a0Months\u00a0(PSB Green Earth)</td> <td>6.10$</td> </tr> <tr> <td>&gt;22\u00a0Months\u00a0\u2013\u00a0&lt;2\u00a0Years</td> <td>6.00</td> </tr> <tr> <td>2\u00a0Years\u00a0\u2013\u00a0776\u00a0Days</td> <td>6.10</td> </tr> <tr> <td>777\u00a0Days</td> <td>6.15</td> </tr> <tr> <td>778\u00a0\u2013\u00a0998\u00a0Days</td> <td>6.00</td> </tr> <tr> <td>999\u00a0Days\u00a0(Callable)</td> <td>6.10</td> </tr> <tr> <td>999\u00a0Days\u00a0(Non\u2011Callable)</td> <td>6.15</td> </tr> <tr> <td>1000\u00a0Days\u00a0\u2013\u00a0&lt;\u00a03\u00a0Years</td> <td>6.10</td> </tr> <tr> <td>3\u00a0Years\u00a0\u2013\u00a0&lt;\u00a044\u00a0Months</td> <td>6.00</td> </tr> <tr> <td>44\u00a0Months\u00a0(PSB Green Earth)</td> <td>6.10$</td> </tr> <tr> <td>&gt;44\u00a0Months\u00a0\u2013\u00a05\u00a0Years</td> <td>6.00</td> </tr> <tr> <td>5\u00a0Years</td> <td>6.10</td> </tr> <tr> <td>&gt;5\u00a0Years\u00a0\u2013\u00a0&lt;\u00a066\u00a0Months</td> <td>6.00</td> </tr> <tr> <td>66\u00a0Months\u00a0(PSB Green Earth)</td> <td>6.10$</td> </tr> <tr> <td>&gt;66\u00a0Months\u00a0\u2013\u00a010\u00a0Years</td> <td>6.00</td> </tr> </tbody> </table>",
+              "type": "table_html",
+              "data_present": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

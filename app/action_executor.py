@@ -12,6 +12,7 @@ import re, os, time, logging ,pprint, requests, base64, traceback
 from io import StringIO
 from urllib.parse import urlparse
 import undetected_chromedriver as uc
+from urllib.parse import urljoin
 
 from app.operation_executor import *
 from app.utils import *
@@ -221,8 +222,7 @@ class ActionExecutor:
             "type":type,
             "data_present": bool(value)
         }
-    
-    
+     
     # ===================== ACTION =====================
     
     #DOM-Scrape Actions
@@ -533,6 +533,8 @@ class ActionExecutor:
                     file_url = None
 
             if file_url:
+                
+                file_url = urljoin(self.driver.current_url, file_url)
                 output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["downloads"])
                 file_type = None
                 header = os.path.basename(urlparse(file_url).path)
@@ -555,7 +557,8 @@ class ActionExecutor:
 
     def __download_file(self, file_url, output_dir, idx, extension):
         cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
-        r = requests.get(file_url, cookies=cookies, timeout=10)
+        r = requests.get(file_url, cookies=cookies,allow_redirects=True)
+        
         if r.status_code == 200:
             file_path = os.path.join(output_dir, os.path.basename(file_url))
             file_data = r.content
