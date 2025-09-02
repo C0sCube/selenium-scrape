@@ -197,6 +197,12 @@ class Helper:
         return Helper._normalize_whitespace(text)
     
     @staticmethod
+    def sanitize_Win_filename(name):
+        # Replace illegal Windows characters with underscores
+        return re.sub(r'[<>:"/\\|?*]', '_', name)
+
+    
+    @staticmethod
     def _normalize_alphanumeric(text: str) -> str:
         if not isinstance(text, str):
             return text
