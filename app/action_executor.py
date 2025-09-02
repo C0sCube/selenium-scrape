@@ -442,69 +442,59 @@ class ActionExecutor:
         self.logger.info(f"Tab List Loop Using BY={self.BY} and VALUE={self.VALUE}")
         
         tabList = self.driver.find_elements(self.BY, self.VALUE)
+    
         self.logger.info(f"Total Elements Found By={self.BY} and Value={self.VALUE} are {len(tabList)}")
         
-        if tabList:
-            for idx,tab in enumerate(tabList):
-                print(f"Tab_{idx}")
-                # print(tab.get_attribute("innerText"))
-                pprint.pprint(tab.get_attribute("outerHTML"))
-        else:
-            pass
         
         follow_ups = self.FOLLOW_UP_ACTIONS
 
-        # for tab in tabList:
-        #     try:
-        #         tab_text = tab.get_attribute("innerText").strip()
-        #         self.logger.info(f"Clicking tab: {tab_text}")
-        #         tab.click()
-
-        #         # Optional: wait for table to load
-        #         WebDriverWait(self.driver, 10).until(
-        #             EC.presence_of_element_located((By.TAG_NAME, "table"))
-        #         )
-
-        #         # Scrape the table here
-        #         tables = self.driver.find_elements(By.TAG_NAME, "table")
-        #         self.logger.info(f"Found {len(tables)} tables under tab: {tab_text}")
-        #         pprint.pprint(tables)
-
-        #     except Exception as e:
-        #         self.logger.warning(f"Failed on tab '{tab_text}': {e}")
-
-        
-        for i in range(len(tabList)):
+        for idx, tab in enumerate(self.driver.find_elements(self.BY, self.VALUE)):
             try:
-                # re-find tabs each iteration (DOM may refresh)
-                tabs = self.driver.find_elements(self.BY, self.VALUE)
-                tab = tabs[i]
-
                 self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", tab)
                 ActionChains(self.driver).move_to_element(tab).perform()
-
-                # self.logger.info(f"Clicking tab[{i}] = {tab.text.strip()}")
                 self.driver.execute_script("arguments[0].click();", tab)
-
                 
-                tab_text = tab.get_attribute("innerText")
-                print(tab_text)
+                print(f"========={tab.get_attribute("innerText")}========")
+
                 time.sleep(0.5)
-                for idx,step in enumerate(follow_ups):
-                    
+                for step in follow_ups:
                     if step.get("wait_until"):
-                        condition = self.__get_condition(step.get("wait_until"), step.get("by"), step.get("value"))
-                        WebDriverWait(self.driver, step.get("timeout")).until(condition)
-                    
+                        condition = self.__get_condition(step["wait_until"], step["by"], step["value"])
+                        WebDriverWait(self.driver, step["timeout"]).until(condition)
+
                     result = self.execute(step)
-                    if not result:
-                        continue
-                    pprint.pprint(result.get("data_present"))
-                    pprint.pprint(len(result.get("response")))
+                    # if result:
+                    #     pprint.pprint(result.get("response"))
 
             except Exception as e:
-                self.logger.warning(f"Failed on tab[{i}]: {e}")
+                self.logger.warning(f"Failed on tab[{idx}]: {e}")
+                
+            # i = 0
+            # while True:
+            #     try:
+            #         tabs = self.driver.find_elements(self.BY, self.VALUE)
+            #         if i >= len(tabs):
+            #             break  # stop if no more tabs left
 
+            #         tab = tabs[i]
+            #         self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", tab)
+            #         ActionChains(self.driver).move_to_element(tab).perform()
+            #         self.driver.execute_script("arguments[0].click();", tab)
+
+            #         time.sleep(0.5)
+            #         for step in follow_ups:
+            #             if step.get("wait_until"):
+            #                 condition = self.__get_condition(step["wait_until"], step["by"], step["value"])
+            #                 WebDriverWait(self.driver, step["timeout"]).until(condition)
+
+            #             result = self.execute(step)
+            #             if result:
+            #                 pprint.pprint(result.get("response"))
+
+            #         i += 1
+            #     except Exception as e:
+            #         self.logger.warning(f"Failed on tab[{i}]: {e}")
+            #         i += 1
         return {}
     
     def _action_requests(self):
