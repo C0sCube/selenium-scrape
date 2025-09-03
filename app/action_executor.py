@@ -7,15 +7,13 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium import webdriver 
 from bs4 import BeautifulSoup
 from datetime import datetime
-
-import re, os, time, logging ,pprint, requests, base64, traceback
 from io import StringIO
-from urllib.parse import urlparse
-import undetected_chromedriver as uc
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
-from app.operation_executor import *
-from app.utils import *
+import re, os, time, logging ,pprint, requests, base64, traceback, random
+import undetected_chromedriver as uc
+from app.operation_executor import OperationExecutor
+from app.utils import Helper
 
 class ActionExecutor:
     def __init__(self,logger=None, params=None, paths=None):
@@ -48,15 +46,17 @@ class ActionExecutor:
         return self.driver
     
     def create_uc_driver(self):
+
         options = uc.ChromeOptions()
         # options.add_argument(f"--user-data-dir={profile_path}")
         # options.add_argument(f"--profile-directory={profile_dir}")
         options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--start-maximized")
+        # options.add_argument("--start-maximized")
         options.add_argument("--disable-extensions")
         
-        self.driver = uc.Chrome(options=options)  # self.driver.get("https://www.cogencis.com/")
-        time.sleep(random.randint(0,2))
+        self.driver = uc.Chrome(options=options)
+        self.driver.set_window_size(900,700)
+        time.sleep(random.uniform(0.5, 2.5))
         
         self.window_stack = [self.driver.current_window_handle]
         return self.driver
@@ -77,7 +77,7 @@ class ActionExecutor:
         self.URL = _action_.get("url","https://tinyurl.com/nothing-borgir")
         
         #time
-        self.DEFAULT_WAIT = _action_.get("time", 1.5)
+        self.DEFAULT_WAIT = _action_.get("time", 2)
         self.TIMEOUT = _action_.get("timeout", 15)
         self.WAIT_UNTIL = _action_.get("wait_until")
         self.WAIT_BY = _action_.get("wait_by", self.BY) #dependent
@@ -109,8 +109,8 @@ class ActionExecutor:
         self.PRINT_BACKGROUND = _action_.get("print_background",False)
         
         #window
-        # self.NEW_WINDOW = _action_.get("new_window", False)
-        # self.RETURN_TO_BASE = _action_.get("return_to_base", False)
+        self.NEW_WINDOW = _action_.get("new_window", False)
+        self.RETURN_TO_BASE = _action_.get("return_to_base", False)
         
         time.sleep(random.uniform(0, self.DEFAULT_WAIT))
         
@@ -152,6 +152,7 @@ class ActionExecutor:
             "download": self._action_download,
             "pdf": self._action_pdf,
             "tablist": self._action_tab_list,
+            "request":self._action_requests
         }
 
         if not action_type:
@@ -205,10 +206,10 @@ class ActionExecutor:
             "response":content if content else None
         }
         
-        # if hasattr(self, "CURRENT_TAB") and self.CURRENT_TAB:
-        #     packet["tab"] = self.CURRENT_TAB
-        # if hasattr(self, "CURRENT_VIA") and self.CURRENT_VIA:
-        #     packet["via"] = self.CURRENT_VIA
+        if hasattr(self, "TABS_FOUND") and self.TABS_FOUND:
+            packet["tab_found"] = self.TABS_FOUND
+        if hasattr(self, "FOLLOW_UP_ACTION_NAMES") and self.FOLLOW_UP_ACTION_NAMES:
+            packet["follow_ups"] = self.FOLLOW_UP_ACTION_NAMES
         
         return packet
     
@@ -440,35 +441,44 @@ class ActionExecutor:
     
     def _action_tab_list(self)->dict:
         self.logger.info(f"Tab List Loop Using BY={self.BY} and VALUE={self.VALUE}")
-        
         tabList = self.driver.find_elements(self.BY, self.VALUE)
-    
         self.logger.info(f"Total Elements Found By={self.BY} and Value={self.VALUE} are {len(tabList)}")
         
-        
         follow_ups = self.FOLLOW_UP_ACTIONS
-
+        
+        #set important data
+        self.TABS_FOUND = ""
+        self.FOLLOW_UP_ACTION_NAMES =f"|".join([step.get("action") for step in follow_ups])
+        scrape_content = []
         for idx, tab in enumerate(self.driver.find_elements(self.BY, self.VALUE)):
             try:
                 self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", tab)
                 ActionChains(self.driver).move_to_element(tab).perform()
                 self.driver.execute_script("arguments[0].click();", tab)
                 
-                print(f"========={tab.get_attribute("innerText")}========")
+                tabName = tab.get_attribute("innerText")
+                self.TABS_FOUND = self.TABS_FOUND + f"| {str(tabName)}"
+                
+                print(f"========={tabName}========")
 
                 time.sleep(0.5)
                 for step in follow_ups:
+                    result = {}
                     if step.get("wait_until"):
                         condition = self.__get_condition(step["wait_until"], step["by"], step["value"])
                         WebDriverWait(self.driver, step["timeout"]).until(condition)
 
                     result = self.execute(step)
-                    # if result:
-                    #     pprint.pprint(result.get("response"))
+                    # if result.get("data_present",False):
+                        # pprint.pprint(result.get("response"))
+                    step_content = result.get("response",[])
+                    for packet in step_content:
+                        packet["tabName"] = tabName if tabName else "NOT DEFINED"
+                    scrape_content.extend(step_content)
 
             except Exception as e:
                 self.logger.warning(f"Failed on tab[{idx}]: {e}")
-                
+        return scrape_content
             # i = 0
             # while True:
             #     try:
@@ -495,7 +505,6 @@ class ActionExecutor:
             #     except Exception as e:
             #         self.logger.warning(f"Failed on tab[{i}]: {e}")
             #         i += 1
-        return {}
     
     def _action_requests(self):
         self.logger("Performing GET REQUEST for attached website.")
@@ -565,42 +574,8 @@ class ActionExecutor:
 
             except Exception as e:
                 self.logger.error(f"Error at index {idx}: {e}")
-        
-        # for idx, elem in enumerate(elements):
-        #     self.driver.execute_script("arguments[0].scrollIntoView(true);", elem)
-        #     file_url = elem.get_attribute("href")
-
-        #     if not file_url:
-        #         try:
-        #             link_elem = elem.find_element(By.TAG_NAME, "a")
-        #             file_url = link_elem.get_attribute("href")
-        #         except:
-        #             file_url = None
-
-        #     if file_url:
-                
-        #         file_url = urljoin(self.driver.current_url, file_url)
-        #         output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["downloads"])
-        #         file_type = None
-        #         header = os.path.basename(urlparse(file_url).path)
-
-                
-        #         if file_url.endswith(".pdf") or ".pdf" in file_url: file_type = "pdf"
-        #         elif file_url.endswith(".csv"): file_type = "csv"
-        #         elif file_url.endswith(".docx"): file_type = "docx"
-
-        #         if file_type:
-        #             file_content = self.__download_file(file_url, output_dir, idx, file_type)
-        #             scrape_content.append(self.__generate_resp_packet(name=f"{self.pdf_name}_{idx}",header=header,value=file_content,type="pdf"))
-        #         else:
-        #             self.logger.info("Triggered click for file download.")
-        #             elem.click()
-        #     else:
-        #         self.logger.warning(f"No valid URL found for element at index {idx}")
-
         return scrape_content #scrape_data
 
-    
     def __get_file_url(self,elem):
         url = elem.get_attribute("href")
         if not url:
@@ -621,28 +596,35 @@ class ActionExecutor:
         cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
         r = requests.get(file_url, cookies=cookies, verify=False)
         self.logger.notice(f" `{extension}` GET Request Returned Status: {r.status_code}")
+        
+        
+        encoded_data = ""
+        MAX_SIZE = 2_000_000
+        
         if r.status_code == 200:
 
             parsed_url = urlparse(file_url)
             raw_filename = os.path.basename(parsed_url.path)
             safe_filename = Helper.sanitize_Win_filename(raw_filename)
     
-            if not safe_filename:
-                safe_filename = f"file_{idx}.{extension}"
+            if not safe_filename: safe_filename = f"file_{idx}.{extension}"
 
             file_path = os.path.join(output_dir, safe_filename)
             file_data = r.content
+            
+            if len(file_data)>=MAX_SIZE:
+                self.logger.warning(f"Skipped {safe_filename} — size {len(file_data)} exceeds limit.")
+                return encoded_data
+            
             encoded_data = base64.b64encode(file_data).decode("utf-8")
-
             if self.FILE_SAVE:
                 Helper.write_binary_file(file_path, file_data)
                 self.logger.info(f"Downloaded {extension.upper()} to {file_path}")
                 
-            return encoded_data
-
         else:
-            self.logger.error(f"Failed to download {extension.upper()}: {file_url}")
-            return {}
+            self.logger.error(f"Failed to download {extension.upper()}, returning empty str.")
+        
+        return encoded_data
     
     def _action_redirect(self):
         try:
@@ -690,6 +672,7 @@ class ActionExecutor:
     
     def execute_blocks(self, block: list):  
         block_data = []
+        self.logger.notice(f"Total Action(s) {len(block)}")
         for _,_action_ in enumerate(block):
             data = self.execute(_action_)
             if data:

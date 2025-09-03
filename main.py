@@ -1,4 +1,4 @@
-import os, warnings,time, ssl
+import os, warnings,time, ssl, traceback
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # TensorFlow-specific-selenium
 warnings.filterwarnings('ignore')
 ssl._create_default_https_context = ssl._create_stdlib_context
@@ -15,13 +15,13 @@ paths = Helper.load_json(r"paths.json")
 # Constants
 LOG_DIR, CACHE_DIR, PROCESS_DIR = Helper.create_dirs(paths["output"], ["logs", "cache", "processed"])
 PROGRAM_NAME = "SCRAPE_BANK_RATE_KAUSTUBH"
-
+POST_SCRAPE_OPS = config["POST_SCRAPE_OPS"].get("sha1",{})
 
 # Logger
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
 
 BANK_CODES = [f"PSB_{i}" for i in range(1,13)]+["PVB_1","PVB_2","PVB_3","PVB_4","PVB_5","PVB_6","PVB_7","PVB_8","PVB_10","PVB_11","PVB_12","PVB_13","PVB_14","PVB_15","PVB_16","PVB_18","PVB_19","PVB_20","PVB_21","PVB_22"]
-# BANK_CODES = ["PVB_9"]
+BANK_CODES = ["PSB_2"]
 
 # Mailer().start_mail(PROGRAM_NAME,BANK_CODES)
 final_dict = BankScraper.get_final_struct()
@@ -34,13 +34,19 @@ try:
         result = scraper.run()
         final_dict["records"].append(result)
         final_dict["registry"].update({code:bank_params["bank_name"]})
-        time.sleep(5)
+        time.sleep(3)
+    
+    #post-op
+    # proce_dict = BankScraper.post_scrape(final_dict, POST_SCRAPE_OPS, logger)
+
 except KeyboardInterrupt:
     logger.warning("Process Interrupted by User!")
+    
 except Exception as e:
-    pass
+    logger.error(f"Error in Main.py :[{type(e).__name__}] {e}")
+    logger.debug(f"Traceback:\n{traceback.format_exc()}")
 
 finally:
-    Helper.save_json(final_dict, os.path.join(CACHE_DIR, final_dict["metadata"]["filename"]))
+    Helper.save_json(final_dict, os.path.join(CACHE_DIR, final_dict["metadata"]["cfname"]))
+    # Helper.save_json(proce_dict,os.path.join(PROCESS_DIR, final_dict["metadata"]["pfname"]))
     logger.save("Saved Cached Data.")
-    # Mailer().end_mail(PROGRAM_NAME)

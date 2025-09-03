@@ -156,7 +156,7 @@ class OperationExecutor:
         records = p_dict.get("records", [])
 
         for record in records:
-            print(f"Processing : {record['bank_name']}")
+            self.logger.info(f"Processing : {record['bank_name']}")
             response_data = record.get("scraped_data", [])
             if not response_data:
                 continue
@@ -412,6 +412,38 @@ class OperationExecutor:
                 ws = writer.sheets[sheet_name]
                 row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=bank_name, bank_link=bank_link)
 
+
+                max_tables = max(len(new_entries), len(removed_entries))
+                for i in range(max_tables):
+                    new_df = self._parse_table(new_entries[i]) if i < len(new_entries) else pd.DataFrame()
+                    removed_df = self._parse_table(removed_entries[i]) if i < len(removed_entries) else pd.DataFrame()
+                    row_cursor = self._write_side_by_side_tables(ws, new_df, removed_df, start_row=row_cursor)
+
+        return output_path
+    
+    def generate_sorted_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
+        # Sort records: prioritize those with new entries
+        sorted_records = sorted(
+            comparison_json.get("records", []),
+            key=lambda r: len(r.get("comparison_result", {}).get("new", [])),
+            reverse=True
+        )
+
+        with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
+            for record in sorted_records:
+                bank_name = record.get("bank_name")
+                bank_code = record.get("bank_code")
+                bank_link = record.get("base_url")
+                sheet_name = f"{bank_name} ({bank_code})"[:31]
+
+                comparison_result = record.get("comparison_result", {})
+                summary = comparison_result.get("summary", {})
+                new_entries = comparison_result.get("new", [])
+                removed_entries = comparison_result.get("removed", [])
+
+                pd.DataFrame().to_excel(writer, sheet_name=sheet_name, index=False)
+                ws = writer.sheets[sheet_name]
+                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=bank_name, bank_link=bank_link)
 
                 max_tables = max(len(new_entries), len(removed_entries))
                 for i in range(max_tables):

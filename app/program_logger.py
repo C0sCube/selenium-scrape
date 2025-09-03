@@ -16,9 +16,9 @@ TRACE_LEVEL_NUM = 15
 SAVE_LEVEL_NUM = 22
 NOTICE_LEVEL_NUM = 25
 
-logging.addLevelName(TRACE_LEVEL_NUM, "TRACE")
+logging.addLevelName(TRACE_LEVEL_NUM, "TRAC")
 logging.addLevelName(SAVE_LEVEL_NUM, "SAVE")
-logging.addLevelName(NOTICE_LEVEL_NUM, "NOTICE")
+logging.addLevelName(NOTICE_LEVEL_NUM, "NOTI")
 
 def trace(self, message, *args, **kwargs):
     if self.isEnabledFor(TRACE_LEVEL_NUM):
@@ -40,12 +40,12 @@ logging.Logger.notice = notice
 DEFAULT_FORMAT = "%(asctime)s [%(levelname)s]: %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 LOG_COLORS = {
-    'TRACE': 'white',
+    'TRAC': 'white',
     'SAVE': 'blue',
-    'NOTICE': 'bold_cyan',
+    'NOTI': 'bold_cyan',
     'DEBUG': 'cyan',
     'INFO': 'green',
-    'WARNING': 'yellow',
+    'WARN': 'yellow',
     'ERROR': 'red',
     'CRITICAL': 'bold_red',
 }

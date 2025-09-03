@@ -1,16 +1,23 @@
-import requests
-import subprocess
-import sys
+import requests, subprocess, sys, certifi, warnings, urllib3
 from app.utils import Helper
+
+warnings.filterwarnings("ignore", category=urllib3.exceptions.InsecureRequestWarning)
+
 
 DRIVER_PATH = Helper.load_json('paths.json').get("driver_path","")
 
 def get_latest_chromedriver_version():
     url = "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json"
-    response = requests.get(url)
-    response.raise_for_status()
+    try:
+        response = requests.get(url, verify=certifi.where())
+        response.raise_for_status()
+    except requests.exceptions.SSLError:
+        print("SSL verification failed. Trying insecure connection...")
+        response = requests.get(url, verify=False)
+        response.raise_for_status()
     data = response.json()
     return data["channels"]["Stable"]["version"]
+
 
 def get_local_chromedriver_version():
     try:
