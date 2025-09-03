@@ -192,26 +192,45 @@ class ActionExecutor:
             raise ValueError(f"Unknown wait condition: {wait_type}")
         return condition_func(locator)
     
-     #Packet Functions    
-    
-    def __generate_packet(self,content):
+     #Packet Functions
+     
+    def __generate_packet(self, content):
         packet = {
-            "action":self.ACTION_TYPE,
+            "action": self.ACTION_TYPE,
             "uid": Helper.generate_uid(),
-            "timestamp":datetime.now().strftime("%d%m%Y %H:%M:%S"),
+            "timestamp": datetime.now().strftime("%d%m%Y %H:%M:%S"),
             "webpage": self.driver.current_url,
-            "data_present":not any(key in entity for entity in content for key in ["status", "error_type", "error_message","error"]),
-            "log_message":self.LOG_MESSAGE,
-            "response_count":len(content),
-            "response":content if content else None
+            "data_present": not any(
+                key in entity for entity in content
+                for key in ["status", "error_type", "error_message", "error"]
+            ),
+            "log_message": self.LOG_MESSAGE,
+            "response_count": len(content),
+            "response": content if content else None
         }
-        
-        if hasattr(self, "TABS_FOUND") and self.TABS_FOUND:
-            packet["tab_found"] = self.TABS_FOUND
-        if hasattr(self, "FOLLOW_UP_ACTION_NAMES") and self.FOLLOW_UP_ACTION_NAMES:
-            packet["follow_ups"] = self.FOLLOW_UP_ACTION_NAMES
-        
+
+        if self.ACTION_TYPE == "tablist":
+            packet["tab_found"] = getattr(self, "TABS_FOUND", [])
+            packet["follow_ups"] = [step.get("action") for step in getattr(self, "FOLLOW_UP_ACTIONS", [])if "action" in step]
+
         return packet
+   
+    
+    # def __generate_packet(self,content):
+    #     packet = {
+    #         "action":self.ACTION_TYPE,
+    #         "uid": Helper.generate_uid(),
+    #         "timestamp":datetime.now().strftime("%d%m%Y %H:%M:%S"),
+    #         "webpage": self.driver.current_url,
+    #         "data_present":not any(key in entity for entity in content for key in ["status", "error_type", "error_message","error"]),
+    #         "log_message":self.LOG_MESSAGE,
+    #         "response_count":len(content),
+    #         "response":content if content else None
+    #     }  
+    #     if self.ACTION_TYPE == "tablist":
+    #         if hasattr(self, "TABS_FOUND"):packet["tab_found"] = self.TABS_FOUND
+    #         if hasattr(self, "FOLLOW_UP_ACTION_NAMES"):packet["follow_ups"] = self.FOLLOW_UP_ACTION_NAMESs
+    #     return packet
     
     def __generate_resp_packet(self, name = "",header="",value = None,type = ""):
         return {
@@ -225,7 +244,7 @@ class ActionExecutor:
     # ===================== ACTION =====================
     
     #DOM-Scrape Actions
-    def _action_text_scrape(self)->dict:
+    def _action_text_scrape(self)->dict: #Have to write this better
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
         elements = self.driver.find_elements(self.BY, self.VALUE)
 
@@ -267,82 +286,7 @@ class ActionExecutor:
         self.logger.info(f"Scraped Content:\n{pprint.pformat(data_container)}")
         return data_container
     
-    def __find_nearest_preceding_label(self,table):
-        current = table
-        while True:
-            try:
-                parent = current.find_element(By.XPATH, "..")
-                siblings = parent.find_elements(By.XPATH, "preceding-sibling::*")
-                for sibling in reversed(siblings):
-                    tag = sibling.tag_name.lower()
-                    text = sibling.text.strip()
-                    if tag not in ["div", "br", "hr"] and text:
-                        return text
-                current = parent
-            except:
-                break
-        return "No label found"
-    
-    # def __find_nearest_preceding_label(self, table):
-    #     current = table
-    #     while True:
-    #         try:
-    #             inner_candidates = current.find_elements(By.XPATH, ".//*")
-    #             for elem in inner_candidates:
-    #                 tag = elem.tag_name.lower()
-    #                 text = elem.text.strip()
-    #                 if tag not in ["div", "br", "hr"] and text:
-    #                     return text
-    
-    #             parent = current.find_element(By.XPATH, "..")
-    #             siblings = parent.find_elements(By.XPATH, "preceding-sibling::*")
-    #             for sibling in reversed(siblings):
-    #                 tag = sibling.tag_name.lower()
-    #                 text = sibling.text.strip()
-    #                 if tag not in ["div", "br", "hr"] and text:
-    #                     return text
-
-    #             # Step 3: Move up the tree
-    #             current = parent
-    #         except:
-    #             break
-    #     return "No label found"
-    
-    # def __find_nearest_preceding_label(self, table):
-    #     current = table
-    #     max_depth = 5
-    #     depth = 0
-
-    #     while depth < max_depth:
-    #         try:
-    #             # Step 1: Check inside current element for likely label tags
-    #             inner_candidates = current.find_elements(
-    #                 By.XPATH, ".//label | .//span | .//strong | .//p | .//h1 | .//h2 | .//h3"
-    #             )
-    #             for elem in inner_candidates:
-    #                 text = elem.text
-    #                 if text and text.strip():
-    #                     return text.strip()
-
-    #             # Step 2: Check preceding siblings of the parent
-    #             parent = current.find_element(By.XPATH, "..")
-    #             siblings = parent.find_elements(By.XPATH, "preceding-sibling::*")
-    #             for sibling in reversed(siblings):
-    #                 tag = sibling.tag_name.lower()
-    #                 text = sibling.text
-    #                 if tag not in ["div", "br", "hr"] and text and text.strip():
-    #                     return text.strip()
-
-    #             # Step 3: Move up the tree
-    #             current = parent
-    #             depth += 1
-
-    #         except Exception:
-    #             break
-
-    #     return "No label found"
-    
-    def _action_table_scrape(self)->dict:
+    def _action_table_scrape(self)->list:
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
         elements = self.driver.find_elements(self.BY, self.VALUE) if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)]
             
@@ -402,7 +346,7 @@ class ActionExecutor:
         
         return scrape_content
     
-    def _action_html_scrape(self)->dict:
+    def _action_html_scrape(self)->list:
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
         elements = self.driver.find_elements(self.BY, self.VALUE) if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)] 
             
@@ -415,41 +359,70 @@ class ActionExecutor:
                 continue
             
             cleaned_content.append(html_content)
-            # content_scrape.update({f"{self.html_name}_{idx}":html_content})
-            #trial
-            scrape_content.append(
-                self.__generate_resp_packet(
-                    name=f"{self.html_name}_{idx}",
-                    value=html_content,
-                    header="HTML DOESNT HAVE HEADER",
-                    type="html"
-                    )
-                )
+            scrape_content.append(self.__generate_resp_packet(name=f"{self.html_name}_{idx}",value=html_content,header="HTML DOESNT HAVE HEADER",type="html"))
         
         #save data
-        output_dir = Helper.create_dirs(self.OUTPUT_PATH,["save_html"])
-        OperationExecutor.save_tables_html(
-            cleaned_content,
-            output_dir=output_dir,
-            output_file=f"{self.html_name}.html",
-            separator="<br><hr><br>" if self.CONSOLIDATE_SAVE else None
-        )
+        # output_dir = Helper.create_dirs(self.OUTPUT_PATH,["save_html"])
+        # OperationExecutor.save_tables_html(
+        #     cleaned_content,
+        #     output_dir=output_dir,
+        #     output_file=f"{self.html_name}.html",
+        #     separator="<br><hr><br>" if self.CONSOLIDATE_SAVE else None
+        # )
         
-        self.logger.save(f"Saved {len(cleaned_content)} table(s) to HTML in: {output_dir}")
+        # self.logger.save(f"Saved {len(cleaned_content)} table(s) to HTML in: {output_dir}")
         
         return scrape_content
+    
+    def _action_tab_list(self) -> list:
+        self.logger.info(f"Tab List Loop Using BY={self.BY} and VALUE={self.VALUE}")
+        tabList = self.driver.find_elements(self.BY, self.VALUE)
+        self.logger.info(f"Total Elements Found By={self.BY} and Value={self.VALUE} are {len(tabList)}")
+        
+        scrape_content = []
+        tab_names = []
+
+        for idx, tab in enumerate(self.driver.find_elements(self.BY, self.VALUE)):
+            try:
+                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", tab)
+                ActionChains(self.driver).move_to_element(tab).perform()
+                self.driver.execute_script("arguments[0].click();", tab)
+                
+                tabName = tab.get_attribute("innerText").strip()
+                tab_names.append(tabName)
+                self.logger.info(f"Clicked Tab >> {tabName}")
+
+                time.sleep(0.5)
+                for step in self.FOLLOW_UP_ACTIONS:
+                    if step.get("wait_until"):
+                        condition = self.__get_condition(step["wait_until"], step["by"], step["value"])
+                        WebDriverWait(self.driver, step["timeout"]).until(condition)
+
+                    result = self.execute(step)
+                    if not result:
+                        self.logger.warning(f"No result returned for step {step['action']} on tab[{idx}]={tabName}")
+                        continue
+
+                    step_content = result.get("response", [])
+                    for packet in step_content:
+                        packet["tabName"] = tabName if tabName else "NOT DEFINED"
+                    scrape_content.extend(step_content)
+
+            except Exception as e:
+                self.logger.warning(f"Failed on tab[{idx}]: {e}")
+        self.TABS_FOUND = tab_names
+        return scrape_content
+
+    
     
     def _action_tab_list(self)->dict:
         self.logger.info(f"Tab List Loop Using BY={self.BY} and VALUE={self.VALUE}")
         tabList = self.driver.find_elements(self.BY, self.VALUE)
         self.logger.info(f"Total Elements Found By={self.BY} and Value={self.VALUE} are {len(tabList)}")
         
-        follow_ups = self.FOLLOW_UP_ACTIONS
-        
-        #set important data
-        self.TABS_FOUND = ""
-        self.FOLLOW_UP_ACTION_NAMES =f"|".join([step.get("action") for step in follow_ups])
+       
         scrape_content = []
+        tab_names = []
         for idx, tab in enumerate(self.driver.find_elements(self.BY, self.VALUE)):
             try:
                 self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", tab)
@@ -457,18 +430,15 @@ class ActionExecutor:
                 self.driver.execute_script("arguments[0].click();", tab)
                 
                 tabName = tab.get_attribute("innerText")
-                self.TABS_FOUND = self.TABS_FOUND + f"| {str(tabName)}"
-                
-                print(f"========={tabName}========")
-
+                self.logger.info(f">>Clicked Tab {tabName}")
                 time.sleep(0.5)
-                for step in follow_ups:
-                    result = {}
+                for step in self.FOLLOW_UP_ACTIONS:
                     if step.get("wait_until"):
                         condition = self.__get_condition(step["wait_until"], step["by"], step["value"])
                         WebDriverWait(self.driver, step["timeout"]).until(condition)
-
+                    
                     result = self.execute(step)
+                    pprint.pprint(result.keys())
                     # if result.get("data_present",False):
                         # pprint.pprint(result.get("response"))
                     step_content = result.get("response",[])
@@ -560,12 +530,7 @@ class ActionExecutor:
                     try:
                         output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["downloads"])
                         file_content = self.__download_file(file_url, output_dir, idx, file_type)
-                        scrape_content.append(self.__generate_resp_packet(
-                            name=f"{self.pdf_name}_{idx}",
-                            header=os.path.basename(urlparse(file_url).path),
-                            value=file_content,
-                            type=file_type
-                        ))
+                        scrape_content.append(self.__generate_resp_packet(name=f"{self.pdf_name}_{idx}",header=os.path.basename(urlparse(file_url).path),value=file_content,type=file_type))
                     except Exception as e:
                         self.logger.error(f"Download failed at index {idx}: {e}")
                 # else:

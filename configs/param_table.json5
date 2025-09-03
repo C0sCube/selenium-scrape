@@ -2,10 +2,26 @@
   POST_SCRAPE_OPS: {
     sha1: {
       primary: [
-        ["normalize_df", "value", "norm_table", "table_html"],
-        ["sha1", "value", "SHA_ONE", "pdf"],
+        [
+          "normalize_df",
+          "value",
+          "norm_table",
+          "table_html"
+        ],
+        [
+          "sha1",
+          "value",
+          "SHA_ONE",
+          "pdf"
+        ],
       ],
-      secondary: [["sha1", "norm_table", "SHA_ONE"]],
+      secondary: [
+        [
+          "sha1",
+          "norm_table",
+          "SHA_ONE"
+        ]
+      ],
     },
   },
   GENERIC_ACTION_PACKETS: {
@@ -45,6 +61,17 @@
       value: ".portlet",
       url: "https://bankofindia.co.in/interest-rate/saving-bank-deposit-rate",
       wait: 5,
+    },
+    action_html: {
+      action: "html",
+      by: "css",
+      value: "body",
+      wait_until: "present",
+      // multiple: true,
+      skip_if_not_found: true,
+      time: 10,
+      timeout: 30,
+      log_message: "Save Html.",
     },
   },
   PSB_1: {
@@ -102,7 +129,6 @@
         url: "https://bankofindia.co.in/interest-rate/rupee-term-deposit-rate",
         time: 30,
         timeout: 50,
-
       },
       {
         action: "table",
@@ -754,13 +780,15 @@
             timeout: 20,
           },
           {
-            action: "screenshot",
-            by: "tag",
-            value: "body",
+            action: "html",
+            by: "css",
+            value: "h2+ h2 .h5",
             wait_until: "present",
+            // multiple: true,
             skip_if_not_found: true,
-            timeout: 20,
-            log_message: "Screen Shotted the Web Page.",
+            time: 10,
+            timeout: 30,
+            log_message: "Save Html.",
           },
         ],
       },
