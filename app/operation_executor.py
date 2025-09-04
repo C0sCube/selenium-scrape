@@ -156,7 +156,8 @@ class OperationExecutor:
         records = p_dict.get("records", [])
 
         for record in records:
-            self.logger.info(f"Processing : {record['bank_name']}")
+            # self.logger.info(f"Processing : {record['bank_name']}")
+            print(f">>Processing {record['bank_name']}")
             response_data = record.get("scraped_data", [])
             if not response_data:
                 continue

@@ -3,19 +3,16 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # TensorFlow-specific-selenium
 warnings.filterwarnings('ignore')
 ssl._create_default_https_context = ssl._create_stdlib_context
 
-from datetime import datetime
 from app.utils import Helper
 from app.program_logger import get_forever_logger
 from app.BankScraper import BankScraper
 from app.mailer import Mailer
+from app.constants import LOG_DIR, CCH_DIR, PRS_DIR, CONFIG, PATHS
 
 config = Helper.load_json(r"configs\param_table.json5", typ="json5")
 paths = Helper.load_json(r"paths.json")
 
-# Constants
-LOG_DIR, CACHE_DIR, PROCESS_DIR = Helper.create_dirs(paths["output"], ["logs", "cache", "processed"])
-PROGRAM_NAME = "SCRAPE_BANK_RATE_KAUSTUBH"
-POST_SCRAPE_OPS = config["POST_SCRAPE_OPS"].get("sha1",{})
+# PROGRAM_NAME = "SCRAPE_BANK_RATE_KAUSTUBH"
 
 # Logger
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
@@ -26,17 +23,18 @@ BANK_CODES = ["PVB_9"]
 # Mailer().start_mail(PROGRAM_NAME,BANK_CODES)
 final_dict = BankScraper.get_final_struct()
 try:
+    #scrape
     for code in BANK_CODES:
-        if code not in config:
+        if code not in CONFIG:
             continue
         bank_params = config[code]
-        scraper = BankScraper(bank_params, logger,paths)
+        scraper = BankScraper(bank_params, logger,PATHS)
         result = scraper.run()
         final_dict["records"].append(result)
-        final_dict["registry"].update({code:bank_params["bank_name"]})
+        # final_dict["registry"].update({code:bank_params["bank_name"]})
         time.sleep(3)
     
-    #post-op
+    #post-scrape
     # proce_dict = BankScraper.post_scrape(final_dict, POST_SCRAPE_OPS, logger)
 
 except KeyboardInterrupt:
@@ -47,6 +45,6 @@ except Exception as e:
     logger.debug(f"Traceback:\n{traceback.format_exc()}")
 
 finally:
-    Helper.save_json(final_dict, os.path.join(CACHE_DIR, final_dict["metadata"]["cfname"]))
+    Helper.save_json(final_dict, os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]))
     # Helper.save_json(proce_dict,os.path.join(PROCESS_DIR, final_dict["metadata"]["pfname"]))
     logger.save("Saved Cached Data.")

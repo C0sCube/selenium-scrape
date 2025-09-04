@@ -18,7 +18,6 @@ class BankScraper:
         }
         self.executor = ActionExecutor(logger, bank_params, paths) # not inherit, call here!!
 
-        # self.ops_executor = OperationExecutor(logger)
     @staticmethod
     def get_final_struct():
         
