@@ -152,7 +152,7 @@ class ActionExecutor:
             "pdf": self._action_page_pdf,
             "screenshot": self._action_page_screenshot,
             "tablist": self._action_tab_list,
-            "request":self._action_http_request,
+            "http":self._action_http_request,
             # "directfile":self._action_directfile
         }
 
@@ -579,20 +579,17 @@ class ActionExecutor:
             self.logger.error(f"Failed to print page to PDF: {str(e)}")
     
     def _action_http_request(self):
-        self.logger("Performing GET REQUEST for attached website.")
+        self.logger.info("Performing GET REQUEST for attached website.")
+        file_url = self.URL
+        file_type = self.export_format or "dat"
+        output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["downloads"])
+        scrape_content = []
         try:
-            res = requests.get(self.URL)
-            if res.status_code == 200:
-                
-                if self.URL.endswith(".json"):
-                    print("Requests gives you a json.") #Perform Action
-                    pass
-                elif self.URL.endswith(".xlsx"):
-                    pass
-            else:
-                raise ValueError(f"Response gave error: {res.status_code}. Aborting...")
+            file_content = self.__download_file(file_url, output_dir, 0, file_type)
+            scrape_content.append(self.__generate_resp_packet(name=f"{self.pdf_name}",header=os.path.basename(urlparse(file_url).path),value=file_content,type=file_type))
         except Exception as e:
             self.logger.error(e)
+        return scrape_content
     
     def execute_blocks(self, block: list):  
         block_data = []

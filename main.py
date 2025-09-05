@@ -18,7 +18,7 @@ paths = Helper.load_json(r"paths.json")
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
 
 BANK_CODES = [f"PSB_{i}" for i in range(1,13)]+["PVB_1","PVB_2","PVB_3","PVB_4","PVB_5","PVB_6","PVB_7","PVB_8","PVB_10","PVB_11","PVB_12","PVB_13","PVB_14","PVB_15","PVB_16","PVB_18","PVB_19","PVB_20","PVB_21","PVB_22"]
-BANK_CODES = ["PVB_9"]
+BANK_CODES = ["PVB_13"]
 
 # Mailer().start_mail(PROGRAM_NAME,BANK_CODES)
 final_dict = BankScraper.get_final_struct()
