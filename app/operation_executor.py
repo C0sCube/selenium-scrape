@@ -213,33 +213,6 @@ class OperationExecutor:
             record["scraped_data"] = new_scraped_data
 
         return p_dict
-                    
-                    # stage dynamic
-            #         for stage_name, operations in function_to_execute.items():
-            #             for func_name, source_key, target_key in operations:
-            #                 if target_key in check_packet:
-            #                     raise ValueError(f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}")
-                            
-            #                 func = self.procedures.get(func_name)
-            #                 if not func:
-            #                     raise ValueError(f"Function '{func_name}' not found in procedures.")
-                            
-            #                 input_value = _packet_.get(source_key)
-            #                 if input_value is None:
-            #                     continue
-                            
-            #                 if stage_name == "primary":
-            #                     packet_type = _packet_.get("type", "").lower()
-            #                     allowed_types = self.type_compatibility.get(func_name, [])
-            #                     if packet_type not in allowed_types:
-            #                         self.logger and self.logger.debug(f"[Primary] Skipped '{func_name}' for packet type '{packet_type}'")
-            #                         continue
-
-            #                 _packet_[target_key] = func(input_value)
-
-            #         new_scraped_data.append(_packet_)
-            # record["scraped_data"] = new_scraped_data
-            
         
     
     def process_comparison(self, old_json: dict, new_json: dict, key: str = "hash256") -> dict:

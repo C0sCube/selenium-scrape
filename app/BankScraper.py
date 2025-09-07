@@ -1,8 +1,10 @@
 from app.action_executor import ActionExecutor
 from app.operation_executor import OperationExecutor
 from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, InvalidSessionIdException
 
-import time, traceback, threading, pprint
+
+import time, traceback, threading, pprint, hashlib
 from datetime import datetime
 
 class BankScraper:
@@ -37,6 +39,8 @@ class BankScraper:
             "registry":{},
         }
     
+    from selenium.common.exceptions import TimeoutException, InvalidSessionIdException
+
     def run(self):
         try:
             self.executor.create_uc_driver()
@@ -44,32 +48,69 @@ class BankScraper:
             try:
                 self.executor.driver.set_page_load_timeout(50)
                 self.executor.driver.get(self.bank_params["base_url"])
-                self.logger.notice(f"Page fetched successfully.")
+                self.logger.notice("Page fetched successfully.")
             except TimeoutException:
                 self.logger.error("Page load timed out. Attempting to stop...")
-                self.executor.driver.execute_script("window.stop();")
+                try:
+                    self.executor.driver.execute_script("window.stop();")
+                except InvalidSessionIdException:
+                    self.logger.error("Driver session lost during timeout handling.")
+                    return {"error": "Driver crashed during load"}
+            
+            self.logger.info(f"========{self.bank_params['bank_name']}: {self.bank_params['bank_type_code']}========")
 
-            self.logger.info(f"========{self.bank_params['bank_name']}: {self.bank_params["bank_type_code"]}========")
-                   
-            # for idx, block in enumerate(self.bank_params["blocks"]):
-            #     self.logger.info(f"Running Block: {idx}")
-            #     data = self.executor.execute_blocks(block)
-            #     self.scrape_data["scraped_data"].extend(data)
             actions = self.bank_params["blocks"]
             data = self.executor.execute_blocks(actions)
             self.scrape_data["scraped_data"].extend(data)
 
+        except InvalidSessionIdException as e:
+            self.logger.error(f"Driver session invalid for {self.bank_params['bank_name']}. Restart required.")
+            self.scrape_data["scraped_data"] = [{"error_Type": "InvalidSessionId", "error_Message": str(e)}]
+        
         except Exception as e:
-            error_type = type(e).__name__
-            error_msg = str(e)
-            self.logger.error(f"Error in BankScraper.py {self.bank_params['bank_name']}:[{error_type}] {error_msg}")
+            self.logger.error(f"Error in BankScraper.py {self.bank_params['bank_name']}: {type(e).__name__} {e}")
             self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
-            self.scrape_data["scraped_data"] = [{"error_Type": error_type, "error_Message": error_msg,"error_from": "BankScraper.py"}]
+            self.scrape_data["scraped_data"] = [{"error_Type": type(e).__name__, "error_Message": str(e),"error_from": "BankScraper.py"}]
+        
         finally:
-            self.executor.driver.close()
-            del self.executor.driver
-            
+            try:
+                self.executor.driver.quit()
+            except Exception:
+                pass
+            self.executor.driver = None
+        
         return self.scrape_data
+
+    
+    # def run(self):
+    #     try:
+    #         self.executor.create_uc_driver()
+    #         self.logger.info("Driver Created.")
+    #         try:
+    #             self.executor.driver.set_page_load_timeout(50)
+    #             self.executor.driver.get(self.bank_params["base_url"])
+    #             self.logger.notice(f"Page fetched successfully.")
+    #         except TimeoutException:
+    #             self.logger.error("Page load timed out. Attempting to stop...")
+    #             self.executor.driver.execute_script("window.stop();")
+
+    #         self.logger.info(f"========{self.bank_params['bank_name']}: {self.bank_params["bank_type_code"]}========")
+                   
+    #         actions = self.bank_params["blocks"]
+    #         data = self.executor.execute_blocks(actions)
+    #         self.scrape_data["scraped_data"].extend(data)
+
+    #     except Exception as e:
+    #         error_type = type(e).__name__
+    #         error_msg = str(e)
+    #         self.logger.error(f"Error in BankScraper.py {self.bank_params['bank_name']}:[{error_type}] {error_msg}")
+    #         self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
+    #         self.scrape_data["scraped_data"] = [{"error_Type": error_type, "error_Message": error_msg,"error_from": "BankScraper.py"}]
+    #     finally:
+    #         self.executor.driver.close()
+    #         del self.executor.driver
+            
+    #     return self.scrape_data
 
     @staticmethod
     def post_scrape(data: dict, ops_rules: dict, logger=None) -> dict:
@@ -93,4 +134,27 @@ class BankScraper:
                 logger.debug(f"[PostScrape] Traceback:\n{traceback.format_exc()}")
             processed_data = {"error": str(e)}
 
-        return processed_data   
+        return processed_data
+    
+    @staticmethod
+    def dedupe_responses(result: dict) -> dict:
+        if "scraped_data" not in result:
+            return result
+        
+        for action in result["scraped_data"]:
+            if "response" not in action:
+                continue
+
+            seen = set()
+            unique = []
+            for resp in action["response"]:
+                if "value" in resp: 
+                    val = resp["value"]
+                    val_hash = hashlib.sha256(val.encode("utf-8")).hexdigest()
+                    if val_hash not in seen:
+                        seen.add(val_hash)
+                        unique.append(resp)
+                else:
+                    unique.append(resp)
+            action["response"] = unique
+        return result

@@ -274,61 +274,98 @@ class ActionExecutor:
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
         elements = self.driver.find_elements(self.BY, self.VALUE) if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)]
             
-        #mandatory filter
-        if self.BY == By.CSS_SELECTOR:
+        if self.BY == By.CSS_SELECTOR: #mandatory filter
             elements = [elem for elem in elements if elem.tag_name.lower() == "table"]
-
         self.logger.info(f"Total Elements Found By={self.BY} and Value={self.VALUE} are {len(elements)}")
         
-        cleaned_tables = []
-        scrape_content = []
+        scrape_content,cleaned_tables = [],[]
         for idx, elem in enumerate(elements):
-            # header = self.__find_nearest_preceding_label(elem)
-            # print(f"Table: {idx} has header:: {header}")
+            header = self.__find_preceding_texts(elem)
+            self.logger.info(f"Table: {idx} has header:: {header}")
+            
             raw_html = elem.get_attribute("outerHTML")
+            final_html = self.__clean_raw_table_html(raw_html)
             
-            raw_html = Helper.apply_sub(raw_html, r'<th\b', '<td', ignore_case=True)
-            raw_html = Helper.apply_sub(raw_html, r'</th\b', '</td', ignore_case=True)
-            
-            #tbody
-            raw_html = re.sub(r"<thead\b",r"<tbody",raw_html, re.IGNORECASE)
-            raw_html = re.sub(r"</thead\b",r"</tbody",raw_html, re.IGNORECASE)
-            
-            #other tags
-            raw_html = Helper.apply_sub(raw_html, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>",ignore_case=True)
-            raw_html = Helper.apply_sub(raw_html,r'[#*@\n\t]+', ignore_case=True)
-            raw_html = Helper.apply_sub(raw_html,r"<tr[^>]*>\s*(?:&nbsp;|\u00A0|\s)*</tr>", ignore_case=True)
-            raw_html = Helper._normalize_whitespace(raw_html)
-
-            soup = BeautifulSoup(raw_html, "html.parser")
-            ALLOWED = {"rowspan", "colspan"}
-            for tag in soup.find_all(True):
-                for attr in list(tag.attrs):
-                    if attr not in ALLOWED:
-                        del tag.attrs[attr]
-            final_html = str(soup)
             cleaned_tables.append(final_html)
-            scrape_content.append(self.__generate_resp_packet(name=f"{self.table_name}_{idx}",value=final_html,header="NOT SET",type="table_html"))
+            scrape_content.append(self.__generate_resp_packet(name=f"{self.table_name}_{idx}",value=final_html,header=header,type="table_html"))
 
         # export format + save
 
-        if self.export_format in ["excel", "both"]:
-            output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["save_excel"])
-            OperationExecutor.save_tables_to_excel(cleaned_tables,output_dir=output_dir,
-                output_file=f"{self.table_name}.xlsx",
-                consolidate_save=self.CONSOLIDATE_SAVE
-            )
-            self.logger.save(f"Saved {len(cleaned_tables)} table(s) to single Excel file: {output_dir}")
+        # if self.export_format in ["excel", "both"]:
+        #     output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["save_excel"])
+        #     OperationExecutor.save_tables_to_excel(cleaned_tables,output_dir=output_dir,
+        #         output_file=f"{self.table_name}.xlsx",
+        #         consolidate_save=self.CONSOLIDATE_SAVE
+        #     )
+        #     self.logger.save(f"Saved {len(cleaned_tables)} table(s) to single Excel file: {output_dir}")
             
-        if self.export_format in ["html", "both"]:
-            output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["save_html"])
-            OperationExecutor.save_tables_html(cleaned_tables,output_dir=output_dir,
-                output_file=f"{self.table_name}.html",
-                separator="<br><hr><br>" if self.CONSOLIDATE_SAVE else None
-            )
-            self.logger.save(f"Saved {len(cleaned_tables)} table(s) to HTML in: {output_dir}")
+        # if self.export_format in ["html", "both"]:
+        #     output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["save_html"])
+        #     OperationExecutor.save_tables_html(cleaned_tables,output_dir=output_dir,
+        #         output_file=f"{self.table_name}.html",
+        #         separator="<br><hr><br>" if self.CONSOLIDATE_SAVE else None
+        #     )
+        #     self.logger.save(f"Saved {len(cleaned_tables)} table(s) to HTML in: {output_dir}")
         
         return scrape_content
+    
+    def __find_preceding_texts(self, table, n=1):
+        texts = []
+        current = table
+        label_tags = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "strong", "a", "span","div"}
+        MAX_TEXT_LENGTH = 200
+        while len(texts) < n:
+            try:
+                parent = current.find_element(By.XPATH, "..")
+                siblings = parent.find_elements(By.XPATH, "preceding-sibling::*")
+                for sib in reversed(siblings):
+                    if sib.tag_name.lower() in ["table", "br", "hr"]:
+                        continue
+                    
+                    if sib.find_elements(By.TAG_NAME,"table"):
+                        continue
+                    
+                    if sib.tag_name.lower() not in label_tags:
+                        continue
+                    
+                    if sib.tag_name.lower() == "div":
+                        if not sib.find_elements(By.XPATH, ".//h1 | .//h2 | .//h3 | .//p | .//strong | .//a | .//span"):
+                            continue
+
+                    txt = sib.get_attribute("innerText").strip()
+                    txt = Helper._remove_tabspace(txt)
+                    txt = Helper._normalize_whitespace(txt)
+                    if txt and len(txt)<MAX_TEXT_LENGTH:
+                        texts.append(txt)
+                        if len(texts) == n:
+                            return list(reversed(texts))
+                current = parent
+            except:
+                break
+        return list(reversed(texts)) if texts else ["No label found"]*n
+
+    def __clean_raw_table_html(self,rawr):
+        rawr = Helper.apply_sub(rawr, r'<th\b', '<td', ignore_case=True)
+        rawr = Helper.apply_sub(rawr, r'</th\b', '</td', ignore_case=True)
+        
+        #tbody
+        rawr = re.sub(r"<thead\b",r"<tbody",rawr, re.IGNORECASE)
+        rawr = re.sub(r"</thead\b",r"</tbody",rawr, re.IGNORECASE)
+        
+        #other tags
+        rawr = Helper.apply_sub(rawr, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>",ignore_case=True)
+        rawr = Helper.apply_sub(rawr,r'[*@\n\t]+', ignore_case=True)
+        rawr = Helper.apply_sub(rawr,r"<tr[^>]*>\s*(?:&nbsp;|\u00A0|\s)*</tr>", ignore_case=True)
+        rawr = Helper._normalize_whitespace(rawr)
+        
+        soup = BeautifulSoup(rawr, "html.parser")
+        ALLOWED = {"rowspan", "colspan"}
+        for tag in soup.find_all(True):
+            for attr in list(tag.attrs):
+                if attr not in ALLOWED:
+                    del tag.attrs[attr]
+        final_html = str(soup)
+        return final_html
     
     def _action_html_scrape(self)->list:
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")

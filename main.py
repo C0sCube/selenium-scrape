@@ -11,14 +11,10 @@ from app.constants import LOG_DIR, CCH_DIR, PRS_DIR, CONFIG, PATHS
 
 config = Helper.load_json(r"configs\param_table.json5", typ="json5")
 paths = Helper.load_json(r"paths.json")
-
-# PROGRAM_NAME = "SCRAPE_BANK_RATE_KAUSTUBH"
-
-# Logger
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
 
-BANK_CODES = [f"PSB_{i}" for i in range(1,13)]+["PVB_1","PVB_2","PVB_3","PVB_4","PVB_5","PVB_6","PVB_7","PVB_8","PVB_10","PVB_11","PVB_12","PVB_13","PVB_14","PVB_15","PVB_16","PVB_18","PVB_19","PVB_20","PVB_21","PVB_22"]
-BANK_CODES = ["PVB_13"]
+BANK_CODES = [f"PSB_{i}" for i in range(1,13)]+["PVB_1","PVB_2","PVB_3","PVB_4","PVB_5","PVB_6","PVB_7","PVB_8","PVB_9","PVB_10","PVB_11","PVB_12","PVB_13","PVB_14","PVB_15","PVB_16","PVB_18","PVB_19","PVB_20","PVB_21"]
+# BANK_CODES = ["PVB_7"]
 
 # Mailer().start_mail(PROGRAM_NAME,BANK_CODES)
 final_dict = BankScraper.get_final_struct()
@@ -27,11 +23,16 @@ try:
     for code in BANK_CODES:
         if code not in CONFIG:
             continue
-        bank_params = config[code]
-        scraper = BankScraper(bank_params, logger,PATHS)
-        result = scraper.run()
-        final_dict["records"].append(result)
-        # final_dict["registry"].update({code:bank_params["bank_name"]})
+        try:
+            bank_params = config[code]
+            scraper = BankScraper(bank_params, logger, PATHS)
+            result = scraper.run()
+        except Exception as e:
+            logger.error(f"Failed scraping {code}: {e}")
+            result = {"bank_code": code, "scraped_data": [{"error": str(e)}]}
+        
+        clean_result = BankScraper.dedupe_responses(result)
+        final_dict["records"].append(clean_result)
         time.sleep(3)
     
     #post-scrape
