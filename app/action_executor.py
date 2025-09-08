@@ -10,7 +10,7 @@ from datetime import datetime
 from io import StringIO
 from urllib.parse import urljoin, urlparse
 
-import re, os, time, logging ,pprint, requests, base64, traceback, random
+import re, os, time, logging ,pprint, requests, base64, traceback, random,hashlib
 import undetected_chromedriver as uc
 from app.operation_executor import OperationExecutor
 from app.utils import Helper
@@ -222,7 +222,8 @@ class ActionExecutor:
             "title":header,
             "value":value,
             "type":type,
-            "data_present": bool(value)
+            "data_present": bool(value),
+            "hash": hashlib.sha256(value.encode("utf-8")).hexdigest() if value else None
         }
      
     # ===================== ACTION =====================
@@ -309,11 +310,63 @@ class ActionExecutor:
         
         return scrape_content
     
-    def __find_preceding_texts(self, table, n=1):
+    
+    # def __find_preceding_texts(self, table, n=2, max_depth=5, max_text_length=300):
+    #     def has_meaningful_text(element):
+    #         try:
+    #             if element.text.strip():
+    #                 return True
+    #             for child in element.find_elements(By.XPATH, "./*"):
+    #                 if has_meaningful_text(child):
+    #                     return True
+    #         except:
+    #             pass
+    #         return False
+
+    #     def extract_text(element):
+    #         try:
+    #             text = element.text.strip()
+    #             text = Helper._remove_tabspace(text)
+    #             text = Helper._normalize_whitespace(text)
+    #             return text if text and len(text) <= max_text_length else ""
+    #         except:
+    #             return ""
+
+    #     texts = []
+    #     current = table
+    #     depth = 0
+
+    #     while len(texts) < n and depth < max_depth:
+    #         try:
+    #             parent = current.find_element(By.XPATH, "..")
+    #             siblings = parent.find_elements(By.XPATH, "preceding-sibling::*")
+
+    #             for sibling in reversed(siblings):
+    #                 tag = sibling.tag_name.lower()
+    #                 if tag in ["br", "hr"]:
+    #                     continue
+    #                 if tag == "div" and not has_meaningful_text(sibling):
+    #                     continue
+
+    #                 text = extract_text(sibling)
+    #                 if text:
+    #                     texts.append(text)
+    #                     if len(texts) == n:
+    #                         return list(reversed(texts))
+
+    #             current = parent
+    #             depth += 1
+
+    #         except:
+    #             break
+
+    #     return list(reversed(texts)) if texts else ["No label found"] * n
+    
+    def __find_preceding_texts(self, table, n=2):
         texts = []
         current = table
         label_tags = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "strong", "a", "span","div"}
-        MAX_TEXT_LENGTH = 200
+        MAX_TEXT_LENGTH = 350
         while len(texts) < n:
             try:
                 parent = current.find_element(By.XPATH, "..")
@@ -333,6 +386,7 @@ class ActionExecutor:
                             continue
 
                     txt = sib.get_attribute("innerText").strip()
+                    # txt = sib.text.strip()
                     txt = Helper._remove_tabspace(txt)
                     txt = Helper._normalize_whitespace(txt)
                     if txt and len(txt)<MAX_TEXT_LENGTH:

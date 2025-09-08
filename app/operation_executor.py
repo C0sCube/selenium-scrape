@@ -7,6 +7,9 @@ from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.formatting.rule import FormulaRule
 from openpyxl.styles import PatternFill
+from docx import Document
+from docx.shared import Pt
+
 
 class OperationExecutor:
     
@@ -29,9 +32,6 @@ class OperationExecutor:
             "original": ["pdf", "html", "table_html"]
         }
 
-        
-    
-    
     #============ PROCEDURES ==============
     @staticmethod
     def extract_date(text: str) -> str:
@@ -214,7 +214,6 @@ class OperationExecutor:
 
         return p_dict
         
-    
     def process_comparison(self, old_json: dict, new_json: dict, key: str = "hash256") -> dict:
     
         def __extract_scraped_items(data, bank_code):
@@ -368,32 +367,6 @@ class OperationExecutor:
                 FormulaRule(formula=[formula], fill=RED_FILL)
             )
         return start_row + max_rows + 2
-
-    def generate_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
-        
-        with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
-            for record in comparison_json.get("records", []):
-                bank_name = record.get("bank_name")
-                bank_code = record.get("bank_code")
-                bank_link = record.get("base_url")
-                sheet_name = f"{bank_name} ({bank_code})"[:31]
-
-                summary = record.get("comparison_result", {}).get("summary", {})
-                new_entries = record.get("comparison_result", {}).get("new", [])
-                removed_entries = record.get("comparison_result", {}).get("removed", [])
-
-                pd.DataFrame().to_excel(writer, sheet_name=sheet_name, index=False)
-                ws = writer.sheets[sheet_name]
-                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=bank_name, bank_link=bank_link)
-
-
-                max_tables = max(len(new_entries), len(removed_entries))
-                for i in range(max_tables):
-                    new_df = self._parse_table(new_entries[i]) if i < len(new_entries) else pd.DataFrame()
-                    removed_df = self._parse_table(removed_entries[i]) if i < len(removed_entries) else pd.DataFrame()
-                    row_cursor = self._write_side_by_side_tables(ws, new_df, removed_df, start_row=row_cursor)
-
-        return output_path
     
     def generate_sorted_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
         # Sort records: prioritize those with new entries
@@ -427,3 +400,87 @@ class OperationExecutor:
 
         return output_path
     
+    #Doc Generation
+    def _parse_entry_for_doc(self,entry):
+        content_type = entry.get("type", "str")
+        raw_content = entry.get("value", "")
+        result = {"type": content_type, "content": None}
+
+        try:
+            if content_type == "table_html":
+                df = pd.read_html(StringIO(raw_content))[0]
+                result["content"] = df
+
+            elif content_type == "html":
+                soup = BeautifulSoup(raw_content, "html.parser")
+                text = soup.get_text(separator="\n").strip()
+                result["content"] = text
+
+            elif content_type == "pdf":
+                pdf_bytes = base64.b64decode(raw_content)
+                pdf_file = BytesIO(pdf_bytes)
+                all_rows = []
+                with pdfplumber.open(pdf_file) as pdf:
+                    for page in pdf.pages:
+                        table = page.extract_table()
+                        if table:
+                            all_rows.extend(table)
+                result["content"] = pd.DataFrame(all_rows) if all_rows else "[No table found in PDF]"
+
+            else:
+                result["content"] = "[Unsupported content type]"
+
+        except Exception as e:
+            result["content"] = f"[Failed to parse: {e}]"
+
+        return result
+
+    def generate_sorted_doc_report(self,comparison_json, output_path="DepositRate_Comparison_Report.docx"):
+        document = Document()
+
+        sorted_records = comparison_json.get("records", [])
+
+        for record in sorted_records:
+            bank_name = record.get("bank_name", "")
+            bank_code = record.get("bank_code", "")
+            bank_link = record.get("base_url", "")
+            scraped_data = record.get("scraped_data", [])
+
+
+            # Bank Header
+            document.add_heading(f">> {bank_code} : {bank_name}", level=1)
+            document.add_paragraph(f"Website: {bank_link}")
+            document.add_paragraph("Summary:")
+            document.add_paragraph("")
+
+            # Scraped Data
+            for scrape in scraped_data:
+                responses = scrape.get("response", [])
+                for response_entry in responses:
+                    titles = response_entry.get("title", [])
+                    parsed = self._parse_entry_for_doc(response_entry)
+
+                    # Add 3 title lines
+                    for line in titles:
+                        document.add_paragraph(line)
+
+                    # Add content
+                    content = parsed["content"]
+                    if isinstance(content, pd.DataFrame):
+                        table = document.add_table(rows=1, cols=len(content.columns))
+                        table.style = 'Table Grid'
+                        for i, col_name in enumerate(content.columns):
+                            table.cell(0, i).text = str(col_name)
+                        for _, row in content.iterrows():
+                            row_cells = table.add_row().cells
+                            for i, val in enumerate(row):
+                                row_cells[i].text = str(val)
+                    else:
+                        document.add_paragraph(str(content))
+                    document.add_paragraph("")
+                    document.add_paragraph("")
+
+            document.add_page_break()
+
+        document.save(output_path)
+        return output_path
