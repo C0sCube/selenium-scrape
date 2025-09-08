@@ -133,12 +133,17 @@ class ActionExecutor:
             self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
             return self.__generate_packet([{"error_type": error_type, "error_message": error_msg, "error_from":"ActionExecutor.execute"}]) # skip further execution
 
-        # if self.RETURN_TO_BASE:
-        #     self.logger.info("Returning to Base Window.")
-        #     if len(self.window_stack) > 1:
-        #         self.driver.close()
-        #         self.window_stack.pop()
-        #         self.driver.switch_to.window(self.window_stack[-1])
+        if self.NEW_WINDOW:
+            self.logger.info("Switching to NEW WINDOW (latest handle).")
+            self.driver.switch_to.window(self.driver.window_handles[-1])
+            self.window_stack.append(self.driver.current_window_handle)
+
+        if self.RETURN_TO_BASE:
+            self.logger.info("Returning to Base Window.")
+            if len(self.window_stack) > 1:
+                self.driver.close()
+                self.window_stack.pop()
+                self.driver.switch_to.window(self.window_stack[-1])
         return self.__generate_packet(content) if content else self.__generate_packet([{"error_type": "NoneType", "error_message": "No content extracted from action.","error_from":"ActionExecutor.execute"}])
 
     def __perform_action(self,action_type = None):
@@ -646,6 +651,13 @@ class ActionExecutor:
             
     def _action_page_pdf(self):
         try:
+            encoded_data,scrape_content = "",[]
+
+            if self.ACTION_TYPE == "redir_pdf":
+                self.driver.switch_to.window(self.driver.window_handles[-1])
+                self.driver.maximize_window()
+                self.driver.execute_script("document.body.style.zoom='100%'")
+            
             last_height = self.driver.execute_script("return document.body.scrollHeight")
             while True:
                 self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -661,13 +673,19 @@ class ActionExecutor:
                 })
 
             #save + output
-            pdf_data = result['data']
+            encoded_data = result['data']
             file_path = Helper.create_path(self.OUTPUT_PATH, f"{self.pdf_name}-{Helper.generate_uid()}.pdf")
-            Helper.write_binary_file(file_path, base64.b64decode(pdf_data)) #decoded as chromeDevTool returns base64 coded data
-            self.logger.info(f"Saved printed PDF to {file_path}")
+            if self.FILE_SAVE:
+                Helper.write_binary_file(file_path, base64.b64decode(encoded_data))
+                self.logger.info(f"Saved printed PDF to {file_path}")
+            
+            scrape_content.append(self.__generate_resp_packet(name=f"{self.pdf_name}",header="",value=encoded_data,type=self.ACTION_TYPE))
+            self.logger.info(f"Saved encoded pdf to {file_path}")
+            return scrape_content
 
         except Exception as e:
             self.logger.error(f"Failed to print page to PDF: {str(e)}")
+            return scrape_content
     
     def _action_http_request(self):
         self.logger.info("Performing GET REQUEST for attached website.")
