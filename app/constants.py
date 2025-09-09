@@ -14,3 +14,6 @@ CCH_DIR = Helper.create_dir(PATHS["output"],"cache",TODAY)
 PRS_DIR = Helper.create_dir(PATHS["output"],"process",TODAY) 
 
 POST_SCRAPE_OPS = CONFIG["POST_SCRAPE_OPS"]
+
+# BANK_CODES = [f"PSB_{i}" for i in range(1,13)]+["PVB_{i}" for i in range(1,23)]
+BANK_CODES = ["PVB_11"]

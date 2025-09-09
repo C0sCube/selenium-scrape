@@ -112,7 +112,7 @@ class BankScraper:
             seen = set()
             unique = []
             for resp in action["response"]:
-                if "value" in resp:# and resp.get("type") == "pdf": 
+                if "value" in resp and resp.get("type") == "pdf": #pdf specific
                     val = resp["value"]
                     val_hash = hashlib.sha256(val.encode("utf-8")).hexdigest()
                     if val_hash not in seen:

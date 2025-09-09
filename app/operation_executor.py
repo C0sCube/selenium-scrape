@@ -1,4 +1,4 @@
-import time ,re,os, hmac, hashlib, inspect, dateutil, base64, pdfplumber
+import time ,re,os, hmac, hashlib, inspect, dateutil, base64, pdfplumber, ocrmypdf, tempfile,shutil, tabula
 import pandas as pd
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
@@ -9,6 +9,7 @@ from openpyxl.formatting.rule import FormulaRule
 from openpyxl.styles import PatternFill
 from docx import Document
 from docx.shared import Pt
+from app.utils import Helper
 
 
 class OperationExecutor:
@@ -304,8 +305,9 @@ class OperationExecutor:
             
             elif content_type == "html":      
                 soup = BeautifulSoup(raw_content, "html.parser")
-                return  pd.DataFrame({"text":soup.get_text()})
-            
+                text_lines = soup.get_text().splitlines()
+                text_lines = [line.strip() for line in text_lines if line.strip()]
+                return pd.DataFrame({"text": text_lines})
             elif content_type == "pdf":
                 pdf_bytes = base64.b64decode(raw_content)
                 pdf_file = BytesIO(pdf_bytes)
@@ -315,12 +317,51 @@ class OperationExecutor:
                         table = page.extract_table()
                         if table:
                             all_rows.extend(table)
-                return pd.DataFrame(all_rows)
-                
-            else:
-                return pd.DataFrame()  # fallback
+                return pd.DataFrame(all_rows) if all_rows else "[No table found in PDF]"
+            
+            elif content_type == "redir_pdf":
+                pdf_bytes = base64.b64decode(raw_content)
+                pdf_file = BytesIO(pdf_bytes)
+                all_rows = []
+                with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_output:
+                    ocrmypdf.ocr(pdf_file, temp_output.name)
+                with pdfplumber.open(temp_output.name) as pdf:
+                    for page in pdf.pages:
+                        tables = page.extract_tables()
+                        for table in tables:
+                            all_rows.extend(table)
+                return pd.DataFrame(all_rows) if all_rows else "[No table found in PDF]"
+            
+
+            
         except:
-            return pd.DataFrame([["Failed to parse table"]])
+            self.logger.error(f"Failed to parse data for content type {content_type}")
+            return pd.DataFrame([[f"Failed to parse data of type: {content_type}"]])
+                
+            # elif content_type == "pdf":
+            #     pdf_bytes = base64.b64decode(raw_content)
+            #     pdf_file = BytesIO(pdf_bytes)
+            #     all_rows = []
+            #     with pdfplumber.open(pdf_file) as pdf:
+            #         for page in pdf.pages:
+            #             table = page.extract_table()
+            #             if table:
+            #                 all_rows.extend(table)
+            #     return pd.DataFrame(all_rows)
+            
+            # elif content_type == "redir_pdf":
+            #     pdf_bytes = base64.b64decode(raw_content)
+            #     pdf_file = BytesIO(pdf_bytes)
+            #     all_rows = []
+            #     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_output:
+            #         ocrmypdf.ocr(pdf_file, temp_output.name)
+            #     with pdfplumber.open(temp_output.name) as pdf:
+            #         for page in pdf.pages:
+            #             tables = page.extract_tables()
+            #             for table in tables:
+            #                 all_rows.extend(table)
+            #     return pd.DataFrame(all_rows)
+
              
     def _write_side_by_side_tables(self, ws, new_df, removed_df, start_row, gap=2):
         new_col_start = 1
@@ -426,9 +467,22 @@ class OperationExecutor:
                         if table:
                             all_rows.extend(table)
                 result["content"] = pd.DataFrame(all_rows) if all_rows else "[No table found in PDF]"
+            
+            # elif content_type == "redir_pdf":
+            #     pdf_bytes = base64.b64decode(raw_content)
+            #     pdf_file = BytesIO(pdf_bytes)
+            #     all_rows = []
+            #     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_output:
+            #         ocrmypdf.ocr(pdf_file, temp_output.name, force_ocr=True,deskew=True,optimize=1,progress_bar=False )
+            #     dfs = tabula.read_pdf(temp_output.name, pages="all", multiple_tables=True)
+            #     all_rows = []
+            #     for df in dfs:
+            #         all_rows.extend(df.values.tolist())
+
+            #     result["content"] = pd.DataFrame(all_rows) if all_rows else "[No table found in PDF]"
 
             else:
-                result["content"] = "[Unsupported content type]"
+                result["content"] = f"[Unsupported Datatype: {content_type}]"
 
         except Exception as e:
             result["content"] = f"[Failed to parse: {e}]"
@@ -437,8 +491,24 @@ class OperationExecutor:
 
     def generate_sorted_doc_report(self,comparison_json, output_path="DepositRate_Comparison_Report.docx"):
         document = Document()
-
         sorted_records = comparison_json.get("records", [])
+        metadata = comparison_json.get("metadata", {})
+        
+        document.add_heading(">>>Metadata Overview<<<", level=1)
+        table = document.add_table(rows=1, cols=2)
+        table.style = 'Table Grid'
+        hdr_cells = table.rows[0].cells
+        hdr_cells[0].text = 'Key'
+        hdr_cells[1].text = 'Value'
+        
+        for key, value in metadata.items():
+            row_cells = table.add_row().cells
+            row_cells[0].text = f"**{key}**" if key in ["Program", "Date", "Start Time", "Config", "Cache File"] else key
+            row_cells[1].text = value
+
+        document.add_paragraph("\n")
+        
+        COMPULSARY_LINES = 3
 
         for record in sorted_records:
             bank_name = record.get("bank_name", "")
@@ -448,24 +518,38 @@ class OperationExecutor:
 
 
             # Bank Header
-            document.add_heading(f">> {bank_code} : {bank_name}", level=1)
-            document.add_paragraph(f"Website: {bank_link}")
-            document.add_paragraph("Summary:")
-            document.add_paragraph("")
+            document.add_heading(f">> {bank_code} : {bank_name}", level=2)
+            document.add_paragraph("================================================")
 
             # Scraped Data
             for scrape in scraped_data:
                 responses = scrape.get("response", [])
+                
+                action = scrape.get("action","")
+                timestamp = scrape.get("timestamp","")
+                webpage = scrape.get("webpage","")
+                data_present = scrape.get("data_present","")
+                response_count = scrape.get("response_count","")
+                
+                document.add_heading(f"Action: {action}| Timestamp: {timestamp}| Present: {str(data_present)}| Count: {response_count if data_present else 0}", level=3)
+                document.add_paragraph(f"Website: {webpage}")
                 for response_entry in responses:
-                    titles = response_entry.get("title", [])
+                    
+                    #get title for content
+                    titles = response_entry.get("title",[])
+                    titles = [titles] if isinstance(titles,str) else titles
+                    # if len(titles) < COMPULSARY_LINES:
+                    #     titles.extend([""] * (COMPULSARY_LINES - len(titles)))
+                    
                     parsed = self._parse_entry_for_doc(response_entry)
-
-                    # Add 3 title lines
-                    for line in titles:
-                        document.add_paragraph(line)
-
-                    # Add content
                     content = parsed["content"]
+                    
+                    #add title
+                    document.add_paragraph("---------------------------")
+                    for idx,line in enumerate(titles):
+                        document.add_paragraph(f"TITLE {idx+1}: {line}")
+                    
+                    #add content lmao
                     if isinstance(content, pd.DataFrame):
                         table = document.add_table(rows=1, cols=len(content.columns))
                         table.style = 'Table Grid'
@@ -477,7 +561,6 @@ class OperationExecutor:
                                 row_cells[i].text = str(val)
                     else:
                         document.add_paragraph(str(content))
-                    document.add_paragraph("")
                     document.add_paragraph("")
 
             document.add_page_break()

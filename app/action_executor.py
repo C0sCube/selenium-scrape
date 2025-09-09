@@ -51,11 +51,21 @@ class ActionExecutor:
         # options.add_argument(f"--user-data-dir={profile_path}")
         # options.add_argument(f"--profile-directory={profile_dir}")
         options.add_argument("--disable-blink-features=AutomationControlled")
-        # options.add_argument("--start-maximized")
         options.add_argument("--disable-extensions")
         
+        #preferential download
+        options.add_experimental_option("prefs", {
+            "download.default_directory": self.OUTPUT_PATH,
+            "download.prompt_for_download": False,
+            "plugins.always_open_pdf_externally": True,
+            "download.directory_upgrade": True,
+            "safebrowsing.enabled": True
+        })
+        
         self.driver = uc.Chrome(options=options)
-        self.driver.set_window_size(900,700)
+        
+        width,height = self.PARAMS["intial_window_size"]
+        self.driver.set_window_size(width,height)
         time.sleep(random.uniform(0.5, 2.5))
         
         self.window_stack = [self.driver.current_window_handle]
@@ -112,7 +122,7 @@ class ActionExecutor:
         self.NEW_WINDOW = _action_.get("new_window", False)
         self.RETURN_TO_BASE = _action_.get("return_to_base", False)
         
-        time.sleep(random.uniform(0, self.DEFAULT_WAIT))
+        time.sleep(random.uniform(self.DEFAULT_WAIT/2, self.DEFAULT_WAIT))
         
         
         #element; The Which gets loaded as default
@@ -155,10 +165,11 @@ class ActionExecutor:
             "website": self._action_redirect,
             "download": self._action_element_download,
             "pdf": self._action_page_pdf,
+            "redir_pdf":self._action_page_pdf,
             "screenshot": self._action_page_screenshot,
             "tablist": self._action_tab_list,
             "http":self._action_http_request,
-            # "directfile":self._action_directfile
+            "manual":self._action_manual_perform,
         }
 
         if not action_type:
@@ -613,8 +624,61 @@ class ActionExecutor:
         
         return encoded_data
     
+    def _action_manual_perform(self):
+        
+        def wait_for_download(folder, timeout=30):
+            start_time = time.time()
+            initial_files = set(os.listdir(folder))
+
+            while time.time() - start_time < timeout:
+                current_files = set(os.listdir(folder))
+                new_files = current_files - initial_files
+                if new_files:
+                    for fname in new_files:
+                        path = os.path.join(folder, fname)
+                        if fname.endswith(".pdf"):
+                            return path
+                time.sleep(1)
+
+            return None
+
+        self.logger.info("Waiting for user to download PDF...")
+        pdf_path = wait_for_download(self.OUTPUT_PATH, timeout=60)
+        time.sleep(5) #complete the download
+        scrape_content = []
+        if pdf_path:
+            with open(pdf_path, "rb") as f:
+                encoded = base64.b64encode(f.read()).decode("utf-8")
+                scrape_content.append(self.__generate_resp_packet(
+                    name=f"{self.pdf_name}",
+                    header=os.path.basename(pdf_path),
+                    value=encoded,
+                    type="pdf"
+                ))
+        else:
+            self.logger.warning("No valid PDF found within timeout.")
+
+        return scrape_content
       
     #Non-Data Actions
+    # def _action_manual_perform(self):
+    #     input("Please download the PDF manually in the browser, then press Enter to continue...")
+    #     scrape_content = []
+    #     def get_latest_pdf(folder):
+    #         files = [f for f in os.listdir(folder) if f.endswith(".pdf")]
+    #         files.sort(key=lambda x: os.path.getmtime(os.path.join(folder, x)), reverse=True)
+    #         return os.path.join(folder, files[0]) if files else None
+
+    #     pdf_path = get_latest_pdf(self.OUTPUT_PATH)
+    #     if pdf_path:
+    #         with open(pdf_path, "rb") as f:
+    #             encoded = base64.b64encode(f.read()).decode("utf-8")
+    #             scrape_content.append(self.__generate_resp_packet(name=f"{self.pdf_name}",header=os.path.basename(urlparse(pdf_path).path),value=encoded,type="pdf"))
+    #     else:
+    #         self.logger.warning("No valid PDF found after manual download.")
+
+    #     return scrape_content
+    
     def _action_page_screenshot(self):
         try:
             path = Helper.create_path(self.OUTPUT_PATH,f"{self.screenshot_name}-{Helper.generate_uid()}.png")
@@ -651,26 +715,24 @@ class ActionExecutor:
             
     def _action_page_pdf(self):
         try:
-            encoded_data,scrape_content = "",[]
+            scrape_content = []
 
             if self.ACTION_TYPE == "redir_pdf":
                 self.driver.switch_to.window(self.driver.window_handles[-1])
                 self.driver.maximize_window()
                 self.driver.execute_script("document.body.style.zoom='100%'")
-            
+                time.sleep(2)
+
             last_height = self.driver.execute_script("return document.body.scrollHeight")
             while True:
                 self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(2)
+                time.sleep(1.5)
                 new_height = self.driver.execute_script("return document.body.scrollHeight")
                 if new_height == last_height:
                     break
                 last_height = new_height
 
-            result = self.driver.execute_cdp_cmd("Page.printToPDF", {
-                "printBackground": self.PRINT_BACKGROUND,
-                "landscape": self.LANDSCAPE
-                })
+            result = self.driver.execute_cdp_cmd("Page.printToPDF", {"printBackground": self.PRINT_BACKGROUND,"landscape": self.LANDSCAPE,})
 
             #save + output
             encoded_data = result['data']
@@ -680,12 +742,11 @@ class ActionExecutor:
                 self.logger.info(f"Saved printed PDF to {file_path}")
             
             scrape_content.append(self.__generate_resp_packet(name=f"{self.pdf_name}",header="",value=encoded_data,type=self.ACTION_TYPE))
-            self.logger.info(f"Saved encoded pdf to {file_path}")
-            return scrape_content
 
         except Exception as e:
             self.logger.error(f"Failed to print page to PDF: {str(e)}")
-            return scrape_content
+        
+        return scrape_content
     
     def _action_http_request(self):
         self.logger.info("Performing GET REQUEST for attached website.")

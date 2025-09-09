@@ -7,12 +7,10 @@ from app.utils import Helper
 from app.program_logger import get_forever_logger
 from app.BankScraper import BankScraper
 from app.mailer import Mailer
-from app.constants import LOG_DIR, CCH_DIR, PRS_DIR, CONFIG, PATHS, BANK_CODES
-
+from app.constants import LOG_DIR, CCH_DIR, CONFIG, PATHS
 
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
-
-# Mailer().start_mail(PROGRAM_NAME,BANK_CODES)
+BANK_CODES = [f"PSB_{i}" for i in range(1,13)]
 try:
     final_dict = BankScraper.get_final_struct()
     for code in BANK_CODES:
@@ -29,18 +27,14 @@ try:
         clean_result = BankScraper.dedupe_responses(result)
         final_dict["records"].append(clean_result)
         time.sleep(3)
-    
-    #post-scrape
-    # proce_dict = BankScraper.post_scrape(final_dict, POST_SCRAPE_OPS, logger)
-
+        
 except KeyboardInterrupt:
-    logger.warning("Process Interrupted by User!")
+    logger.warning("Process Interrupted by User!")  
     
 except Exception as e:
     logger.error(f"Error in Main.py :[{type(e).__name__}] {e}")
     logger.debug(f"Traceback:\n{traceback.format_exc()}")
-
+    
 finally:
     Helper.save_json(final_dict, os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]))
-    # Helper.save_json(proce_dict,os.path.join(PROCESS_DIR, final_dict["metadata"]["pfname"]))
     logger.save("Saved Cached Data.")
