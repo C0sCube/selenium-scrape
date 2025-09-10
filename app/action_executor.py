@@ -86,6 +86,7 @@ class ActionExecutor:
         self.BY = self.__get_by(_action_.get("by", "css"))
         self.VALUE = _action_.get("value")
         self.URL = _action_.get("url","https://tinyurl.com/nothing-borgir")
+        self.WEBLINKS = _action_.get("web_links",[])
         
         #time
         self.DEFAULT_WAIT = _action_.get("default_wait", 2)
@@ -170,6 +171,7 @@ class ActionExecutor:
             "redir_pdf":self.genPdf,
             "screenshot": self.genSst,
             "tablist": self.tabList,
+            "weblist":self.webList,
             "http":self.httpRequest,
             "manual":self.manualAction,
         }
@@ -194,6 +196,7 @@ class ActionExecutor:
             "name": By.NAME,
             "class": By.CLASS_NAME,
             "tag": By.TAG_NAME,
+            "txt":By.LINK_TEXT
         }
         return mapping.get(by_string.lower(), By.CSS_SELECTOR)
 
@@ -231,6 +234,10 @@ class ActionExecutor:
 
         if self.ACTION_TYPE == "tablist":
             packet["tab_found"] = getattr(self, "TABS_FOUND", [])
+            packet["follow_ups"] = [step.get("action") for step in getattr(self, "FOLLOW_UP_ACTIONS", [])if "action" in step]
+        
+        if self.ACTION_TYPE == "weblist":
+            packet["web_links"] = getattr(self, "WEBLINKS", [])
             packet["follow_ups"] = [step.get("action") for step in getattr(self, "FOLLOW_UP_ACTIONS", [])if "action" in step]
 
         return packet
@@ -412,7 +419,39 @@ class ActionExecutor:
         #     except Exception as e:
         #         self.logger.warning(f"Failed on tab[{i}]: {e}")
         #         i += 1
+
+    def webList(self)->list:
+        self.logger.info(f"Performing weblist action of {len(self.WEBLINKS)} website(s)")
+        scrape_content = []
+        follow_ups = self.FOLLOW_UP_ACTIONS
+        tablist_log = self.LOG_MESSAGE
         
+        for idx, url in enumerate(self.WEBLINKS):
+            try:
+                self.driver.get(url)
+                self.logger.notice(f"Redirecting to: {url}")
+                for step in follow_ups:
+                    if step.get("wait_until"):
+                        condition = self.__get_condition(step["wait_until"], step["by"], step["value"])
+                        WebDriverWait(self.driver, step["timeout"]).until(condition)
+                        result = self.execute(step)
+                        
+                    if not result:
+                        self.logger.warning(f"No result returned for step {step['action']}")
+                        continue
+                    
+                    step_content = result.get("response", [])
+                    scrape_content.extend(step_content)
+            
+            except Exception as e:
+                self.logger.warning(f"Failed on url:{url}:: {e}")
+                         
+        self.ACTION_TYPE = "tablist"
+        self.LOG_MESSAGE = tablist_log
+        self.FOLLOW_UP_ACTIONS = follow_ups
+        return scrape_content
+
+    
     def downloadElem(self):
         
         elements = self.driver.find_elements(self.BY, self.VALUE) if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)]
@@ -614,8 +653,15 @@ class ActionExecutor:
     
     def execute_blocks(self, block: list):  
         block_data = []
+        generic_actions = GENERIC_ACTION_CONFIG
         self.logger.notice(f"Total Action(s) {len(block)}")
         for _,_action_ in enumerate(block):
+            
+            if isinstance(_action_,str):
+                if _action_ not in generic_actions:
+                    self.logger.warning(f" {_action_} not part of generic_action_keys. Skipping.")
+                else:
+                    _action_ = generic_actions.get(_action_)   
             data = self.execute(_action_)
             if data:
                 block_data.append(data)

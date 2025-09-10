@@ -48,3 +48,8 @@ class ActionConfig:
             self.WAIT_BY = self.BY
         if self.WAIT_VALUE is None:
             self.WAIT_VALUE = self.VALUE
+
+
+@dataclass
+class GenericActions:
+    pass

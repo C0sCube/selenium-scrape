@@ -13,8 +13,9 @@ from app.constants import CACHE_REP_DIR,LOG_DIR, CCH_DIR, PRS_DIR
 
 
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
-bank_codes = PVT_BANK_CODES
-bank_codes = ["PVB_2"]
+# bank_codes = PVT_BANK_CODES
+bank_codes = PUB_BANK_CODES
+bank_codes = ["PVB_1","PVB_2"]
 # Mailer().start_mail(PROGRAM_NAME,data=bank_codes)
 
 try:
@@ -37,9 +38,9 @@ try:
     
 
     #doc report
-    doc_path = os.path.join(CACHE_REP_DIR,"SAMPLE_DATA.docx")
-    BankScraper.generate_cache_report(final_dict,output_path=doc_path)
-    logger.save("Initial Cache Report Saved.")
+    # doc_path = os.path.join(CACHE_REP_DIR,"SAMPLE_DATA.docx")
+    # BankScraper.generate_cache_report(final_dict,output_path=doc_path)
+    # logger.save("Initial Cache Report Saved.")
     
     # Mailer().end_mail(PROGRAM_NAME,attachments=[doc_path])
     
@@ -52,7 +53,7 @@ except Exception as e:
     logger.debug(f"Traceback:\n{traceback.format_exc()}")
 
 finally:
-    Helper.save_json(final_dict, os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]),typ="json5")
+    Helper.save_json(final_dict, os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]),typ="json")
     logger.save("Saved Cached Data.")
     logger.notice("Ending Program.")
     

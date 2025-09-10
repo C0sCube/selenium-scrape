@@ -795,55 +795,55 @@ class OperationExecutor:
     
     # @classmethod
     # def generate_cache_excel_report(cls, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
-        sorted_records = comparison_json.get("records", [])
-        metadata = comparison_json.get("metadata", {})
+        # sorted_records = comparison_json.get("records", [])
+        # metadata = comparison_json.get("metadata", {})
 
-        with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
-            meta_df = pd.DataFrame(list(metadata.items()), columns=["Key", "Value"])
-            meta_df.to_excel(writer, sheet_name="Metadata", index=False)
+        # with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
+        #     meta_df = pd.DataFrame(list(metadata.items()), columns=["Key", "Value"])
+        #     meta_df.to_excel(writer, sheet_name="Metadata", index=False)
 
-            for record in sorted_records:
-                bank_name = record.get("bank_name", "UnknownBank")
-                bank_code = record.get("bank_code", "")
-                scraped_data = record.get("scraped_data", [])
-                sheet_name = f"{bank_code}_{bank_name}"[:31]
+        #     for record in sorted_records:
+        #         bank_name = record.get("bank_name", "UnknownBank")
+        #         bank_code = record.get("bank_code", "")
+        #         scraped_data = record.get("scraped_data", [])
+        #         sheet_name = f"{bank_code}_{bank_name}"[:31]
 
-                bank_frames = []
+        #         bank_frames = []
 
-                for scrape in scraped_data:
-                    responses = scrape.get("response", [])
-                    action = scrape.get("action", "")
-                    timestamp = scrape.get("timestamp", "")
-                    webpage = scrape.get("webpage", "")
-                    data_present = scrape.get("data_present", "")
-                    response_count = scrape.get("response_count", "")
+        #         for scrape in scraped_data:
+        #             responses = scrape.get("response", [])
+        #             action = scrape.get("action", "")
+        #             timestamp = scrape.get("timestamp", "")
+        #             webpage = scrape.get("webpage", "")
+        #             data_present = scrape.get("data_present", "")
+        #             response_count = scrape.get("response_count", "")
 
-                    for response_entry in responses:
-                        titles = response_entry.get("title", [])
-                        titles = [titles] if isinstance(titles, str) else titles
+        #             for response_entry in responses:
+        #                 titles = response_entry.get("title", [])
+        #                 titles = [titles] if isinstance(titles, str) else titles
 
-                        parsed = cls.__parse_entry(response_entry)
-                        content_stream = parsed["content"]
+        #                 parsed = cls.__parse_entry(response_entry)
+        #                 content_stream = parsed["content"]
 
-                        header_rows = [
-                            [f"Action: {action}", f"Timestamp: {timestamp}", f"Present: {data_present}", f"Count: {response_count}"],
-                            [f"Website: {webpage}"],
-                            ["---------------------------"],
-                        ]
-                        for idx, title in enumerate(titles):
-                            header_rows.append([f"TITLE {idx+1}: {title}"])
+        #                 header_rows = [
+        #                     [f"Action: {action}", f"Timestamp: {timestamp}", f"Present: {data_present}", f"Count: {response_count}"],
+        #                     [f"Website: {webpage}"],
+        #                     ["---------------------------"],
+        #                 ]
+        #                 for idx, title in enumerate(titles):
+        #                     header_rows.append([f"TITLE {idx+1}: {title}"])
 
-                        bank_frames.append(pd.DataFrame(header_rows))
+        #                 bank_frames.append(pd.DataFrame(header_rows))
 
-                        for item in content_stream:
-                            if item["type"] == "text":
-                                bank_frames.append(pd.DataFrame([[item["text"]]]))
-                            elif item["type"] == "table":
-                                bank_frames.append(item["table"])
+        #                 for item in content_stream:
+        #                     if item["type"] == "text":
+        #                         bank_frames.append(pd.DataFrame([[item["text"]]]))
+        #                     elif item["type"] == "table":
+        #                         bank_frames.append(item["table"])
 
-                        bank_frames.append(pd.DataFrame([[""]]))  # Spacer
+        #                 bank_frames.append(pd.DataFrame([[""]]))  # Spacer
 
-                final_df = pd.concat(bank_frames, ignore_index=True)
-                final_df.to_excel(writer, sheet_name=sheet_name, index=False)
+        #         final_df = pd.concat(bank_frames, ignore_index=True)
+        #         final_df.to_excel(writer, sheet_name=sheet_name, index=False)
 
-        return output_path
+        # return output_path

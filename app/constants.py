@@ -3,6 +3,7 @@ from datetime import datetime
 
 #configs
 CONFIG = Helper.load_json(r"configs\param_table.json5", typ="json5")
+GENERIC_ACTION_CONFIG = Helper.load_json(r"configs\generic_actions.json5", typ="json5")
 PATHS = Helper.load_json(r"paths.json5", typ="json5")
 
 TODAY = datetime.now().strftime("%Y-%m-%d")
