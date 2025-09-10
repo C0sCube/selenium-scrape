@@ -16,6 +16,8 @@ class BankScraper:
             "scraped_data": []
         }
         self.executor = ActionExecutor(logger, bank_params, paths) # not inherit, call here!!
+        
+        self.operator = OperationExecutor(logger)
 
     @staticmethod
     def get_final_struct():
@@ -122,3 +124,10 @@ class BankScraper:
                     unique.append(resp)
             action["response"] = unique
         return result
+    
+    @staticmethod
+    def generate_cache_report(data, output_path="DepositRate_Comparison_Report.docx"):
+        OperationExecutor.generate_cache_doc_report(data, output_path= output_path)
+    
+            
+        

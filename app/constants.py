@@ -3,23 +3,30 @@ from datetime import datetime
 
 #configs
 CONFIG = Helper.load_json(r"configs\param_table.json5", typ="json5")
-PATHS = Helper.load_json(r"paths.json")
-
+PATHS = Helper.load_json(r"paths.json5", typ="json5")
 
 TODAY = datetime.now().strftime("%Y-%m-%d")
+PROGRAM_NAME = "DepositRate Scrape"
 
 #directories
 LOG_DIR = Helper.create_dir(PATHS["output"],"logs")
 CCH_DIR = Helper.create_dir(PATHS["output"],"cache",TODAY) 
-PRS_DIR = Helper.create_dir(PATHS["output"],"process",TODAY) 
+PRS_DIR = Helper.create_dir(PATHS["output"],"process",TODAY)
+CACHE_REP_DIR = Helper.create_dir(PATHS["output"],"report")
 
 POST_SCRAPE_OPS = CONFIG["POST_SCRAPE_OPS"]
 
 
 #file size constants
-MAX_REQ_BYTE_SIZE = 2_000_000
+MAX_REQUEST_BYTE_SIZE = 2_000_000 #2mb file
 
-# BANK_CODES = [f"PSB_{i}" for i in range(1,13)]+["PVB_{i}" for i in range(1,23)]
-BANK_CODES = ["PVB_11"]
+#Manual
+MAX_DOWNLOAD_TIMEOUT = 45
+MAX_DOWNLOAD_WAIT = 5
+
+
+PVT_BANK_CODES = [f"PVB_{i}" for i in range(1,23)]
+PUB_BANK_CODES = [f"PSB_{i}" for i in range(1,13)]
+ALL_BANK_CODES = [f"PSB_{i}" for i in range(1,13)]+["PVB_{i}" for i in range(1,23)]
 
 

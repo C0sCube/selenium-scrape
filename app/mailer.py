@@ -7,6 +7,8 @@ from datetime import datetime
 import logging
 import os,json
 
+from app.constants import PATHS
+
 # logger = logging.getLogger("fs_logger")
 
 
@@ -17,15 +19,15 @@ class Mailer:
                 cc=None, bcc=None, logger=None):
         
         try:
-            with open("paths.json", "r") as f:
-                paths = json.load(f)
-                mail_config = paths.get("mail", {})
-                server = mail_config.get("server", server)
-                port = mail_config.get("port", port)
-                sender = mail_config.get("sender", sender)
-                recipients = mail_config.get("recipients", recipients)
-                cc = mail_config.get("cc", cc)
-                bcc = mail_config.get("bcc", bcc)               
+            
+            paths = PATHS
+            mail_config = paths.get("mail", {})
+            server = mail_config.get("server", server)
+            port = mail_config.get("port", port)
+            sender = mail_config.get("sender", sender)
+            recipients = mail_config.get("recipients", recipients)
+            cc = mail_config.get("cc", cc)
+            bcc = mail_config.get("bcc", bcc)               
         except FileNotFoundError:
             
             print("paths.json file not found. Using default values.")
@@ -40,7 +42,7 @@ class Mailer:
         self.logger = logger or logging.getLogger(__name__)
 
 
-    def start_mail(self, program, data=None):
+    def start_mail(self, program, data=None,attachments=None):
         subject = f"{program} — Execution Started"
         body = f"""
         <html>
@@ -52,10 +54,10 @@ class Mailer:
             </body>
         </html>
         """
-        msg = self.construct_mail(subject=subject, body_html=body)
+        msg = self.construct_mail(subject=subject, body_html=body, attachments = attachments)
         self.send_mail(msg)
    
-    def end_mail(self, program, data=None):
+    def end_mail(self, program, data=None,attachments=None):
         subject = f"{program} — Execution Completed"
         body = f"""
         <html>
@@ -66,7 +68,7 @@ class Mailer:
             </body>
         </html>
         """
-        msg = self.construct_mail(subject=subject, body_html=body)
+        msg = self.construct_mail(subject=subject, body_html=body, attachments = attachments)
         self.send_mail(msg)
 
     def default_body(self):
@@ -84,23 +86,30 @@ class Mailer:
         msg = self.construct_mail(subject=subject, body_html=body_html, body_text=body_text)
         self.send_mail(msg)
     
-    def construct_mail(self, subject, body_html=None, body_text=None):
+    def construct_mail(self, subject, body_html=None, body_text=None, attachments = None):
         msg = MIMEMultipart("alternative")
         msg["From"] = self.FROM
         msg["To"] = ", ".join(self.RECPTS)
-        if self.CC:
-            msg["Cc"] = ", ".join(self.CC)
+        if self.CC: msg["Cc"] = ", ".join(self.CC)
         msg["Subject"] = f"{subject} - {datetime.now().strftime('%Y-%m-%d')}"
 
-        if body_text:
-            msg.attach(MIMEText(body_text, "plain"))
-        if body_html:
-            msg.attach(MIMEText(body_html, "html"))
-        else:
-            msg.attach(MIMEText(self.default_body(), "html"))
+        if body_text: msg.attach(MIMEText(body_text, "plain"))
+        if body_html: msg.attach(MIMEText(body_html, "html"))
+        else: msg.attach(MIMEText(self.default_body(), "html"))
+        
+        
+        if attachments:
+            for file_path in attachments:
+                path = Path(file_path)
+                if path.exists():
+                    with open(path, "rb") as f:
+                        part = MIMEApplication(f.read(), Name=path.name)
+                        part['Content-Disposition'] = f'attachment; filename="{path.name}"'
+                        msg.attach(part)
+                else:
+                    self.logger.warning(f"Attachment not found: {file_path}")
 
         return msg
-
 
     def send_mail(self, msg):
         try:

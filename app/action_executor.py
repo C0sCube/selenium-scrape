@@ -160,6 +160,7 @@ class ActionExecutor:
     def __perform_action(self,action_type = None):
         action_map = {
             "click": self.clickElem,
+            "click_save":self.clickSave,
             "html": self.htmlScrape,
             "table": self.tablScrape,
             "scrape": self.textScrape,
@@ -184,92 +185,7 @@ class ActionExecutor:
                 return result
         else:
             self.logger.warning(f"Unknown action type: {self.ACTION_TYPE}")
-    
-    def _execute_(self, _action_: dict):
-        self.config = ActionConfig(**_action_)
-        time.sleep(random.uniform(self.config.default_wait / 2, self.config.default_wait))
-
-        self.ELEMENT = None
-        try:
-            self.logger.notice(f"Performing _action_: {self.config.action} on {self.config.value}")
-
-            if self.config.wait_until:
-                condition = self.__get_condition(
-                    self.config.wait_until,
-                    self.__get_by(self.config.wait_by),
-                    self.config.wait_value
-                )
-                WebDriverWait(self.driver, self.config.timeout).until(condition)
-
-            if self.config.value:
-                self.ELEMENT = self.driver.find_element(
-                    self.__get_by(self.config.by),
-                    self.config.value
-                )
-
-            content = self._perform_action_(self.config)
-
-        except Exception as e:
-            error_type = type(e).__name__
-            error_msg = str(e)
-            self.logger.error(f"Error in self.execute: [{error_type}] {error_msg}")
-            self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
-            return self.__generate_packet([{
-                "error_type": error_type,
-                "error_message": error_msg,
-                "error_from": "ActionExecutor.execute"
-            }])
-
-        if self.config.new_window:
-            self.logger.info("Switching to NEW WINDOW (latest handle).")
-            self.driver.switch_to.window(self.driver.window_handles[-1])
-            self.window_stack.append(self.driver.current_window_handle)
-
-        if self.config.return_to_base:
-            self.logger.info("Returning to BASE WINDOW.")
-            if len(self.window_stack) > 1:
-                self.driver.close()
-                self.window_stack.pop()
-                self.driver.switch_to.window(self.window_stack[-1])
-
-        if content:
-            return self.__generate_packet(content)
-        else:
-            return self.__generate_packet([{
-                "error_type": "NoneType",
-                "error_message": "No content extracted from action.",
-                "error_from": "ActionExecutor.execute"
-            }])
-
-    def _perform_action_(self, config: ActionConfig):
-        action_map = {
-            "click": self._action_element_click,
-            "html": self._action_html_scrape,
-            "table": self._action_table_scrape,
-            "scrape": self._action_text_scrape,
-            "website": self._action_redirect,
-            "download": self._action_element_download,
-            "pdf": self._action_page_pdf,
-            "redir_pdf": self._action_page_pdf,
-            "screenshot": self._action_page_screenshot,
-            "tablist": self._action_tab_list,
-            "http": self._action_http_request,
-            "manual": self._action_manual_perform,
-        }
-
-        action = action_map.get(config.action)
-        if not action:
-            self.logger.warning(f"Unknown action type: {config.action}")
-            return None
-
-        try:
-            return action()
-        except Exception as e:
-            self.logger.error(f"Action '{config.action}' failed: {e}")
-            self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
-            return None
-
-    
+        
     def __get_by(self, by_string):
         mapping = {
             "css": By.CSS_SELECTOR,
@@ -329,7 +245,7 @@ class ActionExecutor:
             "hash": hashlib.sha256(value.encode("utf-8")).hexdigest() if value else None
         }
     
-    def scroll_to_bottom(self):
+    def __scroll_to_bottom(self):
         last_height = self.driver.execute_script("return document.body.scrollHeight")
         while True:
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -342,47 +258,47 @@ class ActionExecutor:
     # ===================== ACTION =====================
     
     #DOM-Scrape Actions
-    # def textScrape(self)->dict: #Have to write this better
-    #     self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
-    #     elements = self.driver.find_elements(self.BY, self.VALUE)
+    def textScrape(self)->dict: #Have to write this better
+        self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
+        elements = self.driver.find_elements(self.BY, self.VALUE)
 
-    #     data_container = {}
-    #     for elem in elements:
-    #         if self.SCRAPE_FIELDS:
-    #             results = {}
-    #             for key, sub_selector in self.SCRAPE_FIELDS.items():
+        data_container = {}
+        for elem in elements:
+            if self.SCRAPE_FIELDS:
+                results = {}
+                for key, sub_selector in self.SCRAPE_FIELDS.items():
                     
-    #                 if "|||" in sub_selector:
-    #                     sub_selector,BY = sub_selector.split("|||")
-    #                 try:
-    #                     sub_elem = elem.find_element(self.get_by(BY), sub_selector)
-    #                     if sub_elem:
-    #                         text = sub_elem.text.strip()
-    #                         if not text: #Hidden Text
-    #                             print("Trying extract using textContent .")
-    #                             text = sub_elem.get_attribute("textContent").strip()
+                    if "|||" in sub_selector:
+                        sub_selector,BY = sub_selector.split("|||")
+                    try:
+                        sub_elem = elem.find_element(self.get_by(BY), sub_selector)
+                        if sub_elem:
+                            text = sub_elem.text.strip()
+                            if not text: #Hidden Text
+                                print("Trying extract using textContent .")
+                                text = sub_elem.get_attribute("textContent").strip()
                             
-    #                         if not text:
-    #                             print("Trying extract using innerHTML .")
-    #                             text = sub_elem.get_attribute("innerHTML").strip()
+                            if not text:
+                                print("Trying extract using innerHTML .")
+                                text = sub_elem.get_attribute("innerHTML").strip()
                                 
-    #                         results[key] = text
+                            results[key] = text
                             
-    #                 except Exception as e:
-    #                     self.logger.warning(f"Missing field '{key}': {e}")
-    #                     results[key] = None
-    #             data_container.update(results)
+                    except Exception as e:
+                        self.logger.warning(f"Missing field '{key}': {e}")
+                        results[key] = None
+                data_container.update(results)
 
-    #         elif self.ATTRIBUTE:
-    #             data = elem.get_attribute(self.ATTRIBUTE)
-    #             self.logger.info(f"Scraped attribute {self.ATTRIBUTE}: {data}")
-    #             data_container.update({self.ATTRIBUTE: data})
+            elif self.ATTRIBUTE:
+                data = elem.get_attribute(self.ATTRIBUTE)
+                self.logger.info(f"Scraped attribute {self.ATTRIBUTE}: {data}")
+                data_container.update({self.ATTRIBUTE: data})
 
-    #         else:
-    #             data_container.update({"text": elem.text.strip()})
+            else:
+                data_container.update({"text": elem.text.strip()})
 
-    #     self.logger.info(f"Scraped Content:\n{pprint.pformat(data_container)}")
-    #     return data_container
+        self.logger.info(f"Scraped Content:\n{pprint.pformat(data_container)}")
+        return data_container
     
     def tablScrape(self)->list:
         self.logger.info(f"Scraping Using BY={self.BY} and VALUE={self.VALUE}")
@@ -504,20 +420,10 @@ class ActionExecutor:
         scrape_content = []
         
         #Helper
-        def _get_file_url_via_html(elem):
-            url = elem.get_attribute("href")
-            if not url:
-                try:
-                    link_elem = elem.find_element(By.TAG_NAME, "a")
-                    url = link_elem.get_attribute("href")
-                except:
-                    url = None
-            return url
-        
         for idx, elem in enumerate(elements):
             try:
                 self.driver.execute_script("arguments[0].scrollIntoView(true);", elem)
-                file_url = _get_file_url_via_html(elem)
+                file_url = self.__extract_html_href(elem)
 
                 if not file_url:
                     self.logger.warning(f"No valid URL at index {idx}")
@@ -542,6 +448,16 @@ class ActionExecutor:
                 
         return scrape_content
     
+    def __extract_html_href(self,elem):
+            url = elem.get_attribute("href")
+            if not url:
+                try:
+                    link_elem = elem.find_element(By.TAG_NAME, "a")
+                    url = link_elem.get_attribute("href")
+                except:
+                    url = None
+            return url
+    
     def __download_file(self, file_url, output_dir, idx, extension):
         cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
         r = requests.get(file_url, cookies=cookies, verify=False) #check this out
@@ -560,7 +476,7 @@ class ActionExecutor:
             file_path = os.path.join(output_dir, safe_filename)
             file_data = r.content
             
-            if len(file_data)>=MAX_REQ_BYTE_SIZE:
+            if len(file_data)>=MAX_REQUEST_BYTE_SIZE:
                 self.logger.warning(f"Skipped {safe_filename} — size {len(file_data)} exceeds limit.")
                 return encoded_data
             
@@ -574,10 +490,10 @@ class ActionExecutor:
         
         return encoded_data
     
-    def manualAction(self):
+    def manualAction(self, _timeout = MAX_DOWNLOAD_TIMEOUT, _wait = MAX_DOWNLOAD_WAIT):
         self.logger.info("Waiting for user to download PDF...")
-        file_path,ext = ActionExecutorHelper._wait_for_download(self.OUTPUT_PATH, timeout=60)
-        time.sleep(5) #complete the download
+        file_path,ext = ActionExecutorHelper._wait_for_download(self.OUTPUT_PATH, timeout=_timeout)
+        time.sleep(_wait)
         scrape_content = []
         if file_path:
             with open(file_path, "rb") as f:
@@ -613,10 +529,22 @@ class ActionExecutor:
                 self.driver.execute_script("document.body.style.zoom='100%'")
                 time.sleep(2)
 
-            self.scroll_to_bottom()
+            self.__scroll_to_bottom()
             
             scrape_content = []
-            result = self.driver.execute_cdp_cmd("Page.printToPDF", {"printBackground": self.PRINT_BACKGROUND,"landscape": self.LANDSCAPE,})
+            width = self.driver.execute_script("return document.body.scrollWidth")
+            height = self.driver.execute_script("return document.body.scrollHeight")
+
+            dpi = 96
+            paper_width = width / dpi
+            paper_height = height / dpi
+
+            #"landscape": self.LANDSCAPE
+            result = self.driver.execute_cdp_cmd("Page.printToPDF", {
+                "printBackground": self.PRINT_BACKGROUND,                                                     
+                "paperWidth": paper_width,
+                "paperHeight": paper_height,
+            })
 
             #save + output
             encoded_data = result['data']
@@ -639,19 +567,38 @@ class ActionExecutor:
         except Exception as e:
             self.logger.error(f"Unable to redirect: {e}")
                
-    def httpRequest(self): 
+    def clickElem(self): 
         try:
             self.ELEMENT.click()
-            if self.NEW_WINDOW:
-                WebDriverWait(self.driver, self.TIMEOUT).until(lambda d: len(d.window_handles) > len(self.window_stack))
-                new_tab = [h for h in self.driver.window_handles if h not in self.window_stack][0]
-                self.driver.switch_to.window(new_tab)
-                self.window_stack.append(new_tab)
+            # if self.NEW_WINDOW:
+            #     WebDriverWait(self.driver, self.TIMEOUT).until(lambda d: len(d.window_handles) > len(self.window_stack))
+            #     new_tab = [h for h in self.driver.window_handles if h not in self.window_stack][0]
+            #     self.driver.switch_to.window(new_tab)
+            #     self.window_stack.append(new_tab)
             self.logger.info(f"Clicking Element")
         except Exception as e:
             self.logger.error(f"Failed to Click Element: {str(e)}")
+        
+    def clickSave(self):
+        try:
+            scrape_content = []
+            self.logger.info(f"Clicking Element")
+            self.ELEMENT.click()
+            file_path,ext = ActionExecutorHelper._wait_for_download(self.OUTPUT_PATH, timeout=self.TIMEOUT)
+            if file_path:
+                with open(file_path, "rb") as f:
+                    encoded = base64.b64encode(f.read()).decode("utf-8")
+                scrape_content.append(self.__generate_resp_packet(name=f"{self.pdf_name}",header=os.path.basename(file_path),value=encoded,type=ext))
+                self.logger.save("Saved downloaded file in cache.")
+            else:
+                self.logger.warning("No valid downloaded file found within timeout. Empty cache")
+
+        except Exception as e:
+            self.logger.error(f"Failed to Click Element: {str(e)}")
+        
+        return scrape_content 
             
-    def clickElem(self):
+    def httpRequest(self):
         self.logger.info("Performing GET REQUEST for attached website.")
         file_url = self.URL
         file_type = self.export_format or "dat"
@@ -676,6 +623,7 @@ class ActionExecutor:
 
 
 
+#Internal Helper
 class ActionExecutorHelper:
     
     def __init__(self):
