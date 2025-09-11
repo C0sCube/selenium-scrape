@@ -6,5 +6,6 @@ history
 .history/
 
 paths.json
+paths.json5
 
 run.bat

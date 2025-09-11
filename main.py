@@ -14,9 +14,10 @@ from app.constants import CACHE_REP_DIR,LOG_DIR, CCH_DIR, PRS_DIR
 
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
 # bank_codes = PVT_BANK_CODES
-bank_codes = PUB_BANK_CODES
-bank_codes = ["PVB_1","PVB_2"]
-# Mailer().start_mail(PROGRAM_NAME,data=bank_codes)
+# bank_codes = PUB_BANK_CODES
+bank_codes = [f"PSB_{i}" for i in range(1,13)]+[f"PVB_{i}" for i in range(1,23)]
+# bank_codes = ["PVB_1","PVB_2"]
+Mailer().start_mail(PROGRAM_NAME,data=bank_codes)
 
 try:
     logger.notice("Starting Program.")
@@ -38,11 +39,11 @@ try:
     
 
     #doc report
-    # doc_path = os.path.join(CACHE_REP_DIR,"SAMPLE_DATA.docx")
-    # BankScraper.generate_cache_report(final_dict,output_path=doc_path)
-    # logger.save("Initial Cache Report Saved.")
+    doc_path = os.path.join(CACHE_REP_DIR,"SAMPLE_DATA.docx")
+    BankScraper.generate_cache_report(final_dict,output_path=doc_path)
+    logger.save("Initial Cache Report Saved.")
     
-    # Mailer().end_mail(PROGRAM_NAME,attachments=[doc_path])
+    Mailer().end_mail(PROGRAM_NAME,attachments=[doc_path])
     
 except KeyboardInterrupt:
     logger.warning("Process Interrupted by User!")
