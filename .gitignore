@@ -9,3 +9,6 @@ paths.json
 paths.json5
 
 run.bat
+
+.venv/
+venv/
