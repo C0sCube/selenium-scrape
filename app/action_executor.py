@@ -86,7 +86,10 @@ class ActionExecutor:
         self.BY = self.__get_by(_action_.get("by", "css"))
         self.VALUE = _action_.get("value")
         self.URL = _action_.get("url","https://tinyurl.com/nothing-borgir")
+        
+        #weblink header
         self.WEBLINKS = _action_.get("web_links",[])
+        self.WEBLINKS_HEADER = _action_.get("web_link_headers",[])
         
         #time
         self.DEFAULT_WAIT = _action_.get("default_wait", 2)
@@ -102,6 +105,8 @@ class ActionExecutor:
         self.pdf_name = _action_.get('pdf_name', 'webpage_pdf')
         self.export_format = _action_.get("export_format", None)  # default to Excel
         self.LOG_MESSAGE = _action_.get("log_message", "Log Msg For Action Not Attached.")
+        
+        self.CLEAN_TABLE = _action_.get("clean_table",True)
         
         #field
         self.ATTRIBUTE = _action_.get("attribute")
@@ -321,7 +326,7 @@ class ActionExecutor:
             self.logger.info(f"Table: {idx} has header:: {header}")
             
             raw_html = elem.get_attribute("outerHTML")
-            final_html = ActionExecutorHelper._clean_raw_table_html_(raw_html)
+            final_html = ActionExecutorHelper._clean_raw_table_html_(raw_html) if self.CLEAN_TABLE else raw_html
             
             cleaned_tables.append(final_html)
             scrape_content.append(self.__generate_resp_packet(name=f"{self.table_name}_{idx}",value=final_html,header=header,type="table_html"))
@@ -344,13 +349,13 @@ class ActionExecutor:
             cleaned_content.append(html_content)
             scrape_content.append(self.__generate_resp_packet(name=f"{self.html_name}_{idx}",value=html_content,header="HTML DOESNT HAVE HEADER",type="html"))
 
-        if self.FILE_SAVE:
-            for idx,content in enumerate(cleaned_content):
-                html_path = os.path.join(self.OUTPUT_PATH,f"html_content_{idx}.html")
-                with open(html_path,"w") as f:
-                    f.write(content)
+        # if self.FILE_SAVE:
+        #     for idx,content in enumerate(cleaned_content):
+        #         html_path = os.path.join(self.OUTPUT_PATH,f"html_content_{idx}.html")
+        #         with open(html_path,"w") as f:
+        #             f.write(content)
             
-            self.infp.warning(f"Saved Html Data.") 
+        #     self.logger.info(f"Saved Html Data.") 
 
         return scrape_content
     
@@ -434,6 +439,8 @@ class ActionExecutor:
         follow_ups = self.FOLLOW_UP_ACTIONS
         tablist_log = self.LOG_MESSAGE
         
+        weblink_headers = self.WEBLINKS_HEADER
+        
         for idx, url in enumerate(self.WEBLINKS):
             try:
                 self.driver.get(url)
@@ -449,6 +456,15 @@ class ActionExecutor:
                         continue
                     
                     step_content = result.get("response", [])
+                    if weblink_headers:
+                        web_link_header = weblink_headers[idx]
+                        for step in step_content:
+                            # pprint.pprint(step)
+                            if step.get("data_present"):
+                                titles = step.get("title",[])
+                                if titles:titles.append(web_link_header)
+                                else: titles = [web_link_header]
+                                step.update({"title":titles})
                     scrape_content.extend(step_content)
             
             except Exception as e:
