@@ -344,6 +344,14 @@ class ActionExecutor:
             cleaned_content.append(html_content)
             scrape_content.append(self.__generate_resp_packet(name=f"{self.html_name}_{idx}",value=html_content,header="HTML DOESNT HAVE HEADER",type="html"))
 
+        if self.FILE_SAVE:
+            for idx,content in enumerate(cleaned_content):
+                html_path = os.path.join(self.OUTPUT_PATH,f"html_content_{idx}.html")
+                with open(html_path,"w") as f:
+                    f.write(content)
+            
+            self.infp.warning(f"Saved Html Data.") 
+
         return scrape_content
     
     def tabList(self) -> list:
@@ -712,29 +720,81 @@ class ActionExecutorHelper:
                 break
         return list(reversed(texts)) if texts else ["No label found"]*n
 
+    # @staticmethod
+    # def _clean_raw_table_html_(rawr):
+    #     rawr = Helper.apply_sub(rawr, r'<th\b', '<td', ignore_case=True)
+    #     rawr = Helper.apply_sub(rawr, r'</th\b', '</td', ignore_case=True)
+        
+    #     #tbody
+    #     rawr = re.sub(r"<thead\b",r"<tbody",rawr, re.IGNORECASE)
+    #     rawr = re.sub(r"</thead\b",r"</tbody",rawr, re.IGNORECASE)
+        
+    #     #other tags
+    #     rawr = Helper.apply_sub(rawr, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>",ignore_case=True)
+    #     rawr = Helper.apply_sub(rawr,r'[*@\n\t]+', ignore_case=True)
+    #     rawr = Helper.apply_sub(rawr,r"<tr[^>]*>\s*(?:&nbsp;|\u00A0|\s)*</tr>", ignore_case=True)
+    #     rawr = Helper._normalize_whitespace(rawr)
+        
+    #     soup = BeautifulSoup(rawr, "html.parser")
+    #     ALLOWED = {"rowspan", "colspan"}
+    #     for tag in soup.find_all(True):
+    #         for attr in list(tag.attrs):
+    #             if attr not in ALLOWED:
+    #                 del tag.attrs[attr]
+    #     final_html = str(soup)
+    #     return final_html
     @staticmethod
     def _clean_raw_table_html_(rawr):
+        # Replace <th> with <td>
         rawr = Helper.apply_sub(rawr, r'<th\b', '<td', ignore_case=True)
         rawr = Helper.apply_sub(rawr, r'</th\b', '</td', ignore_case=True)
-        
-        #tbody
-        rawr = re.sub(r"<thead\b",r"<tbody",rawr, re.IGNORECASE)
-        rawr = re.sub(r"</thead\b",r"</tbody",rawr, re.IGNORECASE)
-        
-        #other tags
-        rawr = Helper.apply_sub(rawr, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>",ignore_case=True)
-        rawr = Helper.apply_sub(rawr,r'[*@\n\t]+', ignore_case=True)
-        rawr = Helper.apply_sub(rawr,r"<tr[^>]*>\s*(?:&nbsp;|\u00A0|\s)*</tr>", ignore_case=True)
+
+        # Replace <thead> with <tbody>
+        rawr = re.sub(r"<thead\b", r"<tbody", rawr, re.IGNORECASE)
+        rawr = re.sub(r"</thead\b", r"</tbody", rawr, re.IGNORECASE)
+
+        # Remove unwanted tags and characters
+        rawr = Helper.apply_sub(rawr, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>", ignore_case=True)
+        rawr = Helper.apply_sub(rawr, r'[*@\n\t]+', ignore_case=True)
+        rawr = Helper.apply_sub(rawr, r"<tr[^>]*>\s*(?:&nbsp;|\u00A0|\s)*</tr>", ignore_case=True)
         rawr = Helper._normalize_whitespace(rawr)
-        
+
+        # Parse and clean with BeautifulSoup
         soup = BeautifulSoup(rawr, "html.parser")
-        ALLOWED = {"rowspan", "colspan"}
+        ALLOWED = {"rowspan", "colspan", "href"}  # Preserve href for <a> tags
+
+        # for tag in soup.find_all(True):
+        #     for attr in list(tag.attrs):
+        #         if tag.name == "a" and attr == "href":
+        #             continue  # Keep href on <a> tags
+        #         if attr not in ALLOWED:
+        #             del tag.attrs[attr]
         for tag in soup.find_all(True):
+            # Fix <a> tags with javascript:void(0)
+            if tag.name == "a":
+                href_val = tag.get("href", "")
+                onclick_val = tag.get("onclick", "")
+                
+                # Extract URL from onclick if href is void
+                if href_val.startswith("javascript:void") and "newwindow1" in onclick_val:
+                    match = re.search(r"newwindow1\(['\"](.*?)['\"]\)", onclick_val)
+                    if match:
+                        real_url = match.group(1)
+                        tag["href"] = real_url
+                        tag["target"] = "_blank"  # Optional: open in new tab
+                        tag["rel"] = "noopener noreferrer"
+                    del tag["onclick"]  # Clean up the onclick
+
+            # Strip unwanted attributes
             for attr in list(tag.attrs):
-                if attr not in ALLOWED:
+                if tag.name == "a" and attr in {"href", "target", "rel"}:
+                    continue
+                if attr not in {"rowspan", "colspan"}:
                     del tag.attrs[attr]
+
         final_html = str(soup)
         return final_html
+
     
     @staticmethod
     def _determine_file_type(url):
