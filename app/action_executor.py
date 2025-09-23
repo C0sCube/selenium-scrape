@@ -457,9 +457,6 @@ class ActionExecutor:
         if self.WEBLINKS_HEADER:
             weblink_headers = self.WEBLINKS_HEADER.split("||")
         
-        
-    
-        
         for idx, url in enumerate(weblinks):
             try:
                 self.driver.get(url)
@@ -665,7 +662,9 @@ class ActionExecutor:
         try:
             scrape_content = []
             self.logger.info(f"Clicking Element")
-            self.ELEMENT.click()
+            # self.ELEMENT.click()
+            self.driver.execute_script("arguments[0].click();", self.ELEMENT)
+            
             file_path,ext = ActionExecutorHelper._wait_for_download(self.OUTPUT_PATH, timeout=self.TIMEOUT)
             if file_path:
                 with open(file_path, "rb") as f:
@@ -784,6 +783,7 @@ class ActionExecutorHelper:
         if ".pdf" in url: return "pdf"
         if url.endswith(".csv"): return "csv"
         if url.endswith(".docx"): return "docx"
+        if url.endswith(".xlsx"): return "xlsx"
         return None
     
     @staticmethod

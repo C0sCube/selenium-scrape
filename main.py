@@ -14,7 +14,7 @@ from app.IbbiHelper import IbbiHelper
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
-bank_codes = ["INC_10"]
+bank_codes = ["BMEX"]
 
 try:
     logger.notice("Starting Program.")

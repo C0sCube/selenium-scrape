@@ -526,7 +526,23 @@ class OperationExecutor:
                 df = pd.read_html(StringIO(raw_content))[0]
                 result["content"].append({"type": "table", "table": df})
                 result["tables"].append(df)
+            
+            elif content_type == "xlsx":
+                xlsx_bytes = base64.b64decode(raw_content)
+                xlsx_stream = BytesIO(xlsx_bytes)
 
+                # Read all sheets
+                sheets = pd.read_excel(xlsx_stream, sheet_name=None)
+
+                for sheet_name, df in sheets.items():
+                    result["content"].append({
+                        "type": "table",
+                        "sheet": sheet_name,
+                        "table": df
+                    })
+                    result["tables"].append(df)
+
+                result["raw_text"] = f"[XLSX with {len(sheets)} sheet(s) parsed]"
             else:
                 result["content"].append({"type": "text", "text": f"[Unsupported Datatype: {content_type}]"})
 
@@ -615,7 +631,36 @@ class OperationExecutor:
                                             row_cells[i].text = cell.text.strip()
                                     document.add_paragraph("")
                                     document.add_paragraph("")             
-                    document.add_paragraph("")
+                    
+                        elif item["type"] == "xlsx":
+                            # Decode the base64 string to bytes
+                            xlsx_bytes = base64.b64decode(item["value"])
+                            xlsx_stream = BytesIO(xlsx_bytes)
+
+                            # Read all sheets
+                            sheets = pd.read_excel(xlsx_stream, sheet_name=None)
+
+                            for sheet_name, df in sheets.items():
+                                document.add_paragraph(f"SHEET: {sheet_name}")
+
+                                if df.empty:
+                                    document.add_paragraph("[Empty sheet]")
+                                    continue
+
+                                table = document.add_table(rows=1, cols=len(df.columns))
+                                table.style = 'Table Grid'
+
+                                # Header row
+                                for i, col in enumerate(df.columns):
+                                    table.cell(0, i).text = str(col)
+
+                                # Data rows
+                                for _, row in df.iterrows():
+                                    row_cells = table.add_row().cells
+                                    for i, val in enumerate(row):
+                                        row_cells[i].text = "" if pd.isna(val) else str(val)
+
+                                document.add_paragraph("")  # spacing
 
             document.add_page_break()
 
