@@ -1,4 +1,5 @@
 import os, warnings,time, ssl, traceback
+from datetime import datetime
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # TensorFlow-specific-selenium
 warnings.filterwarnings('ignore')
 ssl._create_default_https_context = ssl._create_stdlib_context
@@ -6,18 +7,14 @@ ssl._create_default_https_context = ssl._create_stdlib_context
 from app.utils import Helper
 from app.program_logger import get_forever_logger
 from app.BankScraper import BankScraper
-from app.mailer import Mailer
-from app.constants import CONFIG, PATHS, PROGRAM_NAME
-from app.constants import ALL_BANK_CODES,PVT_BANK_CODES,PUB_BANK_CODES
+from app.constants import CONFIG, PATHS
 from app.constants import CACHE_REP_DIR,LOG_DIR, CCH_DIR, PRS_DIR
 
+from app.IbbiHelper import IbbiHelper
 
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
-# bank_codes = PVT_BANK_CODES
-# bank_codes = PUB_BANK_CODES
-# bank_codes = [f"PSB_{i}" for i in range(1,13)]+[f"PVB_{i}" for i in range(1,23)]
 bank_codes = ["INC_10"]
-# Mailer().start_mail(PROGRAM_NAME,data=bank_codes)
 
 try:
     logger.notice("Starting Program.")
@@ -39,11 +36,10 @@ try:
     
 
     #doc report
-    doc_path = os.path.join(CACHE_REP_DIR,"SAMPLE_DATA.docx")
-    BankScraper.generate_cache_report(final_dict,output_path=doc_path)
+    doc_path = os.path.join(CACHE_REP_DIR,f"IBBI_{timestamp}_DATA.xlsx")
+    IbbiHelper.cache_to_excel_report(final_dict,format_="data",excel_out=doc_path)
     logger.save("Initial Cache Report Saved.")
     
-    # Mailer().end_mail(PROGRAM_NAME,attachments=[doc_path])
     
 except KeyboardInterrupt:
     logger.warning("Process Interrupted by User!")
@@ -57,7 +53,3 @@ finally:
     Helper.save_json(final_dict, os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]),typ="json")
     logger.save("Saved Cached Data.")
     logger.notice("Ending Program.")
-    
-#post-scrape
-# proce_dict = BankScraper.post_scrape(final_dict, POST_SCRAPE_OPS, logger)
-# Helper.save_json(proce_dict,os.path.join(PROCESS_DIR, final_dict["metadata"]["pfname"]))

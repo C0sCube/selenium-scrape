@@ -6,14 +6,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium import webdriver 
 from bs4 import BeautifulSoup
-from datetime import datetime
-from io import StringIO
+from datetime import datetime, date
+from urllib.parse import urlencode
+# from io import StringIO
 from urllib.parse import urljoin, urlparse
 
 import re, os, time, logging ,pprint, requests, base64, traceback, random,hashlib
 import undetected_chromedriver as uc
 from app.utils import Helper
-from app.action_config import ActionConfig
+# from app.action_config import ActionConfig
 from app.constants import *
 
 class ActionExecutor:
@@ -88,7 +89,7 @@ class ActionExecutor:
         self.URL = _action_.get("url","https://tinyurl.com/nothing-borgir")
         
         #weblink header
-        self.WEBLINKS = _action_.get("web_links",[])
+        self.WEBLINKS = _action_.get("web_links",None)
         self.WEBLINKS_HEADER = _action_.get("web_link_headers",[])
         
         #time
@@ -439,9 +440,27 @@ class ActionExecutor:
         follow_ups = self.FOLLOW_UP_ACTIONS
         tablist_log = self.LOG_MESSAGE
         
-        weblink_headers = self.WEBLINKS_HEADER
+        if not self.WEBLINKS:
+            self.logger.error(f"No urls attatched for weblist function to perform.")
+            return scrape_content
+
+        elif isinstance(self.WEBLINKS,list):
+            weblinks = self.WEBLINKS
         
-        for idx, url in enumerate(self.WEBLINKS):
+        elif isinstance(self.WEBLINKS,dict):
+            base_url = self.WEBLINKS["base_url"]
+            params = self.WEBLINKS["params"]
+            weblinks = ActionExecutorHelper.build_multiple_urls(base_url,params)
+        
+        
+        weblink_headers = []
+        if self.WEBLINKS_HEADER:
+            weblink_headers = self.WEBLINKS_HEADER.split("||")
+        
+        
+    
+        
+        for idx, url in enumerate(weblinks):
             try:
                 self.driver.get(url)
                 self.logger.notice(f"Redirecting to: {url}")
@@ -736,81 +755,29 @@ class ActionExecutorHelper:
                 break
         return list(reversed(texts)) if texts else ["No label found"]*n
 
-    # @staticmethod
-    # def _clean_raw_table_html_(rawr):
-    #     rawr = Helper.apply_sub(rawr, r'<th\b', '<td', ignore_case=True)
-    #     rawr = Helper.apply_sub(rawr, r'</th\b', '</td', ignore_case=True)
-        
-    #     #tbody
-    #     rawr = re.sub(r"<thead\b",r"<tbody",rawr, re.IGNORECASE)
-    #     rawr = re.sub(r"</thead\b",r"</tbody",rawr, re.IGNORECASE)
-        
-    #     #other tags
-    #     rawr = Helper.apply_sub(rawr, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>",ignore_case=True)
-    #     rawr = Helper.apply_sub(rawr,r'[*@\n\t]+', ignore_case=True)
-    #     rawr = Helper.apply_sub(rawr,r"<tr[^>]*>\s*(?:&nbsp;|\u00A0|\s)*</tr>", ignore_case=True)
-    #     rawr = Helper._normalize_whitespace(rawr)
-        
-    #     soup = BeautifulSoup(rawr, "html.parser")
-    #     ALLOWED = {"rowspan", "colspan"}
-    #     for tag in soup.find_all(True):
-    #         for attr in list(tag.attrs):
-    #             if attr not in ALLOWED:
-    #                 del tag.attrs[attr]
-    #     final_html = str(soup)
-    #     return final_html
     @staticmethod
     def _clean_raw_table_html_(rawr):
-        # Replace <th> with <td>
         rawr = Helper.apply_sub(rawr, r'<th\b', '<td', ignore_case=True)
         rawr = Helper.apply_sub(rawr, r'</th\b', '</td', ignore_case=True)
-
-        # Replace <thead> with <tbody>
-        rawr = re.sub(r"<thead\b", r"<tbody", rawr, re.IGNORECASE)
-        rawr = re.sub(r"</thead\b", r"</tbody", rawr, re.IGNORECASE)
-
-        # Remove unwanted tags and characters
-        rawr = Helper.apply_sub(rawr, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>", ignore_case=True)
-        rawr = Helper.apply_sub(rawr, r'[*@\n\t]+', ignore_case=True)
-        rawr = Helper.apply_sub(rawr, r"<tr[^>]*>\s*(?:&nbsp;|\u00A0|\s)*</tr>", ignore_case=True)
+        
+        #tbody
+        rawr = re.sub(r"<thead\b",r"<tbody",rawr, re.IGNORECASE)
+        rawr = re.sub(r"</thead\b",r"</tbody",rawr, re.IGNORECASE)
+        
+        #other tags
+        rawr = Helper.apply_sub(rawr, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>",ignore_case=True)
+        rawr = Helper.apply_sub(rawr,r'[*@\n\t]+', ignore_case=True)
+        rawr = Helper.apply_sub(rawr,r"<tr[^>]*>\s*(?:&nbsp;|\u00A0|\s)*</tr>", ignore_case=True)
         rawr = Helper._normalize_whitespace(rawr)
-
-        # Parse and clean with BeautifulSoup
+        
         soup = BeautifulSoup(rawr, "html.parser")
-        ALLOWED = {"rowspan", "colspan", "href"}  # Preserve href for <a> tags
-
-        # for tag in soup.find_all(True):
-        #     for attr in list(tag.attrs):
-        #         if tag.name == "a" and attr == "href":
-        #             continue  # Keep href on <a> tags
-        #         if attr not in ALLOWED:
-        #             del tag.attrs[attr]
+        ALLOWED = {"rowspan", "colspan"}
         for tag in soup.find_all(True):
-            # Fix <a> tags with javascript:void(0)
-            if tag.name == "a":
-                href_val = tag.get("href", "")
-                onclick_val = tag.get("onclick", "")
-                
-                # Extract URL from onclick if href is void
-                if href_val.startswith("javascript:void") and "newwindow1" in onclick_val:
-                    match = re.search(r"newwindow1\(['\"](.*?)['\"]\)", onclick_val)
-                    if match:
-                        real_url = match.group(1)
-                        tag["href"] = real_url
-                        tag["target"] = "_blank"  # Optional: open in new tab
-                        tag["rel"] = "noopener noreferrer"
-                    del tag["onclick"]  # Clean up the onclick
-
-            # Strip unwanted attributes
             for attr in list(tag.attrs):
-                if tag.name == "a" and attr in {"href", "target", "rel"}:
-                    continue
-                if attr not in {"rowspan", "colspan"}:
+                if attr not in ALLOWED:
                     del tag.attrs[attr]
-
         final_html = str(soup)
         return final_html
-
     
     @staticmethod
     def _determine_file_type(url):
@@ -835,4 +802,33 @@ class ActionExecutorHelper:
             time.sleep(1)
 
         return None,None
+    
+    @staticmethod
+    def build_multiple_urls(base_url, params):
+        from itertools import product
+        urls = []
+        constant_params = {}
+        list_params = {}
+        
+        for key, value in params.items():
+            if key == "date":constant_params[key] = datetime.now().strftime(value)
+            elif isinstance(value, str):constant_params[key] = value
+            elif isinstance(value, list):list_params[key] = value
+
+        if not list_params:
+            query_string = urlencode(constant_params)
+            urls.append(f"{base_url}?{query_string}")
+            return urls
+
+        keys = list(list_params.keys())
+        values = list(list_params.values())
+        for combo in product(*values):
+            combo_dict = dict(zip(keys, combo))
+            full_params = {**constant_params, **combo_dict}
+            query_string = urlencode(full_params)
+            urls.append(f"{base_url}?{query_string}")
+        return urls
+
+
+
     
