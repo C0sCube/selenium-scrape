@@ -36,6 +36,8 @@
           "https://ibbi.gov.in//en/orders/ibbi",
           "https://ibbi.gov.in//en/orders/ipa-rvo",
           "https://ibbi.gov.in//en/orders/other-courts",
+          "https://ibbi.gov.in/en/orders/nclt",
+          "https://ibbi.gov.in/en/orders/nclt?page=2"
         ],
         steps: [
           {
