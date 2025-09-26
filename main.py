@@ -8,13 +8,13 @@ from app.utils import Helper
 from app.program_logger import get_forever_logger
 from app.BankScraper import BankScraper
 from app.constants import CONFIG, PATHS
-from app.constants import CACHE_REP_DIR,LOG_DIR, CCH_DIR, PRS_DIR
+from app.constants import CACHE_REP_DIR,LOG_DIR, CCH_DIR
 
 from app.IbbiHelper import IbbiHelper
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
-bank_codes = ["INC_10"]
+bank_codes = ["SUN_12"]
 
 try:
     logger.notice("Starting Program.")
@@ -36,8 +36,9 @@ try:
     
 
     #doc report
-    doc_path = os.path.join(CACHE_REP_DIR,f"IBBI_{timestamp}_DATA.xlsx")
-    IbbiHelper.cache_to_excel_report(final_dict,format_="data",excel_out=doc_path)
+    doc_path = os.path.join(CACHE_REP_DIR,f"IBBI_{timestamp}_DATA.docx")
+    # IbbiHelper.cache_to_excel_report(final_dict,format_="data",excel_out=doc_path)
+    BankScraper.generate_cache_report(final_dict, doc_path)
     logger.save("Initial Cache Report Saved.")
     
     
