@@ -8,13 +8,13 @@ from app.utils import Helper
 from app.program_logger import get_forever_logger
 from app.BankScraper import BankScraper
 from app.constants import CONFIG, PATHS
-from app.constants import CACHE_REP_DIR,LOG_DIR, CCH_DIR
+from app.constants import CACHE_REP_DIR,LOG_DIR, CCH_DIR, PUB_BANK_CODES
 
-from app.IbbiHelper import IbbiHelper
+
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 logger = get_forever_logger(name="scraper", log_dir=LOG_DIR)
-bank_codes = ["SUN_12"]
+bank_codes = PUB_BANK_CODES
 
 try:
     logger.notice("Starting Program.")
