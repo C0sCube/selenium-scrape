@@ -3,11 +3,12 @@ from app.operation_executor import OperationExecutor
 from selenium.common.exceptions import TimeoutException, InvalidSessionIdException
 import time, traceback, threading, pprint, hashlib
 from datetime import datetime
+from app.logger import get_active_logger
 
 class BankScraper:
-    def __init__(self, bank_params, logger, paths):
+    def __init__(self, bank_params, paths):
         self.bank_params = bank_params
-        self.logger = logger
+        self.logger = get_active_logger()
         self.paths = paths
         self.scrape_data = {
             "bank_name": bank_params["bank_name"],
@@ -15,9 +16,9 @@ class BankScraper:
             "base_url": bank_params["base_url"],
             "scraped_data": []
         }
-        self.executor = ActionExecutor(logger, bank_params, paths) # not inherit, call here!!
+        self.executor = ActionExecutor(bank_params, paths) # not inherit, call here!!
         
-        self.operator = OperationExecutor(logger)
+        self.operator = OperationExecutor()
 
     @staticmethod
     def get_final_struct():
