@@ -1,4 +1,10 @@
 {
+    "scripts": {
+        "disable_anim": "const style=document.createElement('style');style.innerHTML='*{animation:none!important;transition:none!important;}';document.head.appendChild(style);",
+        "remove_modals": "document.querySelectorAll('.modal,.overlay').forEach(e=>e.remove());",
+        "highlight_clicked": "arguments[0].style.outline='3px solid red';",
+        "force_clickable": "document.querySelectorAll('*').forEach(e=>{e.style.pointerEvents='auto';e.style.visibility='visible';e.style.opacity='1';e.style.transform='none';});"
+    },
     action_table: {
         action: "table",
         by: "css",
@@ -8,7 +14,7 @@
         skip_if_not_found: true,
         default_wait: 3,
         timeout: 20,
-        clean_table:true,
+        clean_table: true,
         log_message: "Save Html Table(s)",
     },
     action_unclean_table: {
@@ -20,7 +26,7 @@
         skip_if_not_found: true,
         default_wait: 3,
         timeout: 20,
-        clean_table:false,
+        clean_table: false,
         log_message: "Save Html Table(s)",
     },
     action_screenshot: {

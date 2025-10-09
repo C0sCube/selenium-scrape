@@ -13,14 +13,16 @@ from openpyxl.formatting.rule import FormulaRule
 from openpyxl.utils.dataframe import dataframe_to_rows  
 from openpyxl.formatting.rule import CellIsRule
 
+from app.logger import get_active_logger
+
 class OperationExecutor:
     
     
     cache_doc_name = ""
     
-    def __init__(self, logger = None):
+    def __init__(self, ):
         
-        self.logger = logger
+        self.logger = get_active_logger()
         self.procedures = {
             "ext_date": self.extract_date,
             "sha256": self._generate_hash_sha256,

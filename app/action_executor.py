@@ -1,5 +1,6 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver import ActionChains
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
@@ -14,12 +15,12 @@ from urllib.parse import urljoin, urlparse
 import re, os, time, logging ,pprint, requests, base64, traceback, random,hashlib
 import undetected_chromedriver as uc
 from app.utils import Helper
-# from app.action_config import ActionConfig
 from app.constants import *
+from app.logger import get_active_logger
 
 class ActionExecutor:
-    def __init__(self,logger=None, params=None, paths=None):
-        self.logger = logger or logging.getLogger(__name__)
+    def __init__(self, params=None, paths=None):
+        self.logger = get_active_logger() or logging.getLogger(__name__)
         self.PARAMS = params or {}
         self.PATHS = paths or {}
         self.data = {}
@@ -29,6 +30,7 @@ class ActionExecutor:
 
         self.driver = None
         self.window_stack = None
+        self.scripts = SCRIPTS
     
     def create_driver(self):
         options = Options()
@@ -130,6 +132,10 @@ class ActionExecutor:
         self.NEW_WINDOW = _action_.get("new_window", False)
         self.RETURN_TO_BASE = _action_.get("return_to_base", False)
         
+        #script
+        self.SCRIPT_KEY = _action_.get("script_key")
+        self.SCRIPT = _action_.get("script")
+        
         time.sleep(random.uniform(self.DEFAULT_WAIT/2, self.DEFAULT_WAIT))
         
         
@@ -180,6 +186,8 @@ class ActionExecutor:
             "weblist":self.webList,
             "http":self.httpRequest,
             "manual":self.manualAction,
+            "execute_script": self.injectScript
+
         }
 
         if not action_type:
@@ -202,7 +210,8 @@ class ActionExecutor:
             "name": By.NAME,
             "class": By.CLASS_NAME,
             "tag": By.TAG_NAME,
-            "txt":By.LINK_TEXT
+            "txt":By.LINK_TEXT,
+            "ptxt":By.PARTIAL_LINK_TEXT
         }
         return mapping.get(by_string.lower(), By.CSS_SELECTOR)
 
@@ -491,7 +500,6 @@ class ActionExecutor:
         self.FOLLOW_UP_ACTIONS = follow_ups
         return scrape_content
 
-    
     def downloadElem(self):
         
         elements = self.driver.find_elements(self.BY, self.VALUE) if self.MULTIPLE else [self.driver.find_element(self.BY, self.VALUE)]
@@ -510,6 +518,7 @@ class ActionExecutor:
 
                 file_url = urljoin(self.driver.current_url, file_url)
                 file_type = ActionExecutorHelper._determine_file_type(file_url)
+                self.logger.info(f"{file_url}")
 
                 if file_type:
                     try:
@@ -661,10 +670,37 @@ class ActionExecutor:
     def clickSave(self):
         try:
             scrape_content = []
-            self.logger.info(f"Clicking Element")
-            # self.ELEMENT.click()
-            self.driver.execute_script("arguments[0].click();", self.ELEMENT)
-            
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'center'});", self.ELEMENT)
+            time.sleep(0.5)
+
+            # --- Store current tab handles before click ---
+            initial_tabs = self.driver.window_handles
+
+            # --- Perform a true user-like click ---
+            actions = ActionChains(self.driver)
+            actions.move_to_element(self.ELEMENT).pause(0.3).click().perform()
+            self.logger.notice("Clicked element using ActionChains (real user gesture)")
+            time.sleep(2)
+
+            # --- Detect new tab ---
+            new_tabs = self.driver.window_handles
+            if len(new_tabs) > len(initial_tabs):
+                new_tab = list(set(new_tabs) - set(initial_tabs))[0]
+                self.driver.switch_to.window(new_tab)
+                self.logger.notice(f"Switched to new tab: {self.driver.current_url}")
+            else:
+                # --- Fallback: direct open if no new tab was created ---
+                pdf_url = self.ELEMENT.get_attribute("href")
+                self.logger.warning("No new tab opened — navigating directly to href instead.")
+                self.driver.get(pdf_url)
+                self.logger.notice(f"Navigated directly to: {pdf_url}")
+
+            # --- Force Chrome to download the PDF ---
+            current_url = self.driver.current_url
+            if current_url.lower().endswith(".pdf"):
+                self.logger.notice(f"Navigating directly to PDF URL: {current_url}")
+                self.driver.get(current_url)
+                
             file_path,ext = ActionExecutorHelper._wait_for_download(self.OUTPUT_PATH, timeout=self.TIMEOUT)
             if file_path:
                 with open(file_path, "rb") as f:
@@ -692,6 +728,41 @@ class ActionExecutor:
             self.logger.warning(f"Failed to perform http request: {str(e)}")
             
         return scrape_content
+    
+    def injectScript(self):
+        # scrape_content = []
+
+        script_key = self.SCRIPT_KEY
+        raw_script = self.SCRIPT
+
+        if script_key:
+            js = self.scripts.get(script_key)
+            if not js:
+                self.logger.warning(f"No predefined script found for key: {script_key}")
+                return []
+            self.logger.notice(f"Executing predefined script key: {script_key}")
+        elif raw_script:
+            js = raw_script
+            self.logger.notice("Executing custom inline JavaScript.")
+        else:
+            self.logger.warning("No 'script' or 'script_key' provided in action.")
+            return []
+
+        try:
+            result = self.driver.execute_script(js)
+            self.logger.save(f"Script executed successfully: {script_key or '[inline]'}")
+            # scrape_content.append({
+            #     "action": "execute_script",
+            #     "script_key": script_key or "inline_script",
+            #     "result": str(result) if result is not None else "null",
+            #     "data_present": True
+            # })
+        except Exception as e:
+            self.logger.error(f"Failed to execute script: {type(e).__name__} - {e}")
+
+        # return scrape_content
+
+    
     
     def execute_blocks(self, block: list):  
         block_data = []

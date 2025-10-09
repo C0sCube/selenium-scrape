@@ -1,1784 +1,1936 @@
 {
-  POST_SCRAPE_OPS: {
-    sha1: {
-      primary: [
-        ["normalize_df", "value", "norm_table", "table_html"],
-        ["sha1", "value", "SHA_ONE", "pdf"],
-      ],
-      secondary: [["sha1", "norm_table", "SHA_ONE"]],
-    },
-  },
-  INC_10: {
-    bank_name: "iBBi",
-    bank_type: "Other",
-    bank_type_code: "INC_10",
-    base_url: "https://ibbi.gov.in/en/orders/supreme-court",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "weblist",
-        by: "tag",
-        value: "body",
-        skip_if_not_found: true,
-        default_wait: 15,
-        timeout: 30,
-        log_message: "Performing webList.",
-        web_links: [
-          "https://ibbi.gov.in/en/orders",
-          "https://ibbi.gov.in/en/orders/supreme-court",
-          "https://ibbi.gov.in//en/orders/high-courts",
-          "https://ibbi.gov.in//en/orders/nclat",
-          "https://ibbi.gov.in//en/orders/drts",
-          "https://ibbi.gov.in//en/orders/drat",
-          "https://ibbi.gov.in//en/orders/ibbi",
-          "https://ibbi.gov.in//en/orders/ipa-rvo",
-          "https://ibbi.gov.in//en/orders/other-courts",
-          "https://ibbi.gov.in/en/orders/nclt",
-          "https://ibbi.gov.in/en/orders/nclt?page=2",
-        ],
-        steps: [
-          {
-            action: "table",
-            by: "css",
-            value: "table",
-            wait_until: "present",
-            multiple: true,
-            skip_if_not_found: true,
-            default_wait: 3,
-            timeout: 20,
-            clean_table: false,
-            log_message: "Save Html Table(s)",
-          },
-        ],
-      },
-      {
-        action: "weblist",
-        by: "tag",
-        value: "body",
-        skip_if_not_found: true,
-        default_wait: 10,
-        timeout: 20,
-        log_message: "Performing webList.",
-        web_links: {
-          base_url: "https://ibbi.gov.in/en/orders/nclt",
-          params: {
-            title: "",
-            date: "%Y-%m-%d",
-            nclt: [
-              25, 26, 27, 28, 45, 46, 29, 30, 49, 31, 32, 33, 47, 34, 35, 48,
-              36, 39, 37, 38, 40,
+    POST_SCRAPE_OPS: {
+        sha1: {
+            primary: [
+                [
+                    "normalize_df",
+                    "value",
+                    "norm_table",
+                    "table_html"
+                ],
+                [
+                    "sha1",
+                    "value",
+                    "SHA_ONE",
+                    "pdf"
+                ],
             ],
-          },
+            secondary: [
+                [
+                    "sha1",
+                    "norm_table",
+                    "SHA_ONE"
+                ]
+            ],
         },
-        web_link_headers: "Principal Bench, New Delhi||New Delhi Bench - II||New Delhi Bench - III||New Delhi Bench - IV||New Delhi Bench - V||New Delhi Bench - VI||Ahmedabad Bench||Allahabad Bench||Amravati Bench||Bengaluru Bench||Chandigarh Bench||Chennai Bench||Cuttack Bench||Guwahati Bench||Hyderabad Bench||Indore Bench||Jaipur Bench||Kochi Bench||Kolkata Bench||Mumbai Bench||Others",
-        steps: [
-          {
-            action: "table",
-            by: "css",
-            value: "table",
-            wait_until: "present",
-            multiple: true,
-            skip_if_not_found: true,
-            default_wait: 3,
-            timeout: 20,
-            clean_table: false,
-            log_message: "Save Html Table(s)",
-          },
+    },
+    PSB_1: {
+        bank_name: "Bank of Baroda",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_1",
+        base_url: "https://www.bankofbaroda.in/interest-rate-and-service-charges/deposits-interest-rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table",
+            {
+                action: "website",
+                by: "tag",
+                value: "body",
+                url: "https://www.bankofbaroda.in/interest-rate-and-service-charges/retail-loans-interest-rates",
+                default_wait: 5,
+                timeout: 20,
+            },
+            "action_table",
         ],
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  SUN_12: {
-    bank_name: "Bank of Baroda",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_1",
-    base_url: "https://www.sundarammutual.com/mutual-fund-commission-disclosure",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "weblist",
-        by: "tag",
-        value: "body",
-        skip_if_not_found: true,
-        default_wait: 10,
-        timeout: 20,
-        log_message: "Performing webList.",
-        web_links: [
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2024_2025.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2023_2024.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2022_2023_V1.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2021_2022.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2020_2021_V4.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2019-20_V3.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2018_2019_N.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2017_2018_new.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2016-2017.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2015-2016.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2014-2015.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2013-2014.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_12_13_page.htm",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2011_12.html",
-          "https://www.sundarammutual.com/pdf2/Distributor_communication/discomm_2010.htm",
+        intial_window_size: [
+            900,
+            700
         ],
-        steps: [
-          {
-            action: "table",
-            by: "tag",
-            value: "table",
-            multiple: true,
-            wait_until: "present",
-            consolidate_save: true,
-            export_format: "html",
-            skip_if_not_found: true,
-            default_wait: 10,
-            timeout: 20,
-          },
+    },
+    PSB_2: {
+        bank_name: "Bank of India",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_2",
+        base_url: "https://bankofindia.co.in/interest-rate/saving-bank-deposit-rate",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "table",
+                table_name: "BoI_TBLE",
+                by: "tag",
+                value: "table",
+                wait_until: "present",
+                multiple: true,
+                skip_if_not_found: true,
+                default_wait: 30,
+                timeout: 50,
+                log_message: "Save Html Tables.",
+            },
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://bankofindia.co.in/interest-rate/rupee-term-deposit-rate",
+                default_wait: 5,
+                timeout: 50,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://bankofindia.co.in/interest-rates-on-deposit",
+                default_wait: 5,
+                timeout: 50,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://bankofindia.co.in/interest-rate/interest-rate-mclr/2025",
+                default_wait: 5,
+                timeout: 50,
+            },
+            "action_table",
         ],
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PSB_1: {
-    bank_name: "Bank of Baroda",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_1",
-    base_url: "https://www.bankofbaroda.in/interest-rate-and-service-charges/deposits-interest-rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      "action_table",
-      {
-        action: "website",
-        by: "tag",
-        value: "body",
-        url: "https://www.bankofbaroda.in/interest-rate-and-service-charges/retail-loans-interest-rates",
-        default_wait: 5,
-        timeout: 20,
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PSB_2: {
-    bank_name: "Bank of India",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_2",
-    base_url: "https://bankofindia.co.in/interest-rate/saving-bank-deposit-rate",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "table",
-        table_name: "BoI_TBLE",
-        by: "tag",
-        value: "table",
-        wait_until: "present",
-        multiple: true,
-        skip_if_not_found: true,
-        default_wait: 30,
-        timeout: 50,
-        log_message: "Save Html Tables.",
-      },
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://bankofindia.co.in/interest-rate/rupee-term-deposit-rate",
-        default_wait: 5,
-        timeout: 50,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://bankofindia.co.in/interest-rates-on-deposit",
-        default_wait: 5,
-        timeout: 50,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://bankofindia.co.in/interest-rate/interest-rate-mclr/2025",
-        default_wait: 5,
-        timeout: 50,
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PSB_3: {
-    bank_name: "Bank of Maharashtra",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_3",
-    base_url: "https://bankofmaharashtra.in/domestic-term-deposits",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://bankofmaharashtra.in/fcnr-deposits",
-        default_wait: 5,
-        timeout: 30,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://bankofmaharashtra.in/nre-deposits",
-        default_wait: 5,
-        timeout: 30,
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PSB_4: {
-    bank_name: "Canara Bank",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_4",
-    base_url: "https://canarabank.com/pages/deposit-interest-rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: ["action_table"],
-    intial_window_size: [900, 700],
-  },
-  PSB_5: {
-    bank_name: "Central Bank of India",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_5",
-    base_url: "https://www.centralbankofindia.co.in/en/interest-rates-on-deposit",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: ["action_table"],
-    intial_window_size: [900, 700],
-  },
-  PSB_6: {
-    bank_name: "Indian Bank",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_6",
-    base_url: "https://www.indianbank.in/departments/deposit-rates/",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "table",
-        table_name: "Indian_Bank",
-        by: "tag",
-        value: "table",
-        multiple: true,
-        wait_until: "present",
-        skip_if_not_found: true,
-        default_wait: 30,
-        timeout: 20,
-        log_message: "Save Html Tables.",
-      },
-      {
-        action: "click",
-        by: "xpath",
-        value: "//a[contains(normalize-space(.), 'Bulk Deposits Rates')]",
-        // url: "https://www.indianbank.in/departments/interest-rates-for-deposits-of-above-rs-5-00crore/",
-        wait_until: "clickable",
-        skip_if_not_found: true,
-        default_wait: 5,
-        timeout: 20,
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PSB_7: {
-    bank_name: "Indian Overseas Bank",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_7",
-    base_url: "https://www.iob.in/Domestic_Rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: ["action_table"],
-    intial_window_size: [900, 700],
-  },
-  PSB_8: {
-    bank_name: "Punjab and Sind Bank",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_8",
-    base_url: "https://punjabandsindbank.co.in//content/interestdom",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "table",
-        table_name: "P&SB",
-        by: "tag",
-        value: "table",
-        multiple: true,
-        skip_if_not_found: true,
-        default_wait: 35,
-        timeout: 60,
-        log_message: "Save Html Tables.",
-      },
-      {
-        action: "website",
-        by: "css",
-        value: "h5 a",
-        url: "https://punjabandsind.bank.in/module/bulk-deposit-rates",
-        wait_until: "present",
-        default_wait: 20,
-        timeout: 60,
-        log_message: "Bulk 3cr pdf",
-      },
-      {
-        action: "manual",
-        by: "css",
-        value: "body",
-        default_wait: 5,
-        timeout: 60,
-        log_message: "Manual Download PDF",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PSB_9: {
-    bank_name: "Punjab National Bank",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_9",
-    base_url: "https://www.pnbindia.in/Interest-Rates-Deposit.html",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: ["action_table"],
-    intial_window_size: [900, 700],
-  },
-  PSB_10: {
-    bank_name: "State Bank of India",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_10",
-    base_url: "https://sbi.co.in/web/interest-rates/interest-rates/deposit-rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://sbi.co.in/web/interest-rates/savings-bank-deposits",
-        default_wait: 2,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://sbi.co.in/web/interest-rates/deposit-rates/retail-domestic-term-deposits",
-        default_wait: 2,
-        timeout: 20,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://sbi.co.in/web/interest-rates/deposit-rates/domestic-bulk-term-deposits",
-        default_wait: 2,
-        timeout: 20,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://sbi.co.in/web/interest-rates/interest-rates/mclr",
-        default_wait: 3,
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PSB_11: {
-    bank_name: "Uco Bank",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_11",
-    base_url: "https://ucobank.com/interest-rates-on-deposit-schemes",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: ["action_table"],
-    intial_window_size: [900, 700],
-  },
-  PSB_12: {
-    bank_name: "Union Bank of India",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_12",
-    base_url: "https://www.unionbankofindia.co.in/en/details/rate-of-interest",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "table",
-        table_name: "Union_Bank",
-        by: "tag",
-        value: "table",
-        wait_until: "visible",
-        multiple: true,
-        skip_if_not_found: true,
-        default_wait: 30,
-        timeout: 90,
-        log_message: "Save Html Tables.",
-      },
-      {
-        action: "click_save",
-        by: "css",
-        value: ".ancr-tg",
-        skip_if_not_found: true,
-        wait_until: "present",
-        default_wait: 3,
-        timeout: 15,
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PSB_13: {
-    bank_name: "NSE Equity India",
-    bank_type: "PUBLIC SECTOR BANKS",
-    bank_type_code: "PSB_13",
-    base_url: "https://www.nseindia.com/market-data/equity-derivatives-watch",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      [
-        {
-          action: "table",
-          table_name: "equity",
-          by: "css",
-          value: "#eqderivativesTable",
-          wait_until: "present",
-          multiple: true,
-          export_format: false,
-          consolidate_save: false,
-          skip_if_not_found: true,
-          default_wait: 10,
-          timeout: 30,
-          log_message: "Save Html Tables.",
-        },
-      ],
-      [
-        {
-          action: "click",
-          by: "css",
-          value: "#market-lakh",
-          wait_until: "clickable",
-          default_wait: 10,
-          timeout: 20,
-          log_message: "Click to Lakhs Equity",
-        },
-        {
-          action: "table",
-          table_name: "equity",
-          by: "css",
-          value: "#eqderivativesTable",
-          wait_until: "present",
-          multiple: true,
-          export_format: false,
-          consolidate_save: false,
-          skip_if_not_found: true,
-          default_wait: 10,
-          timeout: 30,
-          log_message: "Save Html Tables.",
-        },
-      ],
-      [
-        {
-          action: "click",
-          by: "css",
-          value: "#market-billion",
-          wait_until: "clickable",
-          default_wait: 5,
-          timeout: 20,
-          log_message: "Click to Billions Equity",
-        },
-        {
-          action: "table",
-          table_name: "equity",
-          by: "css",
-          value: "#eqderivativesTable",
-          wait_until: "present",
-          multiple: true,
-          export_format: false,
-          consolidate_save: false,
-          skip_if_not_found: true,
-          default_wait: 10,
-          timeout: 30,
-          log_message: "Save Html Tables.",
-        },
-        {
-          action: "screenshot",
-          by: "css",
-          value: "div.main",
-          wait_until: "visible",
-          skip_if_not_found: true,
-          timeout: 20,
-          log_message: "Screen Shotted the Web Page.",
-        },
-      ],
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_1: {
-    bank_name: "Axis Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_1",
-    base_url: "https://www.axisbank.com/fixed-deposit-interest-rate",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "download",
-        by: "css",
-        value: "a.FDlink.pdf-data",
-        multiple: true,
-        wait_until: "clickable",
-        default_wait: 5,
-        timeout: 20,
-        file_save: true,
-        log_message: "Axis Bank",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_2: {
-    bank_name: "Bandhan Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_2",
-    base_url: "https://www.bandhanbank.com/rates-charges",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: ["action_table"],
-    intial_window_size: [900, 700],
-  },
-  PVB_3: {
-    bank_name: "CSB Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_3",
-    base_url: "https://www.csb.co.in/interest-rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "table",
-        table_name: "CSB",
-        by: "css",
-        value: "#block-system-main table",
-        wait_until: "present",
-        multiple: true,
-        skip_if_not_found: true,
-        default_wait: 10,
-        timeout: 30,
-        log_message: "Scrape + Save Tables.",
-      },
-      {
-        action: "download",
-        by: "css",
-        value: "#tab1 a",
-        multiple: true,
-        wait_until: "present",
-        default_wait: 5,
-        timeout: 20,
-        log_message: "Csb Pdf",
-      },
-      {
-        action: "download",
-        by: "css",
-        value: "#tab2 a",
-        multiple: true,
-        wait_until: "present",
-        default_wait: 5,
-        timeout: 20,
-        log_message: "Csb Pdf",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_4: {
-    bank_name: "City Union Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_4",
-    base_url: "https://cityunionbank.com/deposit-interest-rate",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: ["action_table"],
-    intial_window_size: [900, 700],
-  },
-  PVB_5: {
-    bank_name: "DCB Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_5",
-    base_url: "https://www.dcbbank.com/rates/savings-account-interest-rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.dcbbank.com/rates/fixed-deposit-interest-rate",
-        default_wait: 5,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.dcbbank.com/rates/nri-interest-rates",
-        default_wait: 5,
-      },
-      {
-        action: "tablist",
-        by: "css",
-        value: ".DepositRates_side-tab-nav__lcJdj button",
-        skip_if_not_found: true,
-        wait_until: "visible",
-        default_wait: 5,
-        timeout: 20,
-        log_message: "Performing Tab Click.",
-        steps: [
-          {
-            action: "table",
-            by: "tag",
-            value: "table",
-            multiple: true,
-            wait_until: "present",
-            consolidate_save: true,
-            export_format: "html",
-            skip_if_not_found: true,
-            default_wait: 5,
-            timeout: 20,
-          },
+        intial_window_size: [
+            900,
+            700
         ],
-      },
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.dcbbank.com/rates/lending-rates",
-        default_wait: 5,
-      },
-      {
-        action: "tablist",
-        by: "css",
-        value: ".DepositRates_side-tab-nav__lcJdj button",
-        skip_if_not_found: true,
-        default_wait: 5,
-        timeout: 20,
-        log_message: "Performing Tab Click.",
-        steps: [
-          {
-            action: "table",
-            by: "tag",
-            value: "table",
-            multiple: true,
-            wait_until: "present",
-            consolidate_save: true,
-            export_format: "html",
-            skip_if_not_found: true,
-            default_wait: 5,
-            timeout: 20,
-          },
+    },
+    PSB_3: {
+        bank_name: "Bank of Maharashtra",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_3",
+        base_url: "https://bankofmaharashtra.in/domestic-term-deposits",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://bankofmaharashtra.in/fcnr-deposits",
+                default_wait: 5,
+                timeout: 30,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://bankofmaharashtra.in/nre-deposits",
+                default_wait: 5,
+                timeout: 30,
+            },
+            "action_table",
         ],
-      },
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.dcbbank.com/rates/benchmark-lending-rates",
-        default_wait: 5,
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_6: {
-    bank_name: "Dhanlaxmi Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_6",
-    base_url: "https://www.dhanbank.com/interest-rates/",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: ["action_table"],
-    intial_window_size: [900, 700],
-  },
-  PVB_7: {
-    bank_name: "Federal Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB",
-    base_url: "https://www.federalbank.co.in/deposit-rate",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      "action_table",
-      {
-        action: "download",
-        by: "css",
-        value: "tr td a",
-        multiple: true,
-        wait_until: "present",
-        default_wait: 5,
-        timeout: 20,
-        log_message: "Axis Bank",
-      },
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.federalbank.co.in/nre-fixed-deposits",
-        wait: 5,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.federalbank.co.in/loan-rate",
-        wait: 8,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.federalbank.co.in/fcnr-b-deposits",
-        wait: 5,
-      },
-      {
-        action: "download",
-        by: "css",
-        value: "tr td a",
-        multiple: true,
-        wait_until: "present",
-        default_wait: 5,
-        timeout: 20,
-        log_message: "Axis Bank",
-      },
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.federalbank.co.in/rfc-deposits",
-        wait: 5,
-      },
-      {
-        action: "download",
-        by: "css",
-        value: "tr td a",
-        multiple: true,
-        wait_until: "present",
-        default_wait: 5,
-        timeout: 20,
-        log_message: "Axis Bank",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_8: {
-    bank_name: "HDFC Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_8",
-    base_url: "https://www.hdfcbank.com/personal/resources/rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "table",
-        table_name: "HDFC",
-        by: "tag",
-        value: "table",
-        wait_until: "present",
-        multiple: true,
-        skip_if_not_found: true,
-        default_wait: 10,
-        timeout: 30,
-        log_message: "Save Html Tables.",
-      },
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.hdfcbank.com/personal/resources/interest-rates-for-5-cr-and-above",
-        wait_until: "present",
-        default_wait: 10,
-        timeout: 20,
-        log_message: "HDFC PDF.",
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.hdfcbank.com/personal/resources/non-withdrawable-interest-rates-for-2-cr-above",
-        wait_until: "present",
-        default_wait: 10,
-        timeout: 20,
-        log_message: "HDFC PDF.",
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_9: {
-    bank_name: "ICICI Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_9",
-    base_url: "https://www.icicibank.com/personal-banking/deposits/fixed-deposit/fd-interest-rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
-    blocks: [
-      {
-        action: "tablist",
-        by: "css",
-        value: ".tabs-list button",
-        skip_if_not_found: true,
-        default_wait: 15,
-        timeout: 20,
-        log_message: "Performing Tab Click.",
-        steps: [
-          {
-            action: "table",
-            by: "tag",
-            value: "table",
-            multiple: true,
-            wait_until: "present",
-            skip_if_not_found: true,
-            default_wait: 10,
-            timeout: 20,
-          },
-          {
-            action: "html",
-            by: "css",
-            value: "h2+ h2 .h5",
-            wait_until: "present",
-            skip_if_not_found: true,
-            default_wait: 10,
-            timeout: 30,
-            log_message: "Save Html.",
-          },
+        intial_window_size: [
+            900,
+            700
         ],
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_10: {
-    bank_name: "IDBI Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_10",
-    base_url: "https://www.idbibank.in/interest-rates.aspx",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
     },
-    blocks: [
-      "action_table",
-      {
-        action: "website",
-        by: "css",
-        value: "body",
-        url: "https://www.idbi.bank.in/nri-interest-rates.aspx",
-        default_wait: 5,
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_11: {
-    bank_name: "IDFC First Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_11",
-    base_url: "https://www.idfcfirstbank.com/interest-rate",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PSB_4: {
+        bank_name: "Canara Bank",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_4",
+        base_url: "https://canarabank.com/pages/deposit-interest-rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table"
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: [
-      {
-        action: "download",
-        by: "css",
-        value: ".gresg-polici-main a",
-        multiple: true,
-        wait_until: "present",
-        default_wait: 5,
-        timeout: 20,
-        log_message: "IDFC First Bank",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_12: {
-    bank_name: "IndusInd Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_12",
-    base_url: "https://www.indusind.bank.in/in/en/personal/rates.html",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PSB_5: {
+        bank_name: "Central Bank of India",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_5",
+        base_url: "https://www.centralbankofindia.co.in/en/interest-rates-on-deposit",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table"
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: [
-      "action_table",
-      {
-        action: "download",
-        by: "css",
-        value: "#callable p a",
-        multiple: true,
-        wait_until: "present",
-        default_wait: 7,
-        timeout: 30,
-        file_save: true,
-        log_message: "Downloaded Pdf",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_13: {
-    bank_name: "Jammu and Kashmir Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_13",
-    base_url: "https://www.jkbank.com/interest-rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PSB_6: {
+        bank_name: "Indian Bank",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_6",
+        base_url: "https://indianbank.bank.in/departments/deposit-rates/",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "table",
+                table_name: "Indian_Bank",
+                by: "tag",
+                value: "table",
+                multiple: true,
+                wait_until: "present",
+                skip_if_not_found: true,
+                default_wait: 30,
+                timeout: 20,
+                log_message: "Save Html Tables.",
+            },
+            {
+                action: "execute_script",
+                by:"tag",
+                value:"body",
+                script_key: "force_clickable",
+            },
+            {
+                action: "click",
+                by: "xpath",
+                value: "//a[contains(normalize-space(.), 'Bulk Deposits Rates')]",
+                wait_until: "clickable",
+                skip_if_not_found: true,
+                default_wait: 5,
+                timeout: 20,
+            },
+            "action_table",
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: [
-      {
-        action: "table",
-        by: "tag",
-        value: "table",
-        multiple: true,
-        wait_until: "present",
-        consolidate_save: true,
-        skip_if_not_found: true,
-        default_wait: 10,
-        timeout: 20,
-      },
-      {
-        action: "http",
-        by: "css",
-        value: "body",
-        url: "https://eapp.jkbank.com/eintraweb/domestic-rates",
-        export_format: "pdf",
-        skip_if_not_found: true,
-        default_wait: 2,
-        timeout: 10,
-        log_message: "J&K Bulk Pdf",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_14: {
-    bank_name: "Karnataka Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_14",
-    base_url: "https://karnatakabank.com/deposit-interest-rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PSB_7: {
+        bank_name: "Indian Overseas Bank",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_7",
+        base_url: "https://www.iob.in/Domestic_Rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table"
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: [
-      {
-        action: "download",
-        by: "css",
-        value: "p a",
-        multiple: true,
-        wait_until: "visible",
-        default_wait: 7,
-        timeout: 30,
-        file_save: true,
-        log_message: "Downlaoded Karnataka Bank Pdf",
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_15: {
-    bank_name: "Karur Vysya Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_15",
-    base_url: "https://www.kvb.co.in/interest-rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PSB_8: {
+        bank_name: "Punjab and Sind Bank",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_8",
+        base_url: "https://punjabandsind.bank.in//content/interestdom",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "table",
+                table_name: "P&SB",
+                by: "tag",
+                value: "table",
+                multiple: true,
+                skip_if_not_found: true,
+                default_wait: 20,
+                timeout: 45,
+                log_message: "Save Html Tables.",
+            },
+            {
+                action: "website",
+                by: "css",
+                value: "h5 a",
+                url: "https://punjabandsind.bank.in/module/bulk-deposit-rates",
+                wait_until: "present",
+                default_wait: 20,
+                timeout: 60,
+                log_message: "Bulk 3cr pdf",
+            },
+            {
+                action: "download",
+                by: "xpath",
+                value: "//a[contains(@href, 'bulk_deposit_rate') and contains(@href, '.pdf')]",
+                multiple: false,
+                wait_until: "present",
+                default_wait: 5,
+                timeout: 20,
+                log_message: "punjab and sind",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: [
-      {
-        action: "website",
-        by: "tag",
-        value: "body",
-        url: "https://www.kvb.co.in/interest-rates/resident-nro-deposits/",
-        wait: 5,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "tag",
-        value: "body",
-        url: "https://www.kvb.co.in/interest-rates/mclr-interest-rate/",
-        default_wait: 5,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "tag",
-        value: "body",
-        url: "https://www.kvb.co.in/interest-rates/bulk-term-deposit-rates/",
-        default_wait: 5,
-      },
-      "action_table",
-      {
-        action: "website",
-        by: "tag",
-        value: "body",
-        url: "https://www.kvb.co.in/interest-rates/fcnr-rfc-deposit-rates/",
-        default_wait: 5,
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_16: {
-    bank_name: "Kotak Mahindra Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_16",
-    base_url: "https://www.kotak.com/en/rates/interest-rates.html",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PSB_9: {
+        bank_name: "Punjab National Bank",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_9",
+        base_url: "https://www.pnbindia.in/Interest-Rates-Deposit.html",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table"
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: [
-      "action_table",
-      {
-        action: "website",
-        by: "tag",
-        value: "body",
-        url: "https://www.kotak.com/en/rates/mclr-rate.html",
-        wait: 5,
-      },
-      "action_table",
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_18: {
-    bank_name: "The Nainital Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_18",
-    base_url: "https://www.nainitalbank.co.in/english/interest_rate.aspx",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PSB_10: {
+        bank_name: "State Bank of India",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_10",
+        base_url: "https://sbi.co.in/web/interest-rates/interest-rates/deposit-rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://sbi.co.in/web/interest-rates/savings-bank-deposits",
+                default_wait: 2,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://sbi.co.in/web/interest-rates/deposit-rates/retail-domestic-term-deposits",
+                default_wait: 2,
+                timeout: 20,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://sbi.co.in/web/interest-rates/deposit-rates/domestic-bulk-term-deposits",
+                default_wait: 2,
+                timeout: 20,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://sbi.co.in/web/interest-rates/interest-rates/mclr",
+                default_wait: 3,
+            },
+            "action_table",
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: [
-      {
-        action: "table",
-        table_name: "NAIN",
-        by: "tag",
-        value: "table",
-        wait_until: "present",
-        multiple: true,
-        skip_if_not_found: true,
-        default_wait: 10,
-        timeout: 60,
-        log_message: "Save Html Tables.",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_19: {
-    bank_name: "South Indian Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_19",
-    base_url: "https://www.southindianbank.com/interestrate/interestratelist.aspx",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PSB_11: {
+        bank_name: "Uco Bank",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_11",
+        base_url: "https://ucobank.com/interest-rates-on-deposit-schemes",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table"
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: [
-      {
-        action: "table",
-        table_name: "SIB_TBL",
-        by: "tag",
-        value: "table",
-        wait_until: "present",
-        multiple: true,
-        skip_if_not_found: true,
-        default_wait: 4,
-        timeout: 10,
-        log_message: "Save Html Tables.",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_20: {
-    bank_name: "Tamilnad Mercantile Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_20",
-    base_url: "https://tmb.in/pages/Deposit-Interest-Rates",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PSB_12: {
+        bank_name: "Union Bank of India",
+        bank_type: "PUBLIC SECTOR BANKS",
+        bank_type_code: "PSB_12",
+        base_url: "https://www.unionbankofindia.co.in/en/details/rate-of-interest",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "table",
+                table_name: "Union_Bank",
+                by: "tag",
+                value: "table",
+                wait_until: "visible",
+                multiple: true,
+                skip_if_not_found: true,
+                default_wait: 20,
+                timeout: 60,
+                log_message: "Save Html Tables.",
+            },
+            {
+                action: "click_save",
+                by: "xpath",
+                value: "//a[contains(@class, 'ancr-tg') and contains(@href, '.pdf')]",
+                skip_if_not_found: true,
+                wait_until: "present",
+                default_wait: 3,
+                timeout: 15,
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: ["action_table"],
-    intial_window_size: [900, 700],
-  },
-  PVB_21: {
-    bank_name: "RBL Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_21",
-    base_url: "https://www.rblbank.com/interest-rates?tab=fixed-deposit",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PVB_1: {
+        bank_name: "Axis Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_1",
+        base_url: "https://www.axisbank.com/fixed-deposit-interest-rate",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "download",
+                by: "css",
+                value: "a.FDlink.pdf-data",
+                multiple: true,
+                wait_until: "clickable",
+                default_wait: 5,
+                timeout: 20,
+                file_save: true,
+                log_message: "Axis Bank",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: [
-      "action_table",
-      {
-        action: "download",
-        by: "css",
-        value: "strong a",
-        multiple: true,
-        wait_until: "present",
-        default_wait: 3,
-        timeout: 40,
-        log_message: "Axis Bank",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  PVB_22: {
-    bank_name: "YES Bank",
-    bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_22",
-    base_url: "https://www.yesbank.in/personal-banking/yes-individual/deposits/fixed-deposit",
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-      "Accept-Language": "en-US,en;q=0.9",
+    PVB_2: {
+        bank_name: "Bandhan Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_2",
+        base_url: "https://www.bandhanbank.com/rates-charges",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table"
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
     },
-    blocks: [
-      {
-        action: "table",
-        table_name: "YES",
-        by: "tag",
-        value: "table",
-        wait_until: "present",
-        multiple: true,
-        skip_if_not_found: true,
-        default_wait: 10,
-        timeout: 30,
-        log_message: "Save Html Tables.",
-      },
-    ],
-    intial_window_size: [900, 700],
-  },
-  FRB_1: {
-    bank_name: "Abu Dhabi Commercial Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_2: {
-    bank_name: "AB Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_3: {
-    bank_name: "ANZ Banking Group Ltd",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_4: {
-    bank_name: "Bank of America N.A.",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_5: {
-    bank_name: "Bank of Bahrain and Kuwait BSC",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_6: {
-    bank_name: "Barclays Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_7: {
-    bank_name: "Bank of Ceylon",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_8: {
-    bank_name: "BNP Paribas",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_9: {
-    bank_name: "Citibank India",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_10: {
-    bank_name: "Credit Agricole Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_11: {
-    bank_name: "Credit Suisse",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_12: {
-    bank_name: "CTBC Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_13: {
-    bank_name: "Commonwealth Bank Of Australia",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_14: {
-    bank_name: "DBS Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_15: {
-    bank_name: "Deutsche Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_16: {
-    bank_name: "Doha Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_17: {
-    bank_name: "Emirates NBD",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_18: {
-    bank_name: "FirstRand Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_19: {
-    bank_name: "HSBC Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_20: {
-    bank_name: "ICBC Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_21: {
-    bank_name: "JPMorgan Chase Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_22: {
-    bank_name: "Krung Thai Bank PCL",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_23: {
-    bank_name: "Mizuho Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_24: {
-    bank_name: "MUFG Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_25: {
-    bank_name: "National Australia Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_26: {
-    bank_name: "Rabo Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_27: {
-    bank_name: "Societe Generale Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_28: {
-    bank_name: "Sumitomo Mitsui Banking Corporation",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_29: {
-    bank_name: "Scotiabank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_30: {
-    bank_name: "Shinhan Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_31: {
-    bank_name: "Standard Chartered Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_32: {
-    bank_name: "SBM Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_33: {
-    bank_name: "NatWest Markets Plc",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_34: {
-    bank_name: "UBS AG",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_35: {
-    bank_name: "UOB Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_36: {
-    bank_name: "Westpac Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  FRB_37: {
-    bank_name: "Woori Bank",
-    bank_type: "FOREIGN BANKS",
-    bank_type_code: "FRB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_1: {
-    bank_name: "Adarsh Co-op. Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_2: {
-    bank_name: "Apna Sahakari Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_3: {
-    bank_name: "Abhyudaya Co-op. Bank Ltd",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_4: {
-    bank_name: "Bharat Co-op Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_5: {
-    bank_name: "Bassein Catholic Co-operative Bank Ltd",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_6: {
-    bank_name: "Bombay Mercantile Co-op Bank Ltd.",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_7: {
-    bank_name: "Citizen Credit Co-operative Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_8: {
-    bank_name: "Cosmos Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_9: {
-    bank_name: "Dombivli Nagari Sahakari Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_10: {
-    bank_name: "Jalgaon Janta Sahakari Bank Ltd.",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_11: {
-    bank_name: "Janata Sahakari Bank Ltd",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_12: {
-    bank_name: "Jankalyan Sahakari Bank Ltd.",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_13: {
-    bank_name: "Kallappanna Awade Ichalkaranji Janata Sahakari Bank Ltd.",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_14: {
-    bank_name: "Mahesh Sahakari Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_15: {
-    bank_name: "Mumbai District Central Co-op. Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_16: {
-    bank_name: "Maharashtra State Co-op. Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_17: {
-    bank_name: "New India Co-op. Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_18: {
-    bank_name: "NKGSB Cooperative Bank Ltd.",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_19: {
-    bank_name: "GP Parsik Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_20: {
-    bank_name: "Punjab and Maharashtra Co-op. Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_21: {
-    bank_name: "Rajkot Nagarik Sahakari Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_22: {
-    bank_name: "Saraswat Co-Op. Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_23: {
-    bank_name: "Thane Bharat Sahakari Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_24: {
-    bank_name: "Thane District Central Co-op. Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_25: {
-    bank_name: "TJSB Sahakari Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_26: {
-    bank_name: "The Greater Bombay Co-op Bank Ltd.",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_27: {
-    bank_name: "The Jalgaon People's Co-op. Bank Ltd",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_28: {
-    bank_name: "The Kalupur Commercial Co-op. Bank",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_29: {
-    bank_name: "SVC Co-operative Bank Ltd.",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  COB_30: {
-    bank_name: "The Andhra Pradesh Mahesh Co-operative Urban Bank Ltd.",
-    bank_type: "CO-OPERATIVE BANKS",
-    bank_type_code: "COB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_1: {
-    bank_name: "AU Small Finance Bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_2: {
-    bank_name: "Capital Small Finance Bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_3: {
-    bank_name: "ESAF Small Finance Bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_4: {
-    bank_name: "Fincare Small Finance Bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_5: {
-    bank_name: "Equitas Small Finance Bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_6: {
-    bank_name: "Jana Small Finance bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_7: {
-    bank_name: "North East Small Finance Bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_8: {
-    bank_name: "Suryoday Small Finance Bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_9: {
-    bank_name: "Ujjivan Small Finance Bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_10: {
-    bank_name: "Utkarsh Small Finance Bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_11: {
-    bank_name: "Unity Small Finance Bank Ltd",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
-  SFB_12: {
-    bank_name: "Shivalik Small Fincare Bank",
-    bank_type: "SMALL FINANCE BANK",
-    bank_type_code: "SFB",
-    url: "",
-    intial_window_size: [900, 700],
-  },
+    PVB_3: {
+        bank_name: "CSB Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_3",
+        base_url: "https://www.csb.co.in/interest-rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "table",
+                table_name: "CSB",
+                by: "css",
+                value: "#block-system-main table",
+                wait_until: "present",
+                multiple: true,
+                skip_if_not_found: true,
+                default_wait: 10,
+                timeout: 30,
+                log_message: "Scrape + Save Tables.",
+            },
+            {
+                action: "download",
+                by: "css",
+                value: "#tab1 a",
+                multiple: true,
+                wait_until: "present",
+                default_wait: 5,
+                timeout: 20,
+                log_message: "Csb Pdf",
+            },
+            {
+                action: "download",
+                by: "css",
+                value: "#tab2 a",
+                multiple: true,
+                wait_until: "present",
+                default_wait: 5,
+                timeout: 20,
+                log_message: "Csb Pdf",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_4: {
+        bank_name: "City Union Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_4",
+        base_url: "https://cityunionbank.com/deposit-interest-rate",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table"
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_5: {
+        bank_name: "DCB Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_5",
+        base_url: "https://www.dcbbank.com/rates/savings-account-interest-rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.dcbbank.com/rates/fixed-deposit-interest-rate",
+                default_wait: 5,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.dcbbank.com/rates/nri-interest-rates",
+                default_wait: 5,
+            },
+            {
+                action: "tablist",
+                by: "css",
+                value: ".DepositRates_side-tab-nav__lcJdj button",
+                skip_if_not_found: true,
+                wait_until: "visible",
+                default_wait: 5,
+                timeout: 20,
+                log_message: "Performing Tab Click.",
+                steps: [
+                    {
+                        action: "table",
+                        by: "tag",
+                        value: "table",
+                        multiple: true,
+                        wait_until: "present",
+                        consolidate_save: true,
+                        export_format: "html",
+                        skip_if_not_found: true,
+                        default_wait: 5,
+                        timeout: 20,
+                    },
+                ],
+            },
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.dcbbank.com/rates/lending-rates",
+                default_wait: 5,
+            },
+            {
+                action: "tablist",
+                by: "css",
+                value: ".DepositRates_side-tab-nav__lcJdj button",
+                skip_if_not_found: true,
+                default_wait: 5,
+                timeout: 20,
+                log_message: "Performing Tab Click.",
+                steps: [
+                    {
+                        action: "table",
+                        by: "tag",
+                        value: "table",
+                        multiple: true,
+                        wait_until: "present",
+                        consolidate_save: true,
+                        export_format: "html",
+                        skip_if_not_found: true,
+                        default_wait: 5,
+                        timeout: 20,
+                    },
+                ],
+            },
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.dcbbank.com/rates/benchmark-lending-rates",
+                default_wait: 5,
+            },
+            "action_table",
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_6: {
+        bank_name: "Dhanlaxmi Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_6",
+        base_url: "https://www.dhanbank.com/interest-rates/",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table"
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_7: {
+        bank_name: "Federal Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB",
+        base_url: "https://www.federalbank.co.in/deposit-rate",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table",
+            {
+                action: "download",
+                by: "css",
+                value: "tr td a",
+                multiple: true,
+                wait_until: "present",
+                default_wait: 5,
+                timeout: 20,
+                log_message: "Axis Bank",
+            },
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.federalbank.co.in/nre-fixed-deposits",
+                wait: 5,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.federalbank.co.in/loan-rate",
+                wait: 8,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.federalbank.co.in/fcnr-b-deposits",
+                wait: 5,
+            },
+            {
+                action: "download",
+                by: "css",
+                value: "tr td a",
+                multiple: true,
+                wait_until: "present",
+                default_wait: 5,
+                timeout: 20,
+                log_message: "Axis Bank",
+            },
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.federalbank.co.in/rfc-deposits",
+                wait: 5,
+            },
+            {
+                action: "download",
+                by: "css",
+                value: "tr td a",
+                multiple: true,
+                wait_until: "present",
+                default_wait: 5,
+                timeout: 20,
+                log_message: "Axis Bank",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_8: {
+        bank_name: "HDFC Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_8",
+        base_url: "https://www.hdfcbank.com/personal/resources/rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "table",
+                table_name: "HDFC",
+                by: "tag",
+                value: "table",
+                wait_until: "present",
+                multiple: true,
+                skip_if_not_found: true,
+                default_wait: 10,
+                timeout: 30,
+                log_message: "Save Html Tables.",
+            },
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.hdfcbank.com/personal/resources/interest-rates-for-5-cr-and-above",
+                wait_until: "present",
+                default_wait: 10,
+                timeout: 20,
+                log_message: "HDFC PDF.",
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.hdfcbank.com/personal/resources/non-withdrawable-interest-rates-for-2-cr-above",
+                wait_until: "present",
+                default_wait: 10,
+                timeout: 20,
+                log_message: "HDFC PDF.",
+            },
+            "action_table",
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_9: {
+        bank_name: "ICICI Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_9",
+        base_url: "https://www.icicibank.com/personal-banking/deposits/fixed-deposit/fd-interest-rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "tablist",
+                by: "css",
+                value: ".tabs-list button",
+                skip_if_not_found: true,
+                default_wait: 15,
+                timeout: 20,
+                log_message: "Performing Tab Click.",
+                steps: [
+                    {
+                        action: "table",
+                        by: "tag",
+                        value: "table",
+                        multiple: true,
+                        wait_until: "present",
+                        skip_if_not_found: true,
+                        default_wait: 10,
+                        timeout: 20,
+                    },
+                    {
+                        action: "html",
+                        by: "css",
+                        value: "h2+ h2 .h5",
+                        wait_until: "present",
+                        skip_if_not_found: true,
+                        default_wait: 10,
+                        timeout: 30,
+                        log_message: "Save Html.",
+                    },
+                ],
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_10: {
+        bank_name: "IDBI Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_10",
+        base_url: "https://www.idbibank.in/interest-rates.aspx",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table",
+            {
+                action: "website",
+                by: "css",
+                value: "body",
+                url: "https://www.idbi.bank.in/nri-interest-rates.aspx",
+                default_wait: 5,
+            },
+            "action_table",
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_11: {
+        bank_name: "IDFC First Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_11",
+        base_url: "https://www.idfcfirstbank.com/interest-rate",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "download",
+                by: "css",
+                value: ".gresg-polici-main a",
+                multiple: true,
+                wait_until: "present",
+                default_wait: 5,
+                timeout: 20,
+                log_message: "IDFC First Bank",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_12: {
+        bank_name: "IndusInd Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_12",
+        base_url: "https://www.indusind.bank.in/in/en/personal/rates.html",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table",
+            {
+                action: "download",
+                by: "css",
+                value: "#callable p a",
+                multiple: true,
+                wait_until: "present",
+                default_wait: 7,
+                timeout: 30,
+                file_save: true,
+                log_message: "Downloaded Pdf",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_13: {
+        bank_name: "Jammu and Kashmir Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_13",
+        base_url: "https://www.jkbank.com/interest-rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "table",
+                by: "tag",
+                value: "table",
+                multiple: true,
+                wait_until: "present",
+                consolidate_save: true,
+                skip_if_not_found: true,
+                default_wait: 10,
+                timeout: 20,
+            },
+            {
+                action: "http",
+                by: "css",
+                value: "body",
+                url: "https://eapp.jkbank.com/eintraweb/domestic-rates",
+                export_format: "pdf",
+                skip_if_not_found: true,
+                default_wait: 2,
+                timeout: 10,
+                log_message: "J&K Bulk Pdf",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_14: {
+        bank_name: "Karnataka Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_14",
+        base_url: "https://karnatakabank.com/deposit-interest-rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "download",
+                by: "css",
+                value: "p a",
+                multiple: true,
+                wait_until: "visible",
+                default_wait: 7,
+                timeout: 30,
+                file_save: true,
+                log_message: "Downlaoded Karnataka Bank Pdf",
+            },
+            "action_table",
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_15: {
+        bank_name: "Karur Vysya Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_15",
+        base_url: "https://www.kvb.co.in/interest-rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "website",
+                by: "tag",
+                value: "body",
+                url: "https://www.kvb.co.in/interest-rates/resident-nro-deposits/",
+                wait: 5,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "tag",
+                value: "body",
+                url: "https://www.kvb.co.in/interest-rates/mclr-interest-rate/",
+                default_wait: 5,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "tag",
+                value: "body",
+                url: "https://www.kvb.co.in/interest-rates/bulk-term-deposit-rates/",
+                default_wait: 5,
+            },
+            "action_table",
+            {
+                action: "website",
+                by: "tag",
+                value: "body",
+                url: "https://www.kvb.co.in/interest-rates/fcnr-rfc-deposit-rates/",
+                default_wait: 5,
+            },
+            "action_table",
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_16: {
+        bank_name: "Kotak Mahindra Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_16",
+        base_url: "https://www.kotak.com/en/rates/interest-rates.html",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table",
+            {
+                action: "website",
+                by: "tag",
+                value: "body",
+                url: "https://www.kotak.com/en/rates/mclr-rate.html",
+                wait: 5,
+            },
+            "action_table",
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_18: {
+        bank_name: "The Nainital Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_18",
+        base_url: "https://www.nainitalbank.co.in/english/interest_rate.aspx",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "table",
+                table_name: "NAIN",
+                by: "tag",
+                value: "table",
+                wait_until: "present",
+                multiple: true,
+                skip_if_not_found: true,
+                default_wait: 10,
+                timeout: 60,
+                log_message: "Save Html Tables.",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_19: {
+        bank_name: "South Indian Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_19",
+        base_url: "https://www.southindianbank.com/interestrate/interestratelist.aspx",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "table",
+                table_name: "SIB_TBL",
+                by: "tag",
+                value: "table",
+                wait_until: "present",
+                multiple: true,
+                skip_if_not_found: true,
+                default_wait: 4,
+                timeout: 10,
+                log_message: "Save Html Tables.",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_20: {
+        bank_name: "Tamilnad Mercantile Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_20",
+        base_url: "https://tmb.in/pages/Deposit-Interest-Rates",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table"
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_21: {
+        bank_name: "RBL Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_21",
+        base_url: "https://www.rblbank.com/interest-rates?tab=fixed-deposit",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            "action_table",
+            {
+                action: "download",
+                by: "css",
+                value: "strong a",
+                multiple: true,
+                wait_until: "present",
+                default_wait: 3,
+                timeout: 40,
+                log_message: "Axis Bank",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    PVB_22: {
+        bank_name: "YES Bank",
+        bank_type: "PRIVATE SECTOR BANKS",
+        bank_type_code: "PVB_22",
+        base_url: "https://www.yesbank.in/personal-banking/yes-individual/deposits/fixed-deposit",
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        blocks: [
+            {
+                action: "table",
+                table_name: "YES",
+                by: "tag",
+                value: "table",
+                wait_until: "present",
+                multiple: true,
+                skip_if_not_found: true,
+                default_wait: 10,
+                timeout: 30,
+                log_message: "Save Html Tables.",
+            },
+        ],
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_1: {
+        bank_name: "Abu Dhabi Commercial Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_2: {
+        bank_name: "AB Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_3: {
+        bank_name: "ANZ Banking Group Ltd",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_4: {
+        bank_name: "Bank of America N.A.",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_5: {
+        bank_name: "Bank of Bahrain and Kuwait BSC",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_6: {
+        bank_name: "Barclays Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_7: {
+        bank_name: "Bank of Ceylon",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_8: {
+        bank_name: "BNP Paribas",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_9: {
+        bank_name: "Citibank India",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_10: {
+        bank_name: "Credit Agricole Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_11: {
+        bank_name: "Credit Suisse",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_12: {
+        bank_name: "CTBC Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_13: {
+        bank_name: "Commonwealth Bank Of Australia",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_14: {
+        bank_name: "DBS Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_15: {
+        bank_name: "Deutsche Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_16: {
+        bank_name: "Doha Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_17: {
+        bank_name: "Emirates NBD",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_18: {
+        bank_name: "FirstRand Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_19: {
+        bank_name: "HSBC Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_20: {
+        bank_name: "ICBC Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_21: {
+        bank_name: "JPMorgan Chase Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_22: {
+        bank_name: "Krung Thai Bank PCL",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_23: {
+        bank_name: "Mizuho Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_24: {
+        bank_name: "MUFG Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_25: {
+        bank_name: "National Australia Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_26: {
+        bank_name: "Rabo Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_27: {
+        bank_name: "Societe Generale Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_28: {
+        bank_name: "Sumitomo Mitsui Banking Corporation",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_29: {
+        bank_name: "Scotiabank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_30: {
+        bank_name: "Shinhan Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_31: {
+        bank_name: "Standard Chartered Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_32: {
+        bank_name: "SBM Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_33: {
+        bank_name: "NatWest Markets Plc",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_34: {
+        bank_name: "UBS AG",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_35: {
+        bank_name: "UOB Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_36: {
+        bank_name: "Westpac Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    FRB_37: {
+        bank_name: "Woori Bank",
+        bank_type: "FOREIGN BANKS",
+        bank_type_code: "FRB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_1: {
+        bank_name: "Adarsh Co-op. Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_2: {
+        bank_name: "Apna Sahakari Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_3: {
+        bank_name: "Abhyudaya Co-op. Bank Ltd",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_4: {
+        bank_name: "Bharat Co-op Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_5: {
+        bank_name: "Bassein Catholic Co-operative Bank Ltd",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_6: {
+        bank_name: "Bombay Mercantile Co-op Bank Ltd.",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_7: {
+        bank_name: "Citizen Credit Co-operative Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_8: {
+        bank_name: "Cosmos Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_9: {
+        bank_name: "Dombivli Nagari Sahakari Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_10: {
+        bank_name: "Jalgaon Janta Sahakari Bank Ltd.",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_11: {
+        bank_name: "Janata Sahakari Bank Ltd",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_12: {
+        bank_name: "Jankalyan Sahakari Bank Ltd.",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_13: {
+        bank_name: "Kallappanna Awade Ichalkaranji Janata Sahakari Bank Ltd.",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_14: {
+        bank_name: "Mahesh Sahakari Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_15: {
+        bank_name: "Mumbai District Central Co-op. Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_16: {
+        bank_name: "Maharashtra State Co-op. Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_17: {
+        bank_name: "New India Co-op. Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_18: {
+        bank_name: "NKGSB Cooperative Bank Ltd.",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_19: {
+        bank_name: "GP Parsik Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_20: {
+        bank_name: "Punjab and Maharashtra Co-op. Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_21: {
+        bank_name: "Rajkot Nagarik Sahakari Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_22: {
+        bank_name: "Saraswat Co-Op. Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_23: {
+        bank_name: "Thane Bharat Sahakari Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_24: {
+        bank_name: "Thane District Central Co-op. Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_25: {
+        bank_name: "TJSB Sahakari Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_26: {
+        bank_name: "The Greater Bombay Co-op Bank Ltd.",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_27: {
+        bank_name: "The Jalgaon People's Co-op. Bank Ltd",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_28: {
+        bank_name: "The Kalupur Commercial Co-op. Bank",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_29: {
+        bank_name: "SVC Co-operative Bank Ltd.",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    COB_30: {
+        bank_name: "The Andhra Pradesh Mahesh Co-operative Urban Bank Ltd.",
+        bank_type: "CO-OPERATIVE BANKS",
+        bank_type_code: "COB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_1: {
+        bank_name: "AU Small Finance Bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_2: {
+        bank_name: "Capital Small Finance Bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_3: {
+        bank_name: "ESAF Small Finance Bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_4: {
+        bank_name: "Fincare Small Finance Bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_5: {
+        bank_name: "Equitas Small Finance Bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_6: {
+        bank_name: "Jana Small Finance bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_7: {
+        bank_name: "North East Small Finance Bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_8: {
+        bank_name: "Suryoday Small Finance Bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_9: {
+        bank_name: "Ujjivan Small Finance Bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_10: {
+        bank_name: "Utkarsh Small Finance Bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_11: {
+        bank_name: "Unity Small Finance Bank Ltd",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
+    SFB_12: {
+        bank_name: "Shivalik Small Fincare Bank",
+        bank_type: "SMALL FINANCE BANK",
+        bank_type_code: "SFB",
+        url: "",
+        intial_window_size: [
+            900,
+            700
+        ],
+    },
 }
