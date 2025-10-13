@@ -12,7 +12,7 @@ from app.constants import CACHE_REP_DIR,LOG_DIR, CCH_DIR
 from app.constants import ALL_BANK_CODES,PUB_BANK_CODES,PVT_BANK_CODES
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 logger = setup_logger(name="scraper", log_dir=LOG_DIR)
-bank_codes = ["PSB_6"]#PVT_BANK_CODES #PUB_BANK_CODES #ALL_BANK_CODES
+bank_codes = ["PVB_22"]#PVT_BANK_CODES #PUB_BANK_CODES #ALL_BANK_CODES
 
 try:
     logger.notice("Starting Program.")
@@ -35,7 +35,6 @@ try:
 
     #doc report
     doc_path = os.path.join(CACHE_REP_DIR,f"cache_{timestamp}_DATA.docx")
-    # IbbiHelper.cache_to_excel_report(final_dict,format_="data",excel_out=doc_path)
     BankScraper.generate_cache_report(final_dict, doc_path)
     logger.save("Initial Cache Report Saved.")
     

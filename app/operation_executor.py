@@ -163,8 +163,7 @@ class OperationExecutor:
         records = p_dict.get("records", [])
 
         for record in records:
-            # self.logger.info(f"Processing : {record['bank_name']}")
-            print(f">>Processing {record['bank_name']}")
+            print(f">>Processing {record.get('bank_name', 'Unknown Bank')}")
             response_data = record.get("scraped_data", [])
             if not response_data:
                 continue
@@ -184,36 +183,41 @@ class OperationExecutor:
 
                     for stage_name, operations in function_to_execute.items():
                         for operation in operations:
-                            # Unpack operation with optional expected_type
-                            if len(operation) == 4:
-                                func_name, source_key, target_key, expected_type = operation
-                            else:
-                                func_name, source_key, target_key = operation
-                                expected_type = None
+                            try:
+                                # Unpack operation with optional expected_type
+                                if len(operation) == 4:
+                                    func_name, source_key, target_key, expected_type = operation
+                                else:
+                                    func_name, source_key, target_key = operation
+                                    expected_type = None
 
-                            if target_key in check_packet:
-                                raise ValueError(
-                                    f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}"
-                                )
+                                if target_key in check_packet:
+                                    raise ValueError(
+                                        f"`target_key` '{target_key}' already exists in packet keys: {list(check_packet.keys())}"
+                                    )
 
-                            func = self.procedures.get(func_name)
-                            if not func:
-                                raise ValueError(f"Function '{func_name}' not found in procedures.")
+                                func = self.procedures.get(func_name)
+                                if not func:
+                                    raise ValueError(f"Function '{func_name}' not found in procedures.")
 
-                            input_value = _packet_.get(source_key)
-                            if input_value is None:
-                                continue
-
-                            # Apply type check only in primary stage
-                            if stage_name == "primary" and expected_type:
-                                packet_type = _packet_.get("type", "").lower()
-                                if isinstance(expected_type, list):
-                                    if packet_type not in [t.lower() for t in expected_type]:
-                                        continue
-                                elif packet_type != expected_type.lower():
+                                input_value = _packet_.get(source_key)
+                                if input_value is None:
                                     continue
 
-                            _packet_[target_key] = func(input_value)
+                                # Apply type check only in primary stage
+                                if stage_name == "primary" and expected_type:
+                                    packet_type = _packet_.get("type", "").lower()
+                                    if isinstance(expected_type, list):
+                                        if packet_type not in [t.lower() for t in expected_type]:
+                                            continue
+                                    elif packet_type != expected_type.lower():
+                                        continue
+
+                                _packet_[target_key] = func(input_value)
+
+                            except Exception as e:
+                                print(f"⚠️ Skipping operation '{operation}' for {record.get('bank_name')} due to error: {e}")
+                                continue
 
                     new_scraped_data.append(_packet_)
 
