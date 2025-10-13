@@ -29,24 +29,14 @@ class ActionExecutor:
         self.PARAMS = None
         self.scripts = SCRIPTS
     
-    def set_params(self,params):self.PARAMS = params
-    
-    def create_driver(self):
-        options = Options()
-        options.add_argument(r"--no-sandbox")
-        options.add_argument(r"--disable-dev-shm-usage")
-        options.add_argument(r"--disable-gpu")
-        options.add_argument(rf"--user-data-dir={self.PATHS['profile_path']}")
-        options.add_argument(rf"--profile-directory={self.PATHS['profile_name']}")
-        options.add_experimental_option("excludeSwitches", ["enable-logging"])
-
-        driver_path = self.PATHS.get("driver_path")
-        service = Service(driver_path)
-        self.driver = webdriver.Chrome(service=service, options=options)
-        
-        self.window_stack = [self.driver.current_window_handle]
-        self.__attach_headers()
-        return self.driver
+    def set_params(self,params):
+        self.PARAMS = params
+        self.OUTPUT_PATH = Helper.create_dir(DATA_DIR,params['bank_name'],f"download_{datetime.now().strftime("%H%M")}")
+        self.driver.execute_cdp_cmd("Page.setDownloadBehavior", {
+            "behavior": "allow",
+            "downloadPath": self.OUTPUT_PATH
+        })
+        self.logger.info(f"Download folder set to: {self.OUTPUT_PATH} for bank: {params['bank_name']}")
     
     def create_uc_driver(self):
         options = uc.ChromeOptions()
@@ -74,13 +64,31 @@ class ActionExecutor:
         self.window_stack = [self.driver.current_window_handle]
         return self.driver
     
-    def __attach_headers(self):
-        self.driver.execute_cdp_cmd("Network.enable", {})
-        headers = self.PARAMS.get("headers", {})
-        if headers:
-            self.driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {
-                "headers": headers
-            })
+    
+    # def create_driver(self):
+    #     options = Options()
+    #     options.add_argument(r"--no-sandbox")
+    #     options.add_argument(r"--disable-dev-shm-usage")
+    #     options.add_argument(r"--disable-gpu")
+    #     options.add_argument(rf"--user-data-dir={self.PATHS['profile_path']}")
+    #     options.add_argument(rf"--profile-directory={self.PATHS['profile_name']}")
+    #     options.add_experimental_option("excludeSwitches", ["enable-logging"])
+
+    #     driver_path = self.PATHS.get("driver_path")
+    #     service = Service(driver_path)
+    #     self.driver = webdriver.Chrome(service=service, options=options)
+        
+    #     self.window_stack = [self.driver.current_window_handle]
+    #     self.__attach_headers()
+    #     return self.driver
+    
+    # def __attach_headers(self):
+    #     self.driver.execute_cdp_cmd("Network.enable", {})
+    #     headers = self.PARAMS.get("headers", {})
+    #     if headers:
+    #         self.driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {
+    #             "headers": headers
+    #         })
     
     def get_website(self):
         if self.driver:
@@ -528,12 +536,12 @@ class ActionExecutor:
 
                 file_url = urljoin(self.driver.current_url, file_url)
                 file_type = ActionExecutorHelper._determine_file_type(file_url)
-                self.logger.info(f"{file_url}")
+                self.logger.info(f"URL FOUND:{file_url}")
 
                 if file_type:
                     try:
-                        output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["downloads"])
-                        file_content = self.__download_file(file_url, output_dir, idx, file_type)
+                        self.logger.info("Proceeding with file download.")
+                        file_content = self.__download_file(file_url, self.OUTPUT_PATH, idx, file_type)
                         scrape_content.append(self.__generate_resp_packet(name=f"{self.pdf_name}_{idx}",header=os.path.basename(urlparse(file_url).path),value=file_content,type=file_type))
                     except Exception as e:
                         self.logger.error(f"Download failed at index {idx}: {e}")
@@ -558,7 +566,7 @@ class ActionExecutor:
     
     def __download_file(self, file_url, output_dir, idx, extension):
         cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
-        r = requests.get(file_url, cookies=cookies, verify=False) #check this out
+        r = requests.get(file_url, cookies=cookies, verify=False, timeout=20) #check this out
         self.logger.notice(f" `{extension}` GET Request Returned Status: {r.status_code}")
         
         
@@ -674,23 +682,48 @@ class ActionExecutor:
             #     self.driver.switch_to.window(new_tab)
             #     self.window_stack.append(new_tab)
             self.logger.info(f"Clicking Element")
+            time.sleep(10)
         except Exception as e:
             self.logger.error(f"Failed to Click Element: {str(e)}")
         
     def clickSave(self):
+        
+        logger = self.logger
+        def _wait_for_download(folder, initial_files, timeout=30):
+            start_time = time.time()
+            logger.info(f"Watching folder: {folder}")
+
+            while time.time() - start_time < timeout:
+                current_files = set(os.listdir(folder))
+                new_files = current_files - initial_files
+
+                for fname in new_files:
+                    path = os.path.join(folder, fname)
+                    if fname.endswith(".crdownload"):
+                        logger.debug(f"Skipping incomplete file: {fname}")
+                        continue
+                    ext = ActionExecutorHelper._determine_file_type(path)
+                    if ext:
+                        logger.info(f"Detected new file: {fname} with type: {ext}")
+                        return path, ext
+                time.sleep(1)
+            logger.warning("Timeout reached — no valid file detected.")
+            return None, None
+
         try:
             scrape_content = []
             self.driver.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'center'});", self.ELEMENT)
             time.sleep(0.5)
-
+            initial_files = set(os.listdir(self.OUTPUT_PATH))
+            self.logger.info(f"Initial Files in Folder: {initial_files}")
             # --- Store current tab handles before click ---
             initial_tabs = self.driver.window_handles
 
             # --- Perform a true user-like click ---
-            actions = ActionChains(self.driver)
-            actions.move_to_element(self.ELEMENT).pause(0.3).click().perform()
-            self.logger.notice("Clicked element using ActionChains (real user gesture)")
-            time.sleep(2)
+            # actions = ActionChains(self.driver)
+            # actions.move_to_element(self.ELEMENT).pause(0.1).click().perform()
+            # self.logger.notice("Clicked element using ActionChains (real user gesture)")
+            # time.sleep(2)
 
             # --- Detect new tab ---
             new_tabs = self.driver.window_handles
@@ -710,8 +743,8 @@ class ActionExecutor:
             if current_url.lower().endswith(".pdf"):
                 self.logger.notice(f"Navigating directly to PDF URL: {current_url}")
                 self.driver.get(current_url)
-                
-            file_path,ext = ActionExecutorHelper._wait_for_download(self.OUTPUT_PATH, timeout=self.TIMEOUT)
+            
+            file_path,ext = _wait_for_download(self.OUTPUT_PATH,initial_files, timeout=self.TIMEOUT)
             if file_path:
                 with open(file_path, "rb") as f:
                     encoded = base64.b64encode(f.read()).decode("utf-8")
@@ -729,7 +762,7 @@ class ActionExecutor:
         self.logger.info("Performing GET REQUEST for attached website.")
         file_url = self.URL
         file_type = self.export_format or "dat"
-        output_dir = Helper.create_dirs(self.OUTPUT_PATH, ["downloads"])
+        output_dir = Helper.create_dirs(self.OUTPUT_PATH)
         scrape_content = []
         try:
             file_content = self.__download_file(file_url, output_dir, 0, file_type)
@@ -884,28 +917,59 @@ class ActionExecutorHelper:
     
     @staticmethod
     def _determine_file_type(url):
-        if ".pdf" in url: return "pdf"
-        if url.endswith(".csv"): return "csv"
-        if url.endswith(".docx"): return "docx"
-        if url.endswith(".xlsx"): return "xlsx"
-        return None
+        value = None
+        if ".pdf" in url: value = "pdf"
+        if url.endswith(".csv"): value = "csv"
+        if url.endswith(".docx"): value = "docx"
+        if url.endswith(".xlsx"): value = "xlsx"
+        print(f"The File Type is : {value}")
+        return value
     
+    # @staticmethod
+    # def _wait_for_download(folder, initial_files, timeout=30):
+    #     start_time = time.time()
+    #     initial_files = set(os.listdir(folder))
+    #     print(f"The folder path: {folder}")
+
+    #     while time.time() - start_time < timeout:
+    #         current_files = set(os.listdir(folder))
+    #         new_files = current_files - initial_files
+    #         if new_files:
+    #             for fname in new_files:
+    #                 path = os.path.join(folder, fname)
+    #                 if ext:=ActionExecutorHelper._determine_file_type(path):
+    #                     return path, ext
+    #         time.sleep(1)
+
+    #     return None,None
     @staticmethod
-    def _wait_for_download(folder, timeout=30):
+    def _wait_for_download(folder, initial_files, timeout=30):
         start_time = time.time()
-        initial_files = set(os.listdir(folder))
+        print(f"[INFO] Watching folder: {folder}")
+        print(f"[INFO] Initial files: {initial_files}")
 
         while time.time() - start_time < timeout:
             current_files = set(os.listdir(folder))
             new_files = current_files - initial_files
-            if new_files:
-                for fname in new_files:
-                    path = os.path.join(folder, fname)
-                    if ext:=ActionExecutorHelper._determine_file_type(path):
-                        return path, ext
+
+            for fname in new_files:
+                path = os.path.join(folder, fname)
+
+                # Skip incomplete downloads
+                if fname.endswith(".crdownload"):
+                    print(f"[DEBUG] Skipping incomplete file: {fname}")
+                    continue
+
+                # Check if it's a valid file type
+                ext = ActionExecutorHelper._determine_file_type(path)
+                if ext:
+                    print(f"[INFO] Detected new file: {fname} with type: {ext}")
+                    return path, ext
+
             time.sleep(1)
 
-        return None,None
+        print("[WARNING] Timeout reached — no valid file detected.")
+        return None, None
     
     @staticmethod
     def build_multiple_urls(base_url, params):

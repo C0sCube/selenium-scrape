@@ -98,12 +98,6 @@
         timeout: 20,
         log_message: "Save Html Tables.",
       },
-      //   {
-      //     action: "execute_script",
-      //     by: "tag",
-      //     value: "body",
-      //     script_key: "force_clickable",
-      //   },
       "action_website||https://indianbank.bank.in/departments/interest-rates-for-deposits-of-above-rs-5-00crore/",
       "action_table",
     ],
@@ -710,21 +704,17 @@
 
     blocks: [
       "action_table",
-      //   {
-      //     action: "table",
-      //     table_name: "YES",
-      //     by: "tag",
-      //     value: "table",
-      //     wait_until: "present",
-      //     multiple: true,
-      //     skip_if_not_found: true,
-      //     default_wait: 10,
-      //     timeout: 30,
-      //     log_message: "Save Html Tables.",
-      //   },
-      //a[contains(@href, 'bulk_fixed_deposit_interest_rates_v1_pdf.pdf')]
       "action_website||https://www.yesbank.in/pdf?name=bulk_fixed_deposit_interest_rates_v1_pdf.pdf",
-      "action_download||xpath||a[contains(@href, 'bulk_fixed_deposit_interest_rates_v1_pdf.pdf')]||true||present",
+      {
+        action:"click_save",
+          by: "xpath",
+          value: "//a[contains(@href, 'bulk_fixed_deposit_interest_rates_v1_pdf.pdf')]",
+          multiple: false,
+          wait_until: "present",
+          default_wait: 5,
+          timeout: 10,
+      }
+
     ],
   },
   FRB_1: {

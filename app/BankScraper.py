@@ -10,6 +10,8 @@ class BankScraper:
         self.logger = get_global_logger()
         self.executor = ActionExecutor() # not inherit, call here!!
         self.operator = OperationExecutor()
+        
+        self.error_progs = ["*START*"]
 
     @staticmethod
     def get_final_struct():
@@ -78,6 +80,7 @@ class BankScraper:
             self.logger.error(f"Error in BankScraper.py {bank_params['bank_name']}: {type(e).__name__} {e}")
             self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
             scraped_data = [{"error_Type": type(e).__name__, "error_Message": str(e),"error_from": "BankScraper.py"}]
+            self.error_progs.append(f"BankName:{bank_params['bank_name']},ErrorType:{type(e).__name__},ErrorMessage:{str(e)}")
         
         return {
             "bank_name": bank_params["bank_name"],

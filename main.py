@@ -7,12 +7,12 @@ ssl._create_default_https_context = ssl._create_stdlib_context
 
 from app.constants import *
 from app.logger import setup_logger, set_global_logger
-logger = setup_logger(name="scraper", log_dir=LOG_DIR)
+logger = setup_logger(name="scraper",log_dir=LOG_DIR)
 set_global_logger(logger)
 from app.BankScraper import BankScraper
 from app.utils import Helper
 
-bank_codes = ["PVB_22"]  #PUB_BANK_CODES  #PVT_BANK_CODES #ALL_BANK_CODES
+bank_codes = ["PSB_1"]  #PUB_BANK_CODES  #PVT_BANK_CODES #ALL_BANK_CODES
 
 try:
     logger.notice("Starting Program.")
@@ -38,18 +38,18 @@ try:
 
     #doc report
 
-    doc_path = os.path.join(CACHE_REP_DIR,f"cache_{datetime.now().strftime("%Y%m%d_%H%M")}_DATA.docx")
-    BankScraper.generate_cache_report(final_dict, doc_path)
+    # doc_path = os.path.join(CACHE_REP_DIR,f"cache_{datetime.now().strftime("%Y%m%d_%H%M")}_DATA.docx")
+    # BankScraper.generate_cache_report(final_dict, doc_path)
     logger.save("Initial Cache Report Saved.")
     
-    value = input("DO PROCESSING AS WELL(Y/N):")
-    if value == 'Y':
-        prs = POST_SCRAPE_OPS["sha1"]
-        prs_data = BankScraper.generate_prs_cache(final_dict,prs)
-        prs_path = os.path.join(PRS_DIR,f"prs_{datetime.now().strftime("%Y%m%d_%H%M")}.json")
-        Helper.save_json(prs_data,prs_path)
-    else:
-        print("No processing allowed.")
+    # value = input("DO PROCESSING AS WELL(Y/N):")
+    # if value == 'Y':
+    #     prs = POST_SCRAPE_OPS["sha1"]
+    #     prs_data = BankScraper.generate_prs_cache(final_dict,prs)
+    #     prs_path = os.path.join(PRS_DIR,f"prs_{datetime.now().strftime("%Y%m%d_%H%M")}.json")
+    #     Helper.save_json(prs_data,prs_path)
+    # else:
+    #     print("No processing allowed.")
         
     
 except KeyboardInterrupt:
@@ -62,6 +62,7 @@ except Exception as e:
 
 finally:
     Helper.save_json(final_dict, os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]),typ="json")
+    Helper.save_text(scraper.error_progs,os.path.join(CCH_DIR, final_dict["metadata"]["cfname"].replace(".json",".txt")))
     print(os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]))
     logger.save("Saved Cached Data.")
     logger.notice("Ending Program.")
