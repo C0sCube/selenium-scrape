@@ -12,7 +12,7 @@
         wait_until: "present",
         multiple: true,
         skip_if_not_found: true,
-        default_wait: 3,
+        default_wait: 5,
         timeout: 20,
         clean_table: true,
         log_message: "Save Html Table(s)",
@@ -46,6 +46,7 @@
         wait_until: "clickable",
         default_wait: 5,
         timeout: 20,
+        file_save:true,
         log_message: "Axis Bank",
     },
     action_website: {

@@ -82,8 +82,7 @@ def setup_logger(
     logger.propagate = False
 
     if to_file:
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-        file_path = os.path.join(log_dir, f"{name}_{timestamp}.log")
+        file_path = os.path.join(log_dir, f"{name}.log")
         file_handler = logging.FileHandler(file_path, encoding='utf-8')
         file_handler.setFormatter(_get_formatter(use_color=False))
         file_handler.setLevel(TRACE_LEVEL_NUM)
@@ -98,9 +97,9 @@ def setup_logger(
 # --- Global Logger Registry ---
 _active_logger = None
 
-def set_active_logger(logger):
+def set_global_logger(logger):
     global _active_logger
     _active_logger = logger
 
-def get_active_logger():
+def get_global_logger():
     return _active_logger or logging.getLogger("default_logger")

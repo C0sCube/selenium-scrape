@@ -4,40 +4,53 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # TensorFlow-specific-selenium
 warnings.filterwarnings('ignore')
 ssl._create_default_https_context = ssl._create_stdlib_context
 
-from app.utils import Helper
-from app.logger import setup_logger
-from app.BankScraper import BankScraper
-from app.constants import CONFIG, PATHS
-from app.constants import CACHE_REP_DIR,LOG_DIR, CCH_DIR
-from app.constants import ALL_BANK_CODES,PUB_BANK_CODES,PVT_BANK_CODES
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+from app.constants import *
+from app.logger import setup_logger, set_global_logger
 logger = setup_logger(name="scraper", log_dir=LOG_DIR)
-bank_codes = ["PVB_22"]#PVT_BANK_CODES #PUB_BANK_CODES #ALL_BANK_CODES
+set_global_logger(logger)
+from app.BankScraper import BankScraper
+from app.utils import Helper
+
+bank_codes = ["PVB_22"]  #PUB_BANK_CODES  #PVT_BANK_CODES #ALL_BANK_CODES
 
 try:
     logger.notice("Starting Program.")
-    final_dict = BankScraper.get_final_struct()
+    scraper = BankScraper()
+    final_dict = scraper.get_final_struct()
+    scraper.load_driver()
     for code in bank_codes:
         if code not in CONFIG:
+            logger.error(f"Code: {code} not in config, skipping..")
             continue
         try:
             bank_params = CONFIG[code]
-            scraper = BankScraper(bank_params, PATHS)
-            result = scraper.run()
+            result = scraper.run(bank_params)
         except Exception as e:
             logger.error(f"Failed scraping {code}: {e}")
             result = {"bank_code": code, "scraped_data": [{"error": str(e)}]}
         
         clean_result = BankScraper.dedupe_responses(result)
         final_dict["records"].append(clean_result)
-        time.sleep(3)
+
+    scraper.exit_driver()
     
 
     #doc report
-    doc_path = os.path.join(CACHE_REP_DIR,f"cache_{timestamp}_DATA.docx")
+
+    doc_path = os.path.join(CACHE_REP_DIR,f"cache_{datetime.now().strftime("%Y%m%d_%H%M")}_DATA.docx")
     BankScraper.generate_cache_report(final_dict, doc_path)
     logger.save("Initial Cache Report Saved.")
     
+    value = input("DO PROCESSING AS WELL(Y/N):")
+    if value == 'Y':
+        prs = POST_SCRAPE_OPS["sha1"]
+        prs_data = BankScraper.generate_prs_cache(final_dict,prs)
+        prs_path = os.path.join(PRS_DIR,f"prs_{datetime.now().strftime("%Y%m%d_%H%M")}.json")
+        Helper.save_json(prs_data,prs_path)
+    else:
+        print("No processing allowed.")
+        
     
 except KeyboardInterrupt:
     logger.warning("Process Interrupted by User!")
@@ -49,5 +62,6 @@ except Exception as e:
 
 finally:
     Helper.save_json(final_dict, os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]),typ="json")
+    print(os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]))
     logger.save("Saved Cached Data.")
     logger.notice("Ending Program.")

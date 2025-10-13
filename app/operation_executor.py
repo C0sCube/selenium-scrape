@@ -1,4 +1,4 @@
-import time ,re,os, hmac, hashlib, inspect, dateutil, base64, pdfplumber, ocrmypdf, tempfile,shutil, tabula
+import re,os,hashlib, inspect, dateutil, base64, pdfplumber, ocrmypdf, tempfile
 import pandas as pd
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
@@ -7,13 +7,13 @@ from docx import Document
 from pdf2docx import Converter
 from docx import Document as DocxReader
 
-
+from openpyxl import Workbook
 from openpyxl.styles import PatternFill
 from openpyxl.formatting.rule import FormulaRule
 from openpyxl.utils.dataframe import dataframe_to_rows  
 from openpyxl.formatting.rule import CellIsRule
 
-from app.logger import get_active_logger
+from app.logger import get_global_logger
 
 class OperationExecutor:
     
@@ -22,22 +22,10 @@ class OperationExecutor:
     
     def __init__(self, ):
         
-        self.logger = get_active_logger()
-        self.procedures = {
-            "ext_date": self.extract_date,
-            "sha256": self._generate_hash_sha256,
-            "sha1": self._generate_hash_sha1,
-            "normalize_df": self._generalize_table_df,
-            "original":self._boomerang
-        }
+        self.logger = get_global_logger()
+        self.procedures = { "ext_date": self.extract_date,"sha256": self._generate_hash_sha256,"sha1": self._generate_hash_sha1,"normalize_df": self._generalize_table_df,"original":self._boomerang}
         
-        self.type_compatibility = {
-            "normalize_df": ["table_html"],
-            "sha1": ["table_html", "html", "pdf"],
-            "sha256": ["table_html", "html", "pdf"],
-            "ext_date": ["html"],
-            "original": ["pdf", "html", "table_html"]
-        }
+        self.type_compatibility = {"normalize_df": ["table_html"],"sha1": ["table_html", "html", "pdf"],"sha256": ["table_html", "html", "pdf"],"ext_date": ["html"],"original": ["pdf", "html", "table_html"]}
 
     #============ PROCEDURES ==============
     @staticmethod
@@ -47,10 +35,7 @@ class OperationExecutor:
             return ""
         
         output_format = "%Y%m%d"
-        date_patterns = [r"(\d{2}[.\-/]+\d{2}[.\-/]+\d{4}",
-                        r"\d{1,2}\s*(?:th|st|rd|nd)\s*[A-Za-z]+\s*\d{4}",
-                        r"\d{2}[\.\-\/]+[A-Za-z]+[\.\-\/]+\d{4}",
-                        r"\d{2}\s*[A-Za-z]+\s*\d{4})"]
+        date_patterns = [r"(\d{2}[.\-/]+\d{2}[.\-/]+\d{4}",r"\d{1,2}\s*(?:th|st|rd|nd)\s*[A-Za-z]+\s*\d{4}",r"\d{2}[\.\-\/]+[A-Za-z]+[\.\-\/]+\d{4}",r"\d{2}\s*[A-Za-z]+\s*\d{4})"]
         matches = re.findall(r"|".join(date_patterns), text, re.IGNORECASE)
         
         if matches:
@@ -63,8 +48,7 @@ class OperationExecutor:
                 return date_str
         return text
     
-    def _boomerang(self,data):
-        return data
+    def _boomerang(self,data): return data
     
     def _generate_hash_sha256(self,text:str)->str:
         if not isinstance(text,str):
@@ -170,17 +154,12 @@ class OperationExecutor:
 
             new_scraped_data = []
 
-            for action in response_data:
+            for action in record.get("scraped_data", []):
                 if not action.get("data_present"):
                     continue
 
-                response = action.get("response")
-                if not response:
-                    continue
-
-                for _packet_ in response:
-                    check_packet = _packet_.copy()
-
+                for packet in action.get("response", []):
+                    packet = packet.copy()
                     for stage_name, operations in function_to_execute.items():
                         for operation in operations:
                             try:
@@ -224,7 +203,7 @@ class OperationExecutor:
             record["scraped_data"] = new_scraped_data
 
         return p_dict
-        
+    
     def process_comparison(self, old_json: dict, new_json: dict, key: str = "hash256") -> dict:
     
         def __extract_scraped_items(data, bank_code):
@@ -278,7 +257,10 @@ class OperationExecutor:
         return new_json
     
     def _parse_table(self, entry):
-        
+        """
+        Parses structured content from various formats into a pandas DataFrame.
+        Supported types: table_html, html, pdf, redir_pdf.
+        """
         content_type = entry.get("type", "str")
         raw_content = entry.get("value", "")
 
@@ -286,50 +268,44 @@ class OperationExecutor:
             if content_type == "table_html":
                 return pd.read_html(StringIO(raw_content))[0]
 
-            elif content_type == "html":
+            if content_type == "html":
                 soup = BeautifulSoup(raw_content, "html.parser")
-                text_lines = soup.get_text().splitlines()
-                text_lines = [line.strip() for line in text_lines if line.strip()]
+                text_lines = [line.strip() for line in soup.get_text().splitlines() if line.strip()]
                 return pd.DataFrame({"text": text_lines})
 
-            elif content_type == "pdf":
+            if content_type in {"pdf", "redir_pdf"}:
                 pdf_bytes = base64.b64decode(raw_content)
                 pdf_file = BytesIO(pdf_bytes)
-                all_rows = []
-                try:
-                    with pdfplumber.open(pdf_file) as pdf:
-                        for page_num, page in enumerate(pdf.pages, start=1):
-                            tables = page.extract_tables()
-                            for table in tables:
-                                all_rows.append([f"[Page {page_num}]"])
-                                all_rows.extend(table)
-                except Exception as e:
-                    return pd.DataFrame([[f"Invalid PDF file: {e}"]])
-                return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in PDF"]])
 
-            elif content_type == "redir_pdf":
-                pdf_bytes = base64.b64decode(raw_content)
-                pdf_file = BytesIO(pdf_bytes)
-                all_rows = []
-                with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_output:
-                    ocrmypdf.ocr(pdf_file, temp_output.name)
-                try:
-                    with pdfplumber.open(temp_output.name) as pdf:
-                        for page_num, page in enumerate(pdf.pages, start=1):
-                            tables = page.extract_tables()
-                            for table in tables:
-                                all_rows.append([f"[Page {page_num}]"])
-                                all_rows.extend(table)
-                except Exception as e:
-                    return pd.DataFrame([[f"OCR PDF failed: {e}"]])
-                return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in OCR PDF"]])
+                if content_type == "redir_pdf":
+                    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_output:
+                        ocrmypdf.ocr(pdf_file, temp_output.name)
+                        pdf_file = open(temp_output.name, "rb")
+
+                return self._extract_pdf_tables(pdf_file, content_type)
 
         except Exception as e:
+            msg = f"Failed to parse data for content type {content_type}: {e}"
             if hasattr(self, "logger") and self.logger:
-                self.logger.error(f"Failed to parse data for content type {content_type}: {e}")
+                self.logger.error(msg)
             else:
-                print(f"[ERROR] Failed to parse data for content type {content_type}: {e}")
+                print(f"[ERROR] {msg}")
             return pd.DataFrame([[f"Failed to parse data of type: {content_type}"]])
+
+    def _extract_pdf_tables(self, pdf_file, label="pdf"):
+        """Extracts tables from a PDF file using pdfplumber."""
+        all_rows = []
+        try:
+            with pdfplumber.open(pdf_file) as pdf:
+                for page_num, page in enumerate(pdf.pages, start=1):
+                    tables = page.extract_tables()
+                    for table in tables:
+                        all_rows.append([f"[Page {page_num}]"])
+                        all_rows.extend(table)
+        except Exception as e:
+            return pd.DataFrame([[f"{label.upper()} parsing failed: {e}"]])
+
+        return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([[f"No table found in {label.upper()}"]])    
 
     def _write_summary(self, ws, summary, start_row, bank_name="", bank_link=""):
         # Write bank name and link
@@ -367,7 +343,6 @@ class OperationExecutor:
         comparison_col_start = removed_col_start + removed_df.shape[1] + gap
 
         SKY_BLUE_FILL = PatternFill(start_color="B3E5FC", end_color="B3E5FC", fill_type="solid")
-        # GOLD_YELLOW_FILL = PatternFill(start_color="FFE599", end_color="FFE599", fill_type="solid")
         GREY_FILL = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
         RED_FILL = PatternFill(start_color="FF9999", end_color="FF9999", fill_type="solid")
 
@@ -409,7 +384,6 @@ class OperationExecutor:
         start_row += max_rows + 2  # Leave 2 blank rows below
         return start_row
 
-
     def generate_sorted_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
 
         sorted_records = sorted(comparison_json.get("records", []),key=lambda r: len(r.get("comparison_result", {}).get("new", [])),reverse=True)
@@ -432,15 +406,9 @@ class OperationExecutor:
         summary_df = pd.DataFrame(summary_data, columns=summary_headers)
 
         with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
-            # ✅ Write Summary sheet first
+            # Write Summary sheet first
             summary_df.to_excel(writer, sheet_name="Summary", index=False)
             ws_summary = writer.sheets["Summary"]
-
-            # # Add hyperlinks to bank sheets
-            # for row_idx, sheet_name in enumerate(summary_df["Sheet Link"], start=2):
-            #     cell = ws_summary.cell(row=row_idx, column=9)  # Assuming column 9 is "Sheet Link"
-            #     safe_sheet_name = sheet_name.replace("'", "''")  # Escape single quotes
-            #     cell.value = f'=HYPERLINK("\'{safe_sheet_name}\'!A1", "{sheet_name}")'
 
             # Apply conditional formatting to Change %
             GREEN_FILL = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")
@@ -454,12 +422,9 @@ class OperationExecutor:
             ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="between", formula=["20", "49.99"], fill=YELLOW_FILL))
             ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="lessThan", formula=["20"], fill=GREEN_FILL))
 
-            # ✅ Now write each bank sheet
+            # Now write each bank sheet
             for record in sorted_records:
-                bank_name = record.get("bank_name")
-                bank_code = record.get("bank_code")
-                bank_link = record.get("base_url")
-                sheet_name = f"{bank_name} ({bank_code})"[:31]
+                sheet_name = f"{bank_name} ({record.get("bank_code")})"[:31]
 
                 comparison_result = record.get("comparison_result", {})
                 summary = comparison_result.get("summary", {})
@@ -468,7 +433,7 @@ class OperationExecutor:
 
                 pd.DataFrame().to_excel(writer, sheet_name=sheet_name, index=False)
                 ws = writer.sheets[sheet_name]
-                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=bank_name, bank_link=bank_link)
+                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=record.get("bank_name"), bank_link=record.get("base_url"))
 
                 max_tables = max(len(new_entries), len(removed_entries))
                 for i in range(max_tables):
@@ -558,7 +523,7 @@ class OperationExecutor:
         return result
     
     @classmethod
-    def generate_cache_doc_report(cls, comparison_json, output_path="DepositRate_Comparison_Report.docx"):
+    def generate_cache_doc_report(cls, comparison_json, output_path="ALL_SCRAPED_DATA.docx"):
         document = Document()
         sorted_records = comparison_json.get("records", [])
         metadata = comparison_json.get("metadata", {})
@@ -672,4 +637,4 @@ class OperationExecutor:
 
         document.save(output_path)
         return output_path
-    
+   

@@ -1,83 +1,90 @@
 from app.action_executor import ActionExecutor
 from app.operation_executor import OperationExecutor
-from selenium.common.exceptions import TimeoutException, InvalidSessionIdException
-import time, traceback, threading, pprint, hashlib
+from selenium.common.exceptions import NoSuchWindowException, WebDriverException, TimeoutException, InvalidSessionIdException
+import traceback, pprint, hashlib, time
 from datetime import datetime
-from app.logger import get_active_logger
+from app.logger import get_global_logger
 
 class BankScraper:
-    def __init__(self, bank_params, paths):
-        self.bank_params = bank_params
-        self.logger = get_active_logger()
-        self.paths = paths
-        self.scrape_data = {
-            "bank_name": bank_params["bank_name"],
-            "bank_code": bank_params["bank_type_code"],
-            "base_url": bank_params["base_url"],
-            "scraped_data": []
-        }
-        self.executor = ActionExecutor(bank_params, paths) # not inherit, call here!!
-        
+    def __init__(self):
+        self.logger = get_global_logger()
+        self.executor = ActionExecutor() # not inherit, call here!!
         self.operator = OperationExecutor()
 
     @staticmethod
     def get_final_struct():
-        
-        date = datetime.now().strftime("%d%m%Y")
-        timestamp = datetime.now().strftime("%y-%m-%dT%H-%M-%S")
-        
+        today = datetime.now()
+        date, timestamp = today.strftime("%d%m%y"),today.strftime("%H%M")        
         return {
             "metadata": {
                 "program": "main.py",
                 "date": date,
                 "start_time":timestamp,
                 "config": "params_table.json5",
-                "cfname": f"{timestamp}_cache.json",
-                "pfname": f"{timestamp}_process.json"
+                "cfname": f"CACHE{date}T{timestamp}.json",
+                "pfname": f"PROCESSED{date}T{timestamp}.json"
             },
             "records": [],
             "registry":{},
         }
-    
-    def run(self):
-        try:
-            self.executor.create_uc_driver()
-            self.logger.info("Driver Created.")
+        
+    def load_driver(self, retries=3, delay=10):
+        attempt = 0
+        while attempt < retries:
             try:
+                self.logger.info(f"Attempt {attempt + 1} to create driver...")
+                self.executor.create_uc_driver()
+                if not self.executor.driver:
+                    self.logger.error("Driver creation returned None.")
+                    return None
+
                 self.executor.driver.set_page_load_timeout(50)
-                self.executor.driver.get(self.bank_params["base_url"])
-                self.logger.notice("Page fetched successfully.")
-            except TimeoutException:
-                self.logger.error("Page load timed out. Attempting to stop...")
-                try:
-                    self.executor.driver.execute_script("window.stop();")
-                except InvalidSessionIdException:
-                    self.logger.error("Driver session lost during timeout handling.")
-                    return {"error": "Driver crashed during load"}
-            
-            self.logger.info(f"========{self.bank_params['bank_name']}: {self.bank_params['bank_type_code']}========")
+                self.logger.info("Driver created successfully.")
+                return self.executor.driver  # Return the driver if successful
 
-            actions = self.bank_params["blocks"]
-            data = self.executor.execute_blocks(actions)
-            self.scrape_data["scraped_data"].extend(data)
+            except WebDriverException as e:
+                self.logger.error(f"WebDriver error: {e}. Retrying...")
+                self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
+                attempt += 1
+                time.sleep(delay)
 
-        except InvalidSessionIdException as e:
-            self.logger.error(f"Driver session invalid for {self.bank_params['bank_name']}. Restart required.")
-            self.scrape_data["scraped_data"] = [{"error_Type": "InvalidSessionId", "error_Message": str(e)}]
+            except Exception as e:
+                self.logger.error(f"Unexpected error: {e}. Retrying...")
+                self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
+                attempt += 1
+                time.sleep(delay)
+
+        self.logger.error("Failed to create driver after multiple attempts.")
+        return None
+
+    
+    def exit_driver(self):
+        self.logger.info("Closing the Driver.")
+        self.executor.driver.quit()
+        self.logger.info("Driver Closed.")
+
+    def run(self, bank_params):
+        
+        scraped_data = []
+        
+        try:
+            self.logger.info(f"==========={bank_params['bank_type_code']}:{bank_params['bank_name']}===========")           
+            self.executor.set_params(bank_params)
+            self.executor.get_website()
+            data = self.executor.execute_blocks()
+            scraped_data.extend(data)
         
         except Exception as e:
-            self.logger.error(f"Error in BankScraper.py {self.bank_params['bank_name']}: {type(e).__name__} {e}")
+            self.logger.error(f"Error in BankScraper.py {bank_params['bank_name']}: {type(e).__name__} {e}")
             self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
-            self.scrape_data["scraped_data"] = [{"error_Type": type(e).__name__, "error_Message": str(e),"error_from": "BankScraper.py"}]
+            scraped_data = [{"error_Type": type(e).__name__, "error_Message": str(e),"error_from": "BankScraper.py"}]
         
-        finally:
-            try:
-                self.executor.driver.quit()
-            except Exception:
-                pass
-            self.executor.driver = None
-        
-        return self.scrape_data
+        return {
+            "bank_name": bank_params["bank_name"],
+            "bank_code": bank_params["bank_type_code"],
+            "base_url": bank_params["base_url"],
+            "scraped_data":scraped_data
+        }
 
     @staticmethod
     def post_scrape(data: dict, ops_rules: dict, logger=None) -> dict:
@@ -129,6 +136,12 @@ class BankScraper:
     @staticmethod
     def generate_cache_report(data, output_path="DepositRate_Comparison_Report.docx"):
         OperationExecutor.generate_cache_doc_report(data, output_path= output_path)
+    
+    @staticmethod
+    def generate_prs_cache(data,fns):
+        ops = OperationExecutor()
+        prs_data = ops.runner(data,fns)
+        return prs_data
     
             
         

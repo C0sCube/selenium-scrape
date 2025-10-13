@@ -14,23 +14,22 @@ from urllib.parse import urljoin, urlparse
 
 import re, os, time, logging ,pprint, requests, base64, traceback, random,hashlib
 import undetected_chromedriver as uc
+from app.logger import get_global_logger
 from app.utils import Helper
 from app.constants import *
-from app.logger import get_active_logger
+
 
 class ActionExecutor:
-    def __init__(self, params=None, paths=None):
-        self.logger = get_active_logger() or logging.getLogger(__name__)
-        self.PARAMS = params or {}
-        self.PATHS = paths or {}
+    def __init__(self):
+        self.logger = get_global_logger()
+        self.OUTPUT_PATH = DATA_DIR
         self.data = {}
-
-        self.DATE = datetime.now()
-        self.OUTPUT_PATH = Helper.create_dir(paths["output"],paths["folders"]["data"],self.DATE.strftime("%Y-%m-%d"),params["bank_name"])
-
         self.driver = None
         self.window_stack = None
+        self.PARAMS = None
         self.scripts = SCRIPTS
+    
+    def set_params(self,params):self.PARAMS = params
     
     def create_driver(self):
         options = Options()
@@ -50,12 +49,12 @@ class ActionExecutor:
         return self.driver
     
     def create_uc_driver(self):
-
         options = uc.ChromeOptions()
         # options.add_argument(f"--user-data-dir={profile_path}")
         # options.add_argument(f"--profile-directory={profile_dir}")
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--disable-extensions")
+        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
         
         #preferential download
         options.add_experimental_option("prefs", {
@@ -68,7 +67,7 @@ class ActionExecutor:
         
         self.driver = uc.Chrome(options=options)
         
-        width,height = self.PARAMS["intial_window_size"]
+        width,height = 900,700
         self.driver.set_window_size(width,height)
         time.sleep(random.uniform(0.5, 2.5))
         
@@ -82,8 +81,15 @@ class ActionExecutor:
             self.driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {
                 "headers": headers
             })
+    
+    def get_website(self):
+        if self.driver:
+            self.driver.get(self.PARAMS["base_url"])
+            return
+        self.logger.warning(f"Driver not created. Couldnt get website.")
+    
+    def __set_website_parameters(self,_action_:dict):
         
-    def execute(self, _action_: dict):
         self.ACTION_TYPE = _action_.get("action",None)
         #get
         self.BY = self.__get_by(_action_.get("by", "css"))
@@ -135,6 +141,12 @@ class ActionExecutor:
         #script
         self.SCRIPT_KEY = _action_.get("script_key")
         self.SCRIPT = _action_.get("script")
+
+        return
+      
+    def execute(self, _action_: dict):
+        
+        self.__set_website_parameters(_action_)
         
         time.sleep(random.uniform(self.DEFAULT_WAIT/2, self.DEFAULT_WAIT))
         
@@ -151,11 +163,9 @@ class ActionExecutor:
             self.ELEMENT = self.driver.find_element(self.BY, self.VALUE)
             content = self.__perform_action(action_type = self.ACTION_TYPE)
         except Exception as e:
-            error_type = type(e).__name__
-            error_msg = str(e)
-            self.logger.error(f"Error in self.execute: [{error_type}] {error_msg}")
+            self.logger.error(f"Error in self.execute: [{type(e).__name__}] {str(e)}")
             self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
-            return self.__generate_packet([{"error_type": error_type, "error_message": error_msg, "error_from":"ActionExecutor.execute"}]) # skip further execution
+            return self.__generate_packet([{"error_type": type(e).__name__, "error_message": str(e), "error_from":"ActionExecutor.execute"}]) # skip further execution
 
         if self.NEW_WINDOW:
             self.logger.info("Switching to NEW WINDOW (latest handle).")
@@ -168,7 +178,7 @@ class ActionExecutor:
                 self.driver.close()
                 self.window_stack.pop()
                 self.driver.switch_to.window(self.window_stack[-1])
-        return self.__generate_packet(content) if content else self.__generate_packet([{"error_type": "NoneType", "error_message": "No content extracted from action.","error_from":"ActionExecutor.execute"}])
+        return self.__generate_packet(content) if content else self.__generate_packet([{"error_type": "NoneType", "error_message": "No content extracted.","error_from":"ActionExecutor.execute"}])
 
     def __perform_action(self,action_type = None):
         action_map = {
@@ -236,7 +246,7 @@ class ActionExecutor:
         packet = {
             "action": self.ACTION_TYPE,
             "uid": Helper.generate_uid(),
-            "timestamp": datetime.now().strftime("%d%m%Y %H:%M:%S"),
+            "timestamp": datetime.now().strftime("%d%m%Y %H:%M"),
             "webpage": self.driver.current_url,
             "data_present": not any(
                 key in entity for entity in content
@@ -761,25 +771,48 @@ class ActionExecutor:
             self.logger.error(f"Failed to execute script: {type(e).__name__} - {e}")
 
         # return scrape_content
-
     
-    
-    def execute_blocks(self, block: list):  
+    def execute_blocks(self):
         block_data = []
         generic_actions = GENERIC_ACTION_CONFIG
+
+        block = self.PARAMS["blocks"]
         self.logger.notice(f"Total Action(s) {len(block)}")
-        for _,_action_ in enumerate(block):
-            
-            if isinstance(_action_,str):
-                if _action_ not in generic_actions:
-                    self.logger.warning(f" {_action_} not part of generic_action_keys. Skipping.")
-                else:
-                    _action_ = generic_actions.get(_action_)   
-            data = self.execute(_action_)
+
+        for _, _action_ in enumerate(block):
+            data = None
+
+            if isinstance(_action_, str):
+                action_key, *content = _action_.split("||")
+                if action_key not in generic_actions:
+                    self.logger.warning(f"{action_key} not part of generic_action_keys. Skipping.")
+                    continue
+
+                do_action = generic_actions[action_key].copy()
+
+                if action_key == "action_website":
+                    do_action.update({"url": content[0]})
+                elif action_key == "action_download":
+                    by, value, multiple, wait_until = content
+                    do_action.update({
+                        "by": by,
+                        "value": value,
+                        "multiple": bool(multiple),
+                        "wait_until": wait_until
+                    })
+
+            elif isinstance(_action_, dict):
+                do_action = _action_
+
+            else:
+                self.logger.warning(f"Unsupported action format: {_action_}")
+                continue
+
+            data = self.execute(do_action)
             if data:
                 block_data.append(data)
-        return block_data
 
+        return block_data
 
 
 #Internal Helper

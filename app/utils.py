@@ -4,9 +4,12 @@ import pandas as pd #type:ignore
 from typing import List
 import unicodedata
 
+from app.logger import get_global_logger
+
 class Helper:
     
     def __init__(self):
+        self.logger = get_global_logger()
         pass
     #PARSING UTILS
     def get_xlsx_in_folder(self,path:str, expected_file_name ="table_data.xlsx" ) -> dict:
