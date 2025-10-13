@@ -156,7 +156,7 @@ class ActionExecutor:
         
         self.__set_website_parameters(_action_)
         
-        time.sleep(random.uniform(self.DEFAULT_WAIT/2, self.DEFAULT_WAIT))
+        time.sleep(random.uniform(self.DEFAULT_WAIT/1.2, self.DEFAULT_WAIT))
         
         
         #element; The Which gets loaded as default
@@ -175,17 +175,17 @@ class ActionExecutor:
             self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
             return self.__generate_packet([{"error_type": type(e).__name__, "error_message": str(e), "error_from":"ActionExecutor.execute"}]) # skip further execution
 
-        if self.NEW_WINDOW:
-            self.logger.info("Switching to NEW WINDOW (latest handle).")
-            self.driver.switch_to.window(self.driver.window_handles[-1])
-            self.window_stack.append(self.driver.current_window_handle)
+        # if self.NEW_WINDOW:
+        #     self.logger.info("Switching to NEW WINDOW (latest handle).")
+        #     self.driver.switch_to.window(self.driver.window_handles[-1])
+        #     self.window_stack.append(self.driver.current_window_handle)
 
-        if self.RETURN_TO_BASE:
-            self.logger.info("Returning to Base Window.")
-            if len(self.window_stack) > 1:
-                self.driver.close()
-                self.window_stack.pop()
-                self.driver.switch_to.window(self.window_stack[-1])
+        # if self.RETURN_TO_BASE:
+        #     self.logger.info("Returning to Base Window.")
+        #     if len(self.window_stack) > 1:
+        #         self.driver.close()
+        #         self.window_stack.pop()
+        #         self.driver.switch_to.window(self.window_stack[-1])
         return self.__generate_packet(content) if content else self.__generate_packet([{"error_type": "NoneType", "error_message": "No content extracted.","error_from":"ActionExecutor.execute"}])
 
     def __perform_action(self,action_type = None):
@@ -282,18 +282,18 @@ class ActionExecutor:
             "value":value,
             "type":type,
             "data_present": bool(value),
-            "hash": hashlib.sha256(value.encode("utf-8")).hexdigest() if value else None
+            # "hash": hashlib.sha256(value.encode("utf-8")).hexdigest() if value else None
         }
     
-    def __scroll_to_bottom(self):
-        last_height = self.driver.execute_script("return document.body.scrollHeight")
-        while True:
-            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(1.5)
-            new_height = self.driver.execute_script("return document.body.scrollHeight")
-            if new_height == last_height:
-                break
-            last_height = new_height
+    # def __scroll_to_bottom(self):
+    #     last_height = self.driver.execute_script("return document.body.scrollHeight")
+    #     while True:
+    #         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    #         time.sleep(1.5)
+    #         new_height = self.driver.execute_script("return document.body.scrollHeight")
+    #         if new_height == last_height:
+    #             break
+    #         last_height = new_height
     
     # ===================== ACTION =====================
     
@@ -376,14 +376,6 @@ class ActionExecutor:
             
             cleaned_content.append(html_content)
             scrape_content.append(self.__generate_resp_packet(name=f"{self.html_name}_{idx}",value=html_content,header="HTML DOESNT HAVE HEADER",type="html"))
-
-        # if self.FILE_SAVE:
-        #     for idx,content in enumerate(cleaned_content):
-        #         html_path = os.path.join(self.OUTPUT_PATH,f"html_content_{idx}.html")
-        #         with open(html_path,"w") as f:
-        #             f.write(content)
-            
-        #     self.logger.info(f"Saved Html Data.") 
 
         return scrape_content
     

@@ -82,6 +82,8 @@ class BankScraper:
             scraped_data = [{"error_Type": type(e).__name__, "error_Message": str(e),"error_from": "BankScraper.py"}]
             self.error_progs.append(f"BankName:{bank_params['bank_name']},ErrorType:{type(e).__name__},ErrorMessage:{str(e)}")
         
+        #end session
+        self.executor.driver.delete_all_cookies()
         return {
             "bank_name": bank_params["bank_name"],
             "bank_code": bank_params["bank_type_code"],

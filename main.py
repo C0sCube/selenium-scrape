@@ -12,7 +12,7 @@ set_global_logger(logger)
 from app.BankScraper import BankScraper
 from app.utils import Helper
 
-bank_codes = ["PSB_1"]  #PUB_BANK_CODES  #PVT_BANK_CODES #ALL_BANK_CODES
+bank_codes =  PUB_BANK_CODES  #PVT_BANK_CODES #ALL_BANK_CODES
 
 try:
     logger.notice("Starting Program.")

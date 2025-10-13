@@ -1,4 +1,4 @@
-import re,os,hashlib, inspect, dateutil, base64, pdfplumber, ocrmypdf, tempfile
+import time ,re,os, hmac, hashlib, inspect, dateutil, base64, pdfplumber, ocrmypdf, tempfile,shutil, tabula
 import pandas as pd
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
@@ -7,7 +7,7 @@ from docx import Document
 from pdf2docx import Converter
 from docx import Document as DocxReader
 
-from openpyxl import Workbook
+
 from openpyxl.styles import PatternFill
 from openpyxl.formatting.rule import FormulaRule
 from openpyxl.utils.dataframe import dataframe_to_rows  
@@ -16,16 +16,27 @@ from openpyxl.formatting.rule import CellIsRule
 from app.logger import get_global_logger
 
 class OperationExecutor:
-    
-    
+ 
     cache_doc_name = ""
     
     def __init__(self, ):
         
         self.logger = get_global_logger()
-        self.procedures = { "ext_date": self.extract_date,"sha256": self._generate_hash_sha256,"sha1": self._generate_hash_sha1,"normalize_df": self._generalize_table_df,"original":self._boomerang}
+        self.procedures = {
+            "ext_date": self.extract_date,
+            "sha256": self._generate_hash_sha256,
+            "sha1": self._generate_hash_sha1,
+            "normalize_df": self._generalize_table_df,
+            "original":self._boomerang
+        }
         
-        self.type_compatibility = {"normalize_df": ["table_html"],"sha1": ["table_html", "html", "pdf"],"sha256": ["table_html", "html", "pdf"],"ext_date": ["html"],"original": ["pdf", "html", "table_html"]}
+        self.type_compatibility = {
+            "normalize_df": ["table_html"],
+            "sha1": ["table_html", "html", "pdf"],
+            "sha256": ["table_html", "html", "pdf"],
+            "ext_date": ["html"],
+            "original": ["pdf", "html", "table_html"]
+        }
 
     #============ PROCEDURES ==============
     @staticmethod
@@ -35,7 +46,10 @@ class OperationExecutor:
             return ""
         
         output_format = "%Y%m%d"
-        date_patterns = [r"(\d{2}[.\-/]+\d{2}[.\-/]+\d{4}",r"\d{1,2}\s*(?:th|st|rd|nd)\s*[A-Za-z]+\s*\d{4}",r"\d{2}[\.\-\/]+[A-Za-z]+[\.\-\/]+\d{4}",r"\d{2}\s*[A-Za-z]+\s*\d{4})"]
+        date_patterns = [r"(\d{2}[.\-/]+\d{2}[.\-/]+\d{4}",
+                        r"\d{1,2}\s*(?:th|st|rd|nd)\s*[A-Za-z]+\s*\d{4}",
+                        r"\d{2}[\.\-\/]+[A-Za-z]+[\.\-\/]+\d{4}",
+                        r"\d{2}\s*[A-Za-z]+\s*\d{4})"]
         matches = re.findall(r"|".join(date_patterns), text, re.IGNORECASE)
         
         if matches:
@@ -48,7 +62,8 @@ class OperationExecutor:
                 return date_str
         return text
     
-    def _boomerang(self,data): return data
+    def _boomerang(self,data):
+        return data
     
     def _generate_hash_sha256(self,text:str)->str:
         if not isinstance(text,str):
@@ -142,27 +157,95 @@ class OperationExecutor:
                     f.write("</body></html>")
   
     #Core Functionality
+    # def runner(self, data, function_to_execute):
+    #     p_dict = data.copy()
+    #     records = p_dict.get("records", [])
+
+    #     for record in records:
+    #         # self.logger.info(f"Processing : {record['bank_name']}")
+    #         print(f">>Processing {record['bank_name']}")
+    #         response_data = record.get("scraped_data", [])
+    #         if not response_data:
+    #             continue
+
+    #         new_scraped_data = []
+
+    #         for action in response_data:
+    #             if not action.get("data_present"):
+    #                 continue
+
+    #             response = action.get("response")
+    #             if not response:
+    #                 continue
+
+    #             for _packet_ in response:
+    #                 check_packet = _packet_.copy()
+
+    #                 for stage_name, operations in function_to_execute.items():
+    #                     for operation in operations:
+    #                         # Unpack operation with optional expected_type
+    #                         if len(operation) == 4:
+    #                             func_name, source_key, target_key, expected_type = operation
+    #                         else:
+    #                             func_name, source_key, target_key = operation
+    #                             expected_type = None
+
+    #                         if target_key in check_packet:
+    #                             raise ValueError(
+    #                                 f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}"
+    #                             )
+
+    #                         func = self.procedures.get(func_name)
+    #                         if not func:
+    #                             raise ValueError(f"Function '{func_name}' not found in procedures.")
+
+    #                         input_value = _packet_.get(source_key)
+    #                         if input_value is None:
+    #                             continue
+
+    #                         # Apply type check only in primary stage
+    #                         if stage_name == "primary" and expected_type:
+    #                             packet_type = _packet_.get("type", "").lower()
+    #                             if isinstance(expected_type, list):
+    #                                 if packet_type not in [t.lower() for t in expected_type]:
+    #                                     continue
+    #                             elif packet_type != expected_type.lower():
+    #                                 continue
+
+    #                         _packet_[target_key] = func(input_value)
+
+    #                 new_scraped_data.append(_packet_)
+
+    #         record["scraped_data"] = new_scraped_data
+
+    #     return p_dict
+        
     def runner(self, data, function_to_execute):
         p_dict = data.copy()
         records = p_dict.get("records", [])
 
         for record in records:
-            print(f">>Processing {record.get('bank_name', 'Unknown Bank')}")
+            print(f">>Processing {record['bank_name']}")
             response_data = record.get("scraped_data", [])
             if not response_data:
                 continue
 
             new_scraped_data = []
 
-            for action in record.get("scraped_data", []):
+            for action in response_data:
                 if not action.get("data_present"):
                     continue
 
-                for packet in action.get("response", []):
-                    packet = packet.copy()
-                    for stage_name, operations in function_to_execute.items():
-                        for operation in operations:
-                            try:
+                response = action.get("response")
+                if not response:
+                    continue
+
+                for _packet_ in response:
+                    check_packet = _packet_.copy()
+
+                    try:
+                        for stage_name, operations in function_to_execute.items():
+                            for operation in operations:
                                 # Unpack operation with optional expected_type
                                 if len(operation) == 4:
                                     func_name, source_key, target_key, expected_type = operation
@@ -172,7 +255,7 @@ class OperationExecutor:
 
                                 if target_key in check_packet:
                                     raise ValueError(
-                                        f"`target_key` '{target_key}' already exists in packet keys: {list(check_packet.keys())}"
+                                        f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}"
                                     )
 
                                 func = self.procedures.get(func_name)
@@ -194,9 +277,12 @@ class OperationExecutor:
 
                                 _packet_[target_key] = func(input_value)
 
-                            except Exception as e:
-                                print(f"⚠️ Skipping operation '{operation}' for {record.get('bank_name')} due to error: {e}")
-                                continue
+                    except Exception as e:
+                        error_msg = f"[ERROR] Failed to process packet for bank '{record['bank_name']}': {str(e)}"
+                        if hasattr(self, "logger"):
+                            self.logger.error(error_msg)
+                        else:
+                            print(error_msg)
 
                     new_scraped_data.append(_packet_)
 
@@ -257,10 +343,7 @@ class OperationExecutor:
         return new_json
     
     def _parse_table(self, entry):
-        """
-        Parses structured content from various formats into a pandas DataFrame.
-        Supported types: table_html, html, pdf, redir_pdf.
-        """
+        
         content_type = entry.get("type", "str")
         raw_content = entry.get("value", "")
 
@@ -268,44 +351,50 @@ class OperationExecutor:
             if content_type == "table_html":
                 return pd.read_html(StringIO(raw_content))[0]
 
-            if content_type == "html":
+            elif content_type == "html":
                 soup = BeautifulSoup(raw_content, "html.parser")
-                text_lines = [line.strip() for line in soup.get_text().splitlines() if line.strip()]
+                text_lines = soup.get_text().splitlines()
+                text_lines = [line.strip() for line in text_lines if line.strip()]
                 return pd.DataFrame({"text": text_lines})
 
-            if content_type in {"pdf", "redir_pdf"}:
+            elif content_type == "pdf":
                 pdf_bytes = base64.b64decode(raw_content)
                 pdf_file = BytesIO(pdf_bytes)
+                all_rows = []
+                try:
+                    with pdfplumber.open(pdf_file) as pdf:
+                        for page_num, page in enumerate(pdf.pages, start=1):
+                            tables = page.extract_tables()
+                            for table in tables:
+                                all_rows.append([f"[Page {page_num}]"])
+                                all_rows.extend(table)
+                except Exception as e:
+                    return pd.DataFrame([[f"Invalid PDF file: {e}"]])
+                return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in PDF"]])
 
-                if content_type == "redir_pdf":
-                    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_output:
-                        ocrmypdf.ocr(pdf_file, temp_output.name)
-                        pdf_file = open(temp_output.name, "rb")
-
-                return self._extract_pdf_tables(pdf_file, content_type)
+            elif content_type == "redir_pdf":
+                pdf_bytes = base64.b64decode(raw_content)
+                pdf_file = BytesIO(pdf_bytes)
+                all_rows = []
+                with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_output:
+                    ocrmypdf.ocr(pdf_file, temp_output.name)
+                try:
+                    with pdfplumber.open(temp_output.name) as pdf:
+                        for page_num, page in enumerate(pdf.pages, start=1):
+                            tables = page.extract_tables()
+                            for table in tables:
+                                all_rows.append([f"[Page {page_num}]"])
+                                all_rows.extend(table)
+                except Exception as e:
+                    return pd.DataFrame([[f"OCR PDF failed: {e}"]])
+                return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in OCR PDF"]])
 
         except Exception as e:
-            msg = f"Failed to parse data for content type {content_type}: {e}"
             if hasattr(self, "logger") and self.logger:
-                self.logger.error(msg)
+                self.logger.error(f"Failed to parse data for content type {content_type}: {e}")
             else:
-                print(f"[ERROR] {msg}")
+                print(f"[ERROR] Failed to parse data for content type {content_type}: {e}")
             return pd.DataFrame([[f"Failed to parse data of type: {content_type}"]])
-
-    def _extract_pdf_tables(self, pdf_file, label="pdf"):
-        """Extracts tables from a PDF file using pdfplumber."""
-        all_rows = []
-        try:
-            with pdfplumber.open(pdf_file) as pdf:
-                for page_num, page in enumerate(pdf.pages, start=1):
-                    tables = page.extract_tables()
-                    for table in tables:
-                        all_rows.append([f"[Page {page_num}]"])
-                        all_rows.extend(table)
-        except Exception as e:
-            return pd.DataFrame([[f"{label.upper()} parsing failed: {e}"]])
-
-        return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([[f"No table found in {label.upper()}"]])    
 
     def _write_summary(self, ws, summary, start_row, bank_name="", bank_link=""):
         # Write bank name and link
@@ -384,6 +473,17 @@ class OperationExecutor:
         start_row += max_rows + 2  # Leave 2 blank rows below
         return start_row
 
+    def _write_single_table(self, ws, df, start_row, title=None):
+        if title:
+            for line in title:
+                ws.cell(row=start_row, column=1, value=line)
+                start_row += 1
+        for r in dataframe_to_rows(df, index=False, header=True):
+            for c_idx, value in enumerate(r, start=1):
+                ws.cell(row=start_row, column=c_idx, value=value)
+            start_row += 1
+        return start_row
+    
     def generate_sorted_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
 
         sorted_records = sorted(comparison_json.get("records", []),key=lambda r: len(r.get("comparison_result", {}).get("new", [])),reverse=True)
@@ -396,19 +496,30 @@ class OperationExecutor:
             summary = record.get("comparison_result", {}).get("summary", {})
             sheet_name = f"{bank_name} ({bank_code})"[:31]
 
-            summary_row = [bank_code,bank_name,summary.get("old_total", 0),summary.get("new_total", 0),summary.get("new_count", 0),summary.get("removed_count", 0),summary.get("unchanged_count", 0),round((summary.get("new_count", 0) + summary.get("removed_count", 0)) / max(summary.get("old_total", 1), 1) * 100, 2),sheet_name]
+            old_total = summary.get("old_total", 0)
+            new_count = summary.get("new_count", 0)
+            removed_count = summary.get("removed_count", 0)
+
+            if old_total == 0:
+                change_pct = 100.0 if new_count > 0 else 0.0
+                note = "No previous data" if new_count > 0 else ""
+            else:
+                change_pct = round((new_count + removed_count) / old_total * 100, 2)
+                note = ""
+            summary_row = [bank_code, bank_name, old_total, summary.get("new_total", 0), new_count, removed_count, summary.get("unchanged_count", 0), change_pct, note]
             summary_data.append(summary_row)
 
         summary_headers = [
             "Bank Code", "Bank Name", "Old Total", "New Total",
-            "New Count", "Removed Count", "Unchanged Count", "Change %", "Sheet Link"
+            "New Count", "Removed Count", "Unchanged Count", "Change %", "Notes"
         ]
         summary_df = pd.DataFrame(summary_data, columns=summary_headers)
 
         with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
-            # Write Summary sheet first
             summary_df.to_excel(writer, sheet_name="Summary", index=False)
             ws_summary = writer.sheets["Summary"]
+
+
 
             # Apply conditional formatting to Change %
             GREEN_FILL = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")
@@ -422,9 +533,12 @@ class OperationExecutor:
             ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="between", formula=["20", "49.99"], fill=YELLOW_FILL))
             ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="lessThan", formula=["20"], fill=GREEN_FILL))
 
-            # Now write each bank sheet
+            # ✅ Now write each bank sheet
             for record in sorted_records:
-                sheet_name = f"{bank_name} ({record.get("bank_code")})"[:31]
+                bank_name = record.get("bank_name")
+                bank_code = record.get("bank_code")
+                bank_link = record.get("base_url")
+                sheet_name = f"{bank_name} ({bank_code})"[:31]
 
                 comparison_result = record.get("comparison_result", {})
                 summary = comparison_result.get("summary", {})
@@ -433,28 +547,40 @@ class OperationExecutor:
 
                 pd.DataFrame().to_excel(writer, sheet_name=sheet_name, index=False)
                 ws = writer.sheets[sheet_name]
-                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=record.get("bank_name"), bank_link=record.get("base_url"))
+                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=bank_name, bank_link=bank_link)
 
                 max_tables = max(len(new_entries), len(removed_entries))
+                # for i in range(max_tables):
+                #     new_entry = new_entries[i] if i < len(new_entries) else {}
+                #     removed_entry = removed_entries[i] if i < len(removed_entries) else {}
+
+                #     new_df = self._parse_table(new_entry) if new_entry else pd.DataFrame()
+                #     removed_df = self._parse_table(removed_entry) if removed_entry else pd.DataFrame()
+
+                #     title = new_entry.get("title") or removed_entry.get("title") or []
+                #     title = [title] if isinstance(title,str) else title
+                #     row_cursor = self._write_side_by_side_tables(ws,new_df,removed_df,start_row=row_cursor,title=title)
                 for i in range(max_tables):
-                    new_entry = new_entries[i] if i < len(new_entries) else {}
-                    removed_entry = removed_entries[i] if i < len(removed_entries) else {}
+                    new_entry = new_entries[i] if i < len(new_entries) else None
+                    removed_entry = removed_entries[i] if i < len(removed_entries) else None
 
-                    new_df = self._parse_table(new_entry) if new_entry else pd.DataFrame()
-                    removed_df = self._parse_table(removed_entry) if removed_entry else pd.DataFrame()
+                    title = new_entry.get("title") if new_entry else removed_entry.get("title")
+                    title = [title] if isinstance(title, str) else title or []
 
-                    title = new_entry.get("title") or removed_entry.get("title") or []
-                    title = [title] if isinstance(title,str) else title
-                    row_cursor = self._write_side_by_side_tables(
-                        ws,
-                        new_df,
-                        removed_df,
-                        start_row=row_cursor,
-                        title=title
-                    )
+                    if new_entry and removed_entry:
+                        new_df = self._parse_table(new_entry)
+                        removed_df = self._parse_table(removed_entry)
+                        row_cursor = self._write_side_by_side_tables(ws, new_df, removed_df, start_row=row_cursor, title=title)
+                    elif new_entry:
+                        new_df = self._parse_table(new_entry)
+                        row_cursor = self._write_single_table(ws, new_df, start_row=row_cursor, title=title + ["(Removed data missing)"])
+                    elif removed_entry:
+                        removed_df = self._parse_table(removed_entry)
+                        row_cursor = self._write_single_table(ws, removed_df, start_row=row_cursor, title=title + ["(New data missing)"])
 
         return output_path
 
+    
     @staticmethod
     def __parse_entry(entry):
 
@@ -523,7 +649,7 @@ class OperationExecutor:
         return result
     
     @classmethod
-    def generate_cache_doc_report(cls, comparison_json, output_path="ALL_SCRAPED_DATA.docx"):
+    def generate_cache_doc_report(cls, comparison_json, output_path="DepositRate_Comparison_Report.docx"):
         document = Document()
         sorted_records = comparison_json.get("records", [])
         metadata = comparison_json.get("metadata", {})
@@ -637,4 +763,4 @@ class OperationExecutor:
 
         document.save(output_path)
         return output_path
-   
+    

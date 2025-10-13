@@ -229,18 +229,18 @@
       },
     ],
   },
-  PVB_1: {
+  PVB_2: {
     bank_name: "Axis Bank",
     bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_1",
+    bank_type_code: "PVB_2",
     base_url: "https://www.axisbank.com/fixed-deposit-interest-rate",
 
-    blocks: ["action_download@css@a.FDlink.pdf-data@true@clickable"],
+    blocks: ["action_download||css||a.FDlink.pdf-data||true||clickable"],
   },
-  PVB_2: {
+  PVB_1: {
     bank_name: "Bandhan Bank",
     bank_type: "PRIVATE SECTOR BANKS",
-    bank_type_code: "PVB_2",
+    bank_type_code: "PVB_1",
     base_url: "https://www.bandhanbank.com/rates-charges",
 
     blocks: ["action_table"],
