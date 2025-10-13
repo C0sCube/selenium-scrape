@@ -61,8 +61,7 @@ except Exception as e:
     logger.debug(f"Traceback:\n{traceback.format_exc()}")
 
 finally:
-    Helper.save_json(final_dict, os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]),typ="json")
-    Helper.save_text(scraper.error_progs,os.path.join(CCH_DIR, final_dict["metadata"]["cfname"].replace(".json",".txt")))
-    print(os.path.join(CCH_DIR, final_dict["metadata"]["cfname"]))
-    logger.save("Saved Cached Data.")
-    logger.notice("Ending Program.")
+    path = os.path.join(CCH_DIR, final_dict["metadata"]["cfname"])
+    Helper.save_json(final_dict, path,typ="json")
+    logger.save(f"Saved At: {path}")
+    logger.info("Ending Program.")

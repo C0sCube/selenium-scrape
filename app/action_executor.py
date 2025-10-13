@@ -1,18 +1,14 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver import ActionChains
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium import webdriver 
 from bs4 import BeautifulSoup
 from datetime import datetime, date
-from urllib.parse import urlencode
-# from io import StringIO
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, urlencode
 
-import re, os, time, logging ,pprint, requests, base64, traceback, random,hashlib
+import re, os, time, pprint, requests, base64, traceback, random
 import undetected_chromedriver as uc
 from app.logger import get_global_logger
 from app.utils import Helper
@@ -28,6 +24,46 @@ class ActionExecutor:
         self.window_stack = None
         self.PARAMS = None
         self.scripts = SCRIPTS
+        
+        # ========== Locators and Conditions ==========
+        
+        self.locator_map = {
+            "css": By.CSS_SELECTOR,
+            "xpath": By.XPATH,
+            "id": By.ID,
+            "name": By.NAME,
+            "class": By.CLASS_NAME,
+            "tag": By.TAG_NAME,
+            "txt": By.LINK_TEXT,
+            "ptxt": By.PARTIAL_LINK_TEXT,
+        }
+
+        self.condition_map = {
+            "clickable": EC.element_to_be_clickable,
+            "visible": EC.visibility_of_element_located,
+            "present": EC.presence_of_element_located,
+            "invisible": EC.invisibility_of_element_located,
+            "attached": EC.element_to_be_selected,
+        }
+        
+        self.action_map = {
+            "click": self.clickElem,
+            "click_save":self.clickSave,
+            "html": self.htmlScrape,
+            "table": self.tablScrape,
+            "scrape": self.textScrape,
+            "website": self.webRedir,
+            "download": self.downloadElem,
+            "pdf": self.genPdf,
+            "redir_pdf":self.genPdf,
+            "screenshot": self.genSst,
+            "tablist": self.tabList,
+            "weblist":self.webList,
+            "http":self.httpRequest,
+            "manual":self.manualAction,
+            "execute_script": self.injectScript
+
+        }
     
     def set_params(self,params):
         self.PARAMS = params
@@ -189,64 +225,55 @@ class ActionExecutor:
         return self.__generate_packet(content) if content else self.__generate_packet([{"error_type": "NoneType", "error_message": "No content extracted.","error_from":"ActionExecutor.execute"}])
 
     def __perform_action(self,action_type = None):
-        action_map = {
-            "click": self.clickElem,
-            "click_save":self.clickSave,
-            "html": self.htmlScrape,
-            "table": self.tablScrape,
-            "scrape": self.textScrape,
-            "website": self.webRedir,
-            "download": self.downloadElem,
-            "pdf": self.genPdf,
-            "redir_pdf":self.genPdf,
-            "screenshot": self.genSst,
-            "tablist": self.tabList,
-            "weblist":self.webList,
-            "http":self.httpRequest,
-            "manual":self.manualAction,
-            "execute_script": self.injectScript
-
-        }
-
         if not action_type:
             self.logger.info(f"Checked presence of element: {self.BY}={self.VALUE}")
             return
 
-        action = action_map.get(action_type)
+        action = self.action_map.get(action_type)
         if action:
             result = action()
             if result is not None:
                 return result
         else:
             self.logger.warning(f"Unknown action type: {self.ACTION_TYPE}")
-        
-    def __get_by(self, by_string):
-        mapping = {
-            "css": By.CSS_SELECTOR,
-            "xpath": By.XPATH,
-            "id": By.ID,
-            "name": By.NAME,
-            "class": By.CLASS_NAME,
-            "tag": By.TAG_NAME,
-            "txt":By.LINK_TEXT,
-            "ptxt":By.PARTIAL_LINK_TEXT
-        }
-        return mapping.get(by_string.lower(), By.CSS_SELECTOR)
-
+    
     def __get_condition(self, wait_type, by, value):
-        cond_map = {
-            "clickable": EC.element_to_be_clickable,
-            "visible": EC.visibility_of_element_located,
-            "present": EC.presence_of_element_located,
-            "invisible": EC.invisibility_of_element_located,
-            "attached": EC.element_to_be_selected
-        }
-
-        locator = (self.__get_by(by), value)
-        condition_func = cond_map.get(wait_type)
+        condition_func = self.condition_map.get(wait_type.lower())
         if not condition_func:
             raise ValueError(f"Unknown wait condition: {wait_type}")
+
+        locator = (self.locator_map.get(by.lower(), By.CSS_SELECTOR), value)
         return condition_func(locator)
+
+            
+        
+    # def __get_by(self, by_string):
+    #     mapping = {
+    #         "css": By.CSS_SELECTOR,
+    #         "xpath": By.XPATH,
+    #         "id": By.ID,
+    #         "name": By.NAME,
+    #         "class": By.CLASS_NAME,
+    #         "tag": By.TAG_NAME,
+    #         "txt":By.LINK_TEXT,
+    #         "ptxt":By.PARTIAL_LINK_TEXT
+    #     }
+    #     return mapping.get(by_string.lower(), By.CSS_SELECTOR)
+
+    # def __get_condition(self, wait_type, by, value):
+    #     cond_map = {
+    #         "clickable": EC.element_to_be_clickable,
+    #         "visible": EC.visibility_of_element_located,
+    #         "present": EC.presence_of_element_located,
+    #         "invisible": EC.invisibility_of_element_located,
+    #         "attached": EC.element_to_be_selected
+    #     }
+
+    #     locator = (self.__get_by(by), value)
+    #     condition_func = cond_map.get(wait_type)
+    #     if not condition_func:
+    #         raise ValueError(f"Unknown wait condition: {wait_type}")
+    #     return condition_func(locator)
     
      #Packet Functions
      
@@ -275,25 +302,10 @@ class ActionExecutor:
 
         return packet
     
-    def __generate_resp_packet(self, name = "",header="",value = None,type = ""):
-        return {
-            "name":name,
-            "title":header,
-            "value":value,
-            "type":type,
-            "data_present": bool(value),
-            # "hash": hashlib.sha256(value.encode("utf-8")).hexdigest() if value else None
-        }
-    
-    # def __scroll_to_bottom(self):
-    #     last_height = self.driver.execute_script("return document.body.scrollHeight")
-    #     while True:
-    #         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    #         time.sleep(1.5)
-    #         new_height = self.driver.execute_script("return document.body.scrollHeight")
-    #         if new_height == last_height:
-    #             break
-    #         last_height = new_height
+    def __generate_resp_packet(self, name="", header="", value=None, type=""):
+        return {"name": name, "title": header, "value": value, "type": type, "data_present": bool(value)}
+
+
     
     # ===================== ACTION =====================
     
@@ -765,8 +777,6 @@ class ActionExecutor:
         return scrape_content
     
     def injectScript(self):
-        # scrape_content = []
-
         script_key = self.SCRIPT_KEY
         raw_script = self.SCRIPT
 

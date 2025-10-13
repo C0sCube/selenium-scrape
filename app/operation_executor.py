@@ -1,4 +1,4 @@
-import time ,re,os, hmac, hashlib, inspect, dateutil, base64, pdfplumber, ocrmypdf, tempfile,shutil, tabula
+import re,os, hashlib, inspect, dateutil, base64, pdfplumber, ocrmypdf, tempfile
 import pandas as pd
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
@@ -16,8 +16,6 @@ from openpyxl.formatting.rule import CellIsRule
 from app.logger import get_global_logger
 
 class OperationExecutor:
- 
-    cache_doc_name = ""
     
     def __init__(self, ):
         
@@ -38,6 +36,11 @@ class OperationExecutor:
             "original": ["pdf", "html", "table_html"]
         }
 
+    
+        self.GREEN_FILL = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")
+        self.YELLOW_FILL = PatternFill(start_color="FFF2CC", end_color="FFF2CC", fill_type="solid")
+        self.RED_FILL = PatternFill(start_color="F4CCCC", end_color="F4CCCC", fill_type="solid")
+        self.RED_NOTE_FILL = PatternFill(start_color="FFC7CE", end_color="FFC7CE", fill_type="solid")
     #============ PROCEDURES ==============
     @staticmethod
     def extract_date(text: str) -> str:
@@ -62,8 +65,7 @@ class OperationExecutor:
                 return date_str
         return text
     
-    def _boomerang(self,data):
-        return data
+    def _boomerang(self,data): return data
     
     def _generate_hash_sha256(self,text:str)->str:
         if not isinstance(text,str):
@@ -100,62 +102,6 @@ class OperationExecutor:
         norm_df = final_df.to_csv(index=False,header=False, sep='|', lineterminator='\n')
         return norm_df
 
-
-    
-    @staticmethod
-    def save_tables_to_excel(tables, output_dir="tables", output_file="all_tables.xlsx", consolidate_save=True):
-        """
-        Save tables to Excel.
-        If separator=True, saves all tables in one file with multiple sheets.
-        If separator=False, saves each table in a separate Excel file.
-        """
-        if consolidate_save:
-            full_path = os.path.join(output_dir, output_file)
-            with pd.ExcelWriter(full_path, engine="openpyxl") as writer:
-                for i, table in enumerate(tables):
-                    df = pd.read_html(str(table))[0]
-                    sheet_name = f"Table_{i+1}"
-                    df.to_excel(writer, sheet_name=sheet_name, index=False)
-                    # print(f"Added sheet: {sheet_name}")
-            # return full_path
-        else:
-            saved_files = []
-            for i, table in enumerate(tables):
-                df = pd.read_html(str(table))[0]
-                file_path = os.path.join(output_dir, f"table_{i+1}.xlsx")
-                df.to_excel(file_path, index=False)
-                saved_files.append(file_path)
-                # print(f"Saved: {file_path}")
-            # return saved_files
-
-    @staticmethod
-    def save_tables_html(tables,output_dir="output_html",output_file="combined.html",separator=None,wrap_html=True):
-        
-        if isinstance(tables,str):tables = [tables]
-        if separator is None:
-            # Save each table separately
-            for i, table in enumerate(tables):
-                filename = f"content_{i+1}.html"
-                path = os.path.join(output_dir, filename)
-                with open(path, "w", encoding="utf-8") as f:
-                    if wrap_html:
-                        f.write("<html><body>\n")
-                    f.write(str(table) + "\n")
-                    if wrap_html:
-                        f.write("</body></html>")
-        else:
-            # Save all tables in one file with separator
-            path = os.path.join(output_dir, output_file)
-            with open(path, "w", encoding="utf-8") as f:
-                if wrap_html:
-                    f.write("<html><body>\n")
-                for i, table in enumerate(tables):
-                    f.write(str(table) + "\n")
-                    if i < len(tables) - 1:
-                        f.write(separator + "\n")
-                if wrap_html:
-                    f.write("</body></html>")
-  
     #Core Functionality
     # def runner(self, data, function_to_execute):
     #     p_dict = data.copy()
@@ -227,18 +173,12 @@ class OperationExecutor:
         for record in records:
             print(f">>Processing {record['bank_name']}")
             response_data = record.get("scraped_data", [])
-            if not response_data:
-                continue
-
+            if not response_data: continue
             new_scraped_data = []
-
             for action in response_data:
-                if not action.get("data_present"):
-                    continue
-
+                if not action.get("data_present"):continue
                 response = action.get("response")
-                if not response:
-                    continue
+                if not response:continue
 
                 for _packet_ in response:
                     check_packet = _packet_.copy()
@@ -247,20 +187,15 @@ class OperationExecutor:
                         for stage_name, operations in function_to_execute.items():
                             for operation in operations:
                                 # Unpack operation with optional expected_type
-                                if len(operation) == 4:
-                                    func_name, source_key, target_key, expected_type = operation
+                                if len(operation) == 4: func_name, source_key, target_key, expected_type = operation
                                 else:
                                     func_name, source_key, target_key = operation
                                     expected_type = None
 
-                                if target_key in check_packet:
-                                    raise ValueError(
-                                        f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}"
-                                    )
+                                if target_key in check_packet: raise ValueError(f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}")
 
                                 func = self.procedures.get(func_name)
-                                if not func:
-                                    raise ValueError(f"Function '{func_name}' not found in procedures.")
+                                if not func: raise ValueError(f"Function '{func_name}' not found in procedures.")
 
                                 input_value = _packet_.get(source_key)
                                 if input_value is None:
@@ -279,10 +214,8 @@ class OperationExecutor:
 
                     except Exception as e:
                         error_msg = f"[ERROR] Failed to process packet for bank '{record['bank_name']}': {str(e)}"
-                        if hasattr(self, "logger"):
-                            self.logger.error(error_msg)
-                        else:
-                            print(error_msg)
+                        if hasattr(self, "logger"): self.logger.error(error_msg)
+                        else: print(error_msg)
 
                     new_scraped_data.append(_packet_)
 
@@ -291,57 +224,40 @@ class OperationExecutor:
         return p_dict
     
     def process_comparison(self, old_json: dict, new_json: dict, key: str = "hash256") -> dict:
-    
-        def __extract_scraped_items(data, bank_code):
+        def get_items(data, code):
+            """Return scraped items for a specific bank code."""
             for record in data.get("records", []):
-                if record.get("bank_code") == bank_code:
-                    return [entry for entry in record.get("scraped_data", []) if key in entry]
+                if record.get("bank_code") == code:
+                    return [item for item in record.get("scraped_data", []) if key in item]
             return []
 
-        def __build_comparison_result(result):
-            return {
-                "comparison_result": {
-                    "new": result["new_packets"],
-                    "removed": result["removed_packets"],
-                    "unchanged": list(result["unchanged_keys"]),
-                    "summary": {
-                        "old_total": result["old_total"],
-                        "new_total": result["new_total"],
-                        "new_count": len(result["new_packets"]),
-                        "removed_count": len(result["removed_packets"]),
-                        "unchanged_count": len(result["unchanged_keys"])
-                    }
-                }
+        for new_rec in new_json.get("records", []):
+            bank_code = new_rec.get("bank_code")
+
+            old_items = get_items(old_json, bank_code)
+            new_items = get_items(new_json, bank_code)
+
+            old_keys, new_keys = {i[key] for i in old_items}, {i[key] for i in new_items}
+
+            new_only = new_keys - old_keys
+            removed = old_keys - new_keys
+            same = old_keys & new_keys
+
+            new_rec["comparison_result"] = {
+                "new": [i for i in new_items if i[key] in new_only],
+                "removed": [i for i in old_items if i[key] in removed],
+                "unchanged": list(same),
+                "summary": {
+                    "old_total": len(old_items),
+                    "new_total": len(new_items),
+                    "new_count": len(new_only),
+                    "removed_count": len(removed),
+                    "unchanged_count": len(same)
+                },
             }
-
-        for new_record in new_json.get("records", []):
-            bank_code = new_record.get("bank_code")
-            old_items = __extract_scraped_items(old_json, bank_code)
-            new_items = __extract_scraped_items(new_json, bank_code)
-
-            old_keys = {item[key] for item in old_items}
-            new_keys = {item[key] for item in new_items}
-
-            new_only_keys = new_keys - old_keys
-            removed_keys = old_keys - new_keys
-            unchanged_keys = old_keys & new_keys
-
-            result = {
-                "key": key,
-                "new_keys": new_only_keys,
-                "removed_keys": removed_keys,
-                "unchanged_keys": unchanged_keys,
-                "new_packets": [item for item in new_items if item[key] in new_only_keys],
-                "removed_packets": [item for item in old_items if item[key] in removed_keys],
-                "old_total": len(old_items),
-                "new_total": len(new_items)
-            }
-
-            new_record.update(__build_comparison_result(result))
-            new_record.pop("scraped_data", None)
-
+            new_rec.pop("scraped_data", None)
         return new_json
-    
+
     def _parse_table(self, entry):
         
         content_type = entry.get("type", "str")
@@ -473,40 +389,63 @@ class OperationExecutor:
         start_row += max_rows + 2  # Leave 2 blank rows below
         return start_row
 
-    def _write_single_table(self, ws, df, start_row, title=None):
-        if title:
-            for line in title:
-                ws.cell(row=start_row, column=1, value=line)
-                start_row += 1
-        for r in dataframe_to_rows(df, index=False, header=True):
-            for c_idx, value in enumerate(r, start=1):
-                ws.cell(row=start_row, column=c_idx, value=value)
-            start_row += 1
-        return start_row
+    # def _write_single_table(self, ws, df, start_row, title=None):
+    #     if title:
+    #         for line in title:
+    #             ws.cell(row=start_row, column=1, value=line)
+    #             start_row += 1
+    #     for r in dataframe_to_rows(df, index=False, header=True):
+    #         for c_idx, value in enumerate(r, start=1):
+    #             ws.cell(row=start_row, column=c_idx, value=value)
+    #         start_row += 1
+    #     return start_row
     
     def generate_sorted_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
-
+        # Sort banks by number of new entries (most changed first)
         sorted_records = sorted(comparison_json.get("records", []),key=lambda r: len(r.get("comparison_result", {}).get("new", [])),reverse=True)
-
-        # Prepare summary data before writing
         summary_data = []
+
+        # ==========================
+        # Pass 1 → Build Summary Data
+        # ==========================
         for record in sorted_records:
             bank_name = record.get("bank_name")
             bank_code = record.get("bank_code")
-            summary = record.get("comparison_result", {}).get("summary", {})
-            sheet_name = f"{bank_name} ({bank_code})"[:31]
+            comparison_result = record.get("comparison_result", {})
+            summary = comparison_result.get("summary", {})
+            new_entries = comparison_result.get("new", [])
+            removed_entries = comparison_result.get("removed", [])
 
             old_total = summary.get("old_total", 0)
+            new_total = summary.get("new_total", 0)
             new_count = summary.get("new_count", 0)
             removed_count = summary.get("removed_count", 0)
 
+            # detect missing data
+            new_missing = len(new_entries) == 0
+            old_missing = len(removed_entries) == 0
+
+            # base note
+            if new_missing and not old_missing:
+                note = "⚠️ Scraping failed – No NEW data available"
+            elif old_missing and not new_missing:
+                note = "⚠️ No OLD data – First run or cache missing"
+            elif new_missing and old_missing:
+                note = "⚠️ Both new & old missing – no data to compare"
+            else:
+                note = ""
+
             if old_total == 0:
                 change_pct = 100.0 if new_count > 0 else 0.0
-                note = "No previous data" if new_count > 0 else ""
             else:
-                change_pct = round((new_count + removed_count) / old_total * 100, 2)
-                note = ""
-            summary_row = [bank_code, bank_name, old_total, summary.get("new_total", 0), new_count, removed_count, summary.get("unchanged_count", 0), change_pct, note]
+                change_pct = min(round((new_count + removed_count) / old_total * 100, 2), 100.0)
+
+
+            summary_row = [
+                bank_code, bank_name, old_total, new_total,
+                new_count, removed_count, summary.get("unchanged_count", 0),
+                change_pct, note
+            ]
             summary_data.append(summary_row)
 
         summary_headers = [
@@ -515,72 +454,126 @@ class OperationExecutor:
         ]
         summary_df = pd.DataFrame(summary_data, columns=summary_headers)
 
+        # ==========================
+        # Pass 2 → Write to Excel
+        # ==========================
         with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
+            # ---- Write Summary Sheet ----
             summary_df.to_excel(writer, sheet_name="Summary", index=False)
+            
+            # Apply better styling
+            for col in ws_summary.columns:
+                max_length = 0
+                column = col[0].column_letter  # Get the column name
+                for cell in col:
+                    try:
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(str(cell.value))
+                    except:
+                        pass
+                ws_summary.column_dimensions[column].width = max_length + 4  # auto width
+
+            # Bold header row
+            for cell in ws_summary[1]:
+                cell.font = cell.font.copy(bold=True)
+
+            # Light gray header background
+            from openpyxl.styles import PatternFill, Border, Side, Alignment
+            header_fill = PatternFill(start_color="E0E0E0", end_color="E0E0E0", fill_type="solid")
+            thin_border = Border(
+                left=Side(style='thin'), right=Side(style='thin'),
+                top=Side(style='thin'), bottom=Side(style='thin')
+            )
+            for cell in ws_summary[1]:
+                cell.fill = header_fill
+                cell.alignment = Alignment(horizontal="center", vertical="center")
+
+            # Add borders to all cells
+            for row in ws_summary.iter_rows():
+                for cell in row:
+                    cell.border = thin_border
+
+            
+            
             ws_summary = writer.sheets["Summary"]
 
 
-
-            # Apply conditional formatting to Change %
-            GREEN_FILL = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")
-            YELLOW_FILL = PatternFill(start_color="FFF2CC", end_color="FFF2CC", fill_type="solid")
-            RED_FILL = PatternFill(start_color="F4CCCC", end_color="F4CCCC", fill_type="solid")
-
+            # Conditional formatting for % change
             change_col = summary_headers.index("Change %") + 1
             range_str = f"{ws_summary.cell(row=2, column=change_col).coordinate}:{ws_summary.cell(row=len(summary_df)+1, column=change_col).coordinate}"
+            ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="greaterThanOrEqual", formula=["50"], fill=self.RED_FILL))
+            ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="between", formula=["20", "49.99"], fill=self.YELLOW_FILL))
+            ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="lessThan", formula=["20"], fill=self.GREEN_FILL))
 
-            ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="greaterThanOrEqual", formula=["50"], fill=RED_FILL))
-            ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="between", formula=["20", "49.99"], fill=YELLOW_FILL))
-            ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="lessThan", formula=["20"], fill=GREEN_FILL))
+            # Conditional formatting for Notes (non-empty = red)
+            note_col = summary_headers.index("Notes") + 1
+            note_range = f"{ws_summary.cell(row=2, column=note_col).coordinate}:{ws_summary.cell(row=len(summary_df)+1, column=note_col).coordinate}"
+            ws_summary.conditional_formatting.add(note_range, FormulaRule(formula=[f'LEN({ws_summary.cell(row=2, column=note_col).coordinate})>0'], fill=self.RED_NOTE_FILL))
 
-            # ✅ Now write each bank sheet
+            # ---- Write Each Bank Sheet ----
             for record in sorted_records:
                 bank_name = record.get("bank_name")
                 bank_code = record.get("bank_code")
                 bank_link = record.get("base_url")
-                sheet_name = f"{bank_name} ({bank_code})"[:31]
-
                 comparison_result = record.get("comparison_result", {})
                 summary = comparison_result.get("summary", {})
                 new_entries = comparison_result.get("new", [])
                 removed_entries = comparison_result.get("removed", [])
 
+                new_missing = len(new_entries) == 0
+                old_missing = len(removed_entries) == 0
+
+                sheet_name = f"{bank_name} ({bank_code})"[:31]
                 pd.DataFrame().to_excel(writer, sheet_name=sheet_name, index=False)
                 ws = writer.sheets[sheet_name]
-                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=bank_name, bank_link=bank_link)
+                row_cursor = self._write_summary(ws, summary, start_row=1,bank_name=bank_name, bank_link=bank_link)
 
-                max_tables = max(len(new_entries), len(removed_entries))
-                # for i in range(max_tables):
-                #     new_entry = new_entries[i] if i < len(new_entries) else {}
-                #     removed_entry = removed_entries[i] if i < len(removed_entries) else {}
+                max_tables = max(len(new_entries), len(removed_entries), 1)
 
-                #     new_df = self._parse_table(new_entry) if new_entry else pd.DataFrame()
-                #     removed_df = self._parse_table(removed_entry) if removed_entry else pd.DataFrame()
-
-                #     title = new_entry.get("title") or removed_entry.get("title") or []
-                #     title = [title] if isinstance(title,str) else title
-                #     row_cursor = self._write_side_by_side_tables(ws,new_df,removed_df,start_row=row_cursor,title=title)
                 for i in range(max_tables):
                     new_entry = new_entries[i] if i < len(new_entries) else None
                     removed_entry = removed_entries[i] if i < len(removed_entries) else None
-
-                    title = new_entry.get("title") if new_entry else removed_entry.get("title")
+                    title = new_entry.get("title") if new_entry else (removed_entry.get("title") if removed_entry else "")
                     title = [title] if isinstance(title, str) else title or []
 
-                    if new_entry and removed_entry:
+                    # handle cases
+                    if new_missing and removed_entry:
+                        removed_df = self._parse_table(removed_entry)
+                        row_cursor = self._write_side_by_side_tables(
+                            ws,
+                            pd.DataFrame([["--- Missing NEW Data ---"]]),
+                            removed_df,
+                            start_row=row_cursor,
+                            title=title + ["⚠️ Scraper failed – using OLD data only"]
+                        )
+
+                    elif old_missing and new_entry:
+                        new_df = self._parse_table(new_entry)
+                        row_cursor = self._write_side_by_side_tables(
+                            ws,
+                            new_df,
+                            pd.DataFrame([["--- Missing OLD Data ---"]]),
+                            start_row=row_cursor,
+                            title=title + ["⚠️ No old data available – first run"]
+                        )
+
+                    elif new_entry and removed_entry:
                         new_df = self._parse_table(new_entry)
                         removed_df = self._parse_table(removed_entry)
-                        row_cursor = self._write_side_by_side_tables(ws, new_df, removed_df, start_row=row_cursor, title=title)
-                    elif new_entry:
-                        new_df = self._parse_table(new_entry)
-                        row_cursor = self._write_single_table(ws, new_df, start_row=row_cursor, title=title + ["(Removed data missing)"])
-                    elif removed_entry:
-                        removed_df = self._parse_table(removed_entry)
-                        row_cursor = self._write_single_table(ws, removed_df, start_row=row_cursor, title=title + ["(New data missing)"])
+                        row_cursor = self._write_side_by_side_tables(
+                            ws, new_df, removed_df, start_row=row_cursor, title=title
+                        )
+
+                    else:
+                        ws.cell(row=row_cursor, column=1, value="⚠️ No data available for comparison")
+                        row_cursor += 2
 
         return output_path
 
+
     
+    #==============================================
+    #==============================================
     @staticmethod
     def __parse_entry(entry):
 

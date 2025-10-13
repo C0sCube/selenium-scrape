@@ -19,16 +19,11 @@ class BankScraper:
         date, timestamp = today.strftime("%d%m%y"),today.strftime("%H%M")        
         return {
             "metadata": {
-                "program": "main.py",
                 "date": date,
                 "start_time":timestamp,
-                "config": "params_table.json5",
                 "cfname": f"CACHE{date}T{timestamp}.json",
-                "pfname": f"PROCESSED{date}T{timestamp}.json"
-            },
-            "records": [],
-            "registry":{},
-        }
+                "pfname": f"PROCESS{date}T{timestamp}.json"
+            },"records": [],"registry":{},}
         
     def load_driver(self, retries=3, delay=10):
         attempt = 0
@@ -100,8 +95,7 @@ class BankScraper:
                 logger.notice("No post-scrape operations defined. Skipping.")
             return processed_data
 
-        if logger:
-            logger.notice(f"Running post-scrape ops:\n{pprint.pformat(ops_rules)}")
+        if logger: logger.notice(f"Running post-scrape ops:\n{pprint.pformat(ops_rules)}")
 
         try:
             ops = OperationExecutor()
@@ -142,11 +136,6 @@ class BankScraper:
     def generate_cache_report(data, output_path="DepositRate_Comparison_Report.docx"):
         OperationExecutor.generate_cache_doc_report(data, output_path= output_path)
     
-    @staticmethod
-    def generate_prs_cache(data,fns):
-        ops = OperationExecutor()
-        prs_data = ops.runner(data,fns)
-        return prs_data
     
             
         
