@@ -17,20 +17,14 @@ class BankScraper:
     def get_final_struct():
         today = datetime.now()
         date, timestamp = today.strftime("%d%m%y"),today.strftime("%H%M")        
-        return {
-            "metadata": {
-                "date": date,
-                "start_time":timestamp,
-                "cfname": f"CACHE{date}T{timestamp}.json",
-                "pfname": f"PROCESS{date}T{timestamp}.json"
-            },"records": [],"registry":{},}
+        return {"metadata": {"date": date,"start_time":timestamp,"cfname": f"CACHE{date}T{timestamp}.json","pfname": f"PROCESS{date}T{timestamp}.json"},"records": [],"registry":{},}
         
-    def load_driver(self, retries=3, delay=10):
+    def load_driver(self,headless = False, retries=3, delay=10):
         attempt = 0
         while attempt < retries:
             try:
                 self.logger.info(f"Attempt {attempt + 1} to create driver...")
-                self.executor.create_uc_driver()
+                self.executor.create_uc_driver(headless)
                 if not self.executor.driver:
                     self.logger.error("Driver creation returned None.")
                     return None

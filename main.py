@@ -12,13 +12,13 @@ set_global_logger(logger)
 from app.BankScraper import BankScraper
 from app.utils import Helper
 
-bank_codes =  PUB_BANK_CODES  #PVT_BANK_CODES #ALL_BANK_CODES
+bank_codes = ALL_BANK_CODES  #PUB_BANK_CODES #PVT_BANK_CODES #ALL_BANK_CODES
 
 try:
     logger.notice("Starting Program.")
     scraper = BankScraper()
     final_dict = scraper.get_final_struct()
-    scraper.load_driver()
+    scraper.load_driver(headless=False)
     for code in bank_codes:
         if code not in CONFIG:
             logger.error(f"Code: {code} not in config, skipping..")
@@ -40,7 +40,7 @@ try:
 
     # doc_path = os.path.join(CACHE_REP_DIR,f"cache_{datetime.now().strftime("%Y%m%d_%H%M")}_DATA.docx")
     # BankScraper.generate_cache_report(final_dict, doc_path)
-    logger.save("Initial Cache Report Saved.")
+    # logger.save("Initial Cache Report Saved.")
     
     # value = input("DO PROCESSING AS WELL(Y/N):")
     # if value == 'Y':
@@ -50,7 +50,11 @@ try:
     #     Helper.save_json(prs_data,prs_path)
     # else:
     #     print("No processing allowed.")
-        
+    
+    path = os.path.join(CCH_DIR, final_dict["metadata"]["cfname"])
+    Helper.save_json(final_dict, path,typ="json")
+    logger.save(f"Saved At: {path}")
+    logger.info("Ending Program.") 
     
 except KeyboardInterrupt:
     logger.warning("Process Interrupted by User!")
@@ -60,8 +64,8 @@ except Exception as e:
     logger.error(f"Error in Main.py :[{type(e).__name__}] {e}")
     logger.debug(f"Traceback:\n{traceback.format_exc()}")
 
-finally:
-    path = os.path.join(CCH_DIR, final_dict["metadata"]["cfname"])
-    Helper.save_json(final_dict, path,typ="json")
-    logger.save(f"Saved At: {path}")
-    logger.info("Ending Program.")
+# finally:
+#     path = os.path.join(CCH_DIR, final_dict["metadata"]["cfname"])
+#     Helper.save_json(final_dict, path,typ="json")
+#     logger.save(f"Saved At: {path}")
+#     logger.info("Ending Program.")

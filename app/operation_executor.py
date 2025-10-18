@@ -12,6 +12,9 @@ from openpyxl.styles import PatternFill
 from openpyxl.formatting.rule import FormulaRule
 from openpyxl.utils.dataframe import dataframe_to_rows  
 from openpyxl.formatting.rule import CellIsRule
+import pandas as pd
+from openpyxl.styles import PatternFill, Border, Side, Alignment
+from openpyxl.formatting.rule import CellIsRule, FormulaRule
 
 from app.logger import get_global_logger
 
@@ -400,14 +403,23 @@ class OperationExecutor:
     #         start_row += 1
     #     return start_row
     
-    def generate_sorted_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
-        # Sort banks by number of new entries (most changed first)
-        sorted_records = sorted(comparison_json.get("records", []),key=lambda r: len(r.get("comparison_result", {}).get("new", [])),reverse=True)
-        summary_data = []
 
-        # ==========================
-        # Pass 1 → Build Summary Data
-        # ==========================
+
+    def generate_sorted_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
+        # Define fill styles
+        self.RED_FILL = PatternFill(start_color="FF9999", end_color="FF9999", fill_type="solid")
+        self.YELLOW_FILL = PatternFill(start_color="FFFF99", end_color="FFFF99", fill_type="solid")
+        self.GREEN_FILL = PatternFill(start_color="CCFFCC", end_color="CCFFCC", fill_type="solid")
+        self.RED_NOTE_FILL = PatternFill(start_color="FFCCCC", end_color="FFCCCC", fill_type="solid")
+
+        # Sort records by number of new entries
+        sorted_records = sorted(
+            comparison_json.get("records", []),
+            key=lambda r: len(r.get("comparison_result", {}).get("new", [])),
+            reverse=True
+        )
+
+        summary_data = []
         for record in sorted_records:
             bank_name = record.get("bank_name")
             bank_code = record.get("bank_code")
@@ -421,25 +433,20 @@ class OperationExecutor:
             new_count = summary.get("new_count", 0)
             removed_count = summary.get("removed_count", 0)
 
-            # detect missing data
             new_missing = len(new_entries) == 0
             old_missing = len(removed_entries) == 0
 
-            # base note
             if new_missing and not old_missing:
                 note = "⚠️ Scraping failed – No NEW data available"
             elif old_missing and not new_missing:
                 note = "⚠️ No OLD data – First run or cache missing"
             elif new_missing and old_missing:
-                note = "⚠️ Both new & old missing – no data to compare"
+                note = "⚠️ No Data to Compare"
             else:
-                note = ""
+                note = "\u2713 Changes in Data"
 
-            if old_total == 0:
-                change_pct = 100.0 if new_count > 0 else 0.0
-            else:
-                change_pct = min(round((new_count + removed_count) / old_total * 100, 2), 100.0)
-
+            change_pct = 100.0 if old_total == 0 and new_count > 0 else round((new_count + removed_count) / old_total * 100, 2) if old_total else 0.0
+            change_pct = min(change_pct, 100.0)
 
             summary_row = [
                 bank_code, bank_name, old_total, new_total,
@@ -454,63 +461,44 @@ class OperationExecutor:
         ]
         summary_df = pd.DataFrame(summary_data, columns=summary_headers)
 
-        # ==========================
-        # Pass 2 → Write to Excel
-        # ==========================
         with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
-            # ---- Write Summary Sheet ----
             summary_df.to_excel(writer, sheet_name="Summary", index=False)
-            
-            # Apply better styling
+            ws_summary = writer.sheets["Summary"]
+
+            # Auto column width
             for col in ws_summary.columns:
-                max_length = 0
-                column = col[0].column_letter  # Get the column name
-                for cell in col:
-                    try:
-                        if len(str(cell.value)) > max_length:
-                            max_length = len(str(cell.value))
-                    except:
-                        pass
-                ws_summary.column_dimensions[column].width = max_length + 4  # auto width
+                max_length = max(len(str(cell.value)) if cell.value else 0 for cell in col)
+                column = col[0].column_letter
+                ws_summary.column_dimensions[column].width = max_length + 4
 
-            # Bold header row
-            for cell in ws_summary[1]:
-                cell.font = cell.font.copy(bold=True)
-
-            # Light gray header background
-            from openpyxl.styles import PatternFill, Border, Side, Alignment
+            # Style header
             header_fill = PatternFill(start_color="E0E0E0", end_color="E0E0E0", fill_type="solid")
             thin_border = Border(
                 left=Side(style='thin'), right=Side(style='thin'),
                 top=Side(style='thin'), bottom=Side(style='thin')
             )
             for cell in ws_summary[1]:
+                cell.font = cell.font.copy(bold=True)
                 cell.fill = header_fill
                 cell.alignment = Alignment(horizontal="center", vertical="center")
 
-            # Add borders to all cells
             for row in ws_summary.iter_rows():
                 for cell in row:
                     cell.border = thin_border
 
-            
-            
-            ws_summary = writer.sheets["Summary"]
-
-
-            # Conditional formatting for % change
+            # Conditional formatting
             change_col = summary_headers.index("Change %") + 1
-            range_str = f"{ws_summary.cell(row=2, column=change_col).coordinate}:{ws_summary.cell(row=len(summary_df)+1, column=change_col).coordinate}"
-            ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="greaterThanOrEqual", formula=["50"], fill=self.RED_FILL))
-            ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="between", formula=["20", "49.99"], fill=self.YELLOW_FILL))
-            ws_summary.conditional_formatting.add(range_str, CellIsRule(operator="lessThan", formula=["20"], fill=self.GREEN_FILL))
+            change_range = f"{ws_summary.cell(row=2, column=change_col).coordinate}:{ws_summary.cell(row=len(summary_df)+1, column=change_col).coordinate}"
+            ws_summary.conditional_formatting.add(change_range, CellIsRule(operator="greaterThanOrEqual", formula=["50"], fill=self.RED_FILL))
+            ws_summary.conditional_formatting.add(change_range, CellIsRule(operator="between", formula=["20", "49.99"], fill=self.YELLOW_FILL))
+            ws_summary.conditional_formatting.add(change_range, CellIsRule(operator="lessThan", formula=["20"], fill=self.GREEN_FILL))
 
-            # Conditional formatting for Notes (non-empty = red)
             note_col = summary_headers.index("Notes") + 1
             note_range = f"{ws_summary.cell(row=2, column=note_col).coordinate}:{ws_summary.cell(row=len(summary_df)+1, column=note_col).coordinate}"
             ws_summary.conditional_formatting.add(note_range, FormulaRule(formula=[f'LEN({ws_summary.cell(row=2, column=note_col).coordinate})>0'], fill=self.RED_NOTE_FILL))
 
-            # ---- Write Each Bank Sheet ----
+            # Write individual bank sheets
+            existing_sheets = set(writer.sheets.keys())
             for record in sorted_records:
                 bank_name = record.get("bank_name")
                 bank_code = record.get("bank_code")
@@ -523,20 +511,31 @@ class OperationExecutor:
                 new_missing = len(new_entries) == 0
                 old_missing = len(removed_entries) == 0
 
-                sheet_name = f"{bank_name} ({bank_code})"[:31]
+                base_name = f"{bank_name} ({bank_code})"[:31]
+                sheet_name = base_name
+                counter = 1
+                while sheet_name in existing_sheets:
+                    suffix = f"_{counter}"
+                    sheet_name = f"{base_name[:31-len(suffix)]}{suffix}"
+                    counter += 1
+                existing_sheets.add(sheet_name)
+
                 pd.DataFrame().to_excel(writer, sheet_name=sheet_name, index=False)
                 ws = writer.sheets[sheet_name]
-                row_cursor = self._write_summary(ws, summary, start_row=1,bank_name=bank_name, bank_link=bank_link)
+                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=bank_name, bank_link=bank_link)
 
                 max_tables = max(len(new_entries), len(removed_entries), 1)
-
                 for i in range(max_tables):
                     new_entry = new_entries[i] if i < len(new_entries) else None
                     removed_entry = removed_entries[i] if i < len(removed_entries) else None
-                    title = new_entry.get("title") if new_entry else (removed_entry.get("title") if removed_entry else "")
+
+                    title = ""
+                    if isinstance(new_entry, dict):
+                        title = new_entry.get("title", "")
+                    elif isinstance(removed_entry, dict):
+                        title = removed_entry.get("title", "")
                     title = [title] if isinstance(title, str) else title or []
 
-                    # handle cases
                     if new_missing and removed_entry:
                         removed_df = self._parse_table(removed_entry)
                         row_cursor = self._write_side_by_side_tables(
@@ -546,7 +545,6 @@ class OperationExecutor:
                             start_row=row_cursor,
                             title=title + ["⚠️ Scraper failed – using OLD data only"]
                         )
-
                     elif old_missing and new_entry:
                         new_df = self._parse_table(new_entry)
                         row_cursor = self._write_side_by_side_tables(
@@ -556,21 +554,17 @@ class OperationExecutor:
                             start_row=row_cursor,
                             title=title + ["⚠️ No old data available – first run"]
                         )
-
                     elif new_entry and removed_entry:
                         new_df = self._parse_table(new_entry)
                         removed_df = self._parse_table(removed_entry)
                         row_cursor = self._write_side_by_side_tables(
                             ws, new_df, removed_df, start_row=row_cursor, title=title
                         )
-
                     else:
                         ws.cell(row=row_cursor, column=1, value="⚠️ No data available for comparison")
                         row_cursor += 2
 
         return output_path
-
-
     
     #==============================================
     #==============================================

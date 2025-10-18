@@ -50,8 +50,13 @@ MAX_DOWNLOAD_WAIT = 5
 DRIVER_LOAD_RETRIES = 5
 LOAD_IN_BETWEEN_DELAY = 10 #seconds
 
+COOL_DOWN = 30
+SCHEDULE_START_TIME = "09:58"
+SCHEDULE_INTERVAL = 24000
+
 PVT_BANK_CODES = [f"PVB_{i}" for i in range(1,23)]
 PUB_BANK_CODES = [f"PSB_{i}" for i in range(1,13)]
-ALL_BANK_CODES = [f"PSB_{i}" for i in range(1,13)]+["PVB_{i}" for i in range(1,23)]
+FRN_BANK_CODES = [f"FRB_{i}" for i in range(1,37)]
+ALL_BANK_CODES = [f"PSB_{i}" for i in range(1,13)]+[f"PVB_{i}" for i in range(1,23)]
 
 

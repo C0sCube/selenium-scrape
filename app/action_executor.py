@@ -74,12 +74,13 @@ class ActionExecutor:
         })
         self.logger.info(f"Download folder set to: {self.OUTPUT_PATH} for bank: {params['bank_name']}")
     
-    def create_uc_driver(self):
+    def create_uc_driver(self,headless = False):
         options = uc.ChromeOptions()
         # options.add_argument(f"--user-data-dir={profile_path}")
         # options.add_argument(f"--profile-directory={profile_dir}")
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--disable-extensions")
+        if headless: options.add_argument("--headless=new")
         options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
         
         #preferential download
@@ -247,18 +248,18 @@ class ActionExecutor:
 
             
         
-    # def __get_by(self, by_string):
-    #     mapping = {
-    #         "css": By.CSS_SELECTOR,
-    #         "xpath": By.XPATH,
-    #         "id": By.ID,
-    #         "name": By.NAME,
-    #         "class": By.CLASS_NAME,
-    #         "tag": By.TAG_NAME,
-    #         "txt":By.LINK_TEXT,
-    #         "ptxt":By.PARTIAL_LINK_TEXT
-    #     }
-    #     return mapping.get(by_string.lower(), By.CSS_SELECTOR)
+    def __get_by(self, by_string):
+        mapping = {
+            "css": By.CSS_SELECTOR,
+            "xpath": By.XPATH,
+            "id": By.ID,
+            "name": By.NAME,
+            "class": By.CLASS_NAME,
+            "tag": By.TAG_NAME,
+            "txt":By.LINK_TEXT,
+            "ptxt":By.PARTIAL_LINK_TEXT
+        }
+        return mapping.get(by_string.lower(), By.CSS_SELECTOR)
 
     # def __get_condition(self, wait_type, by, value):
     #     cond_map = {
@@ -570,7 +571,7 @@ class ActionExecutor:
     
     def __download_file(self, file_url, output_dir, idx, extension):
         cookies = {c['name']: c['value'] for c in self.driver.get_cookies()}
-        r = requests.get(file_url, cookies=cookies, verify=False, timeout=20) #check this out
+        r = requests.get(file_url, cookies=cookies, verify=False, timeout=40) #check this out
         self.logger.notice(f" `{extension}` GET Request Returned Status: {r.status_code}")
         
         
@@ -766,7 +767,7 @@ class ActionExecutor:
         self.logger.info("Performing GET REQUEST for attached website.")
         file_url = self.URL
         file_type = self.export_format or "dat"
-        output_dir = Helper.create_dirs(self.OUTPUT_PATH)
+        output_dir = Helper.create_dir(self.OUTPUT_PATH)
         scrape_content = []
         try:
             file_content = self.__download_file(file_url, output_dir, 0, file_type)
