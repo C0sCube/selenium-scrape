@@ -80,14 +80,25 @@ class Helper:
     
     #JSON UN/LOAD 
     @staticmethod
-    def save_json(data: dict,path: str, indent: int = 2,typ = "json"):
+    def save_json(data: dict,path: str):
         with open(path, "w", encoding="utf-8") as f:
-            json5.dump(data, f, indent=indent) if typ == "json5" else json.dump(data, f, indent=indent)
+            json.dump(data, f)
+        
 
     @staticmethod
-    def load_json(path: str,typ = "json"):
+    def load_json(path: str):
         with open(path, "r", encoding="utf-8") as f:
-            return json5.load(f) if typ == "json5" else json.load(f)
+           return json.load(f)
+        
+    @staticmethod
+    def save_json5(data: dict,path: str):
+        with open(path, "w", encoding="utf-8") as f:
+            json5.dump(data, f)
+
+    @staticmethod
+    def load_json5(path: str):
+        with open(path, "r", encoding="utf-8") as f:
+            return json5.load(f)
     
     #WRITE TEXT
     @staticmethod

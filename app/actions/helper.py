@@ -1,0 +1,141 @@
+import os, re, time
+from datetime import datetime
+from urllib.parse import urlencode
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
+from app.utils import Helper
+
+
+class ActionHelper:
+    
+    def __init__(self):
+        pass
+    
+    @staticmethod
+    def _find_preceding_texts(table, n=2):
+        texts = []
+        current = table
+        label_tags = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "strong", "a", "span","div"}
+        MAX_TEXT_LENGTH = 350
+        while len(texts) < n:
+            try:
+                parent = current.find_element(By.XPATH, "..")
+                siblings = parent.find_elements(By.XPATH, "preceding-sibling::*")
+                for sib in reversed(siblings):
+                    if sib.tag_name.lower() in ["table", "br", "hr"]:
+                        continue
+                    
+                    if sib.find_elements(By.TAG_NAME,"table"):
+                        continue
+                    
+                    if sib.tag_name.lower() not in label_tags:
+                        continue
+                    
+                    if sib.tag_name.lower() == "div":
+                        if not sib.find_elements(By.XPATH, ".//h1 | .//h2 | .//h3 | .//p | .//strong | .//a | .//span"):
+                            continue
+
+                    txt = sib.get_attribute("innerText").strip()
+                    # txt = sib.text.strip()
+                    txt = Helper._remove_tabspace(txt)
+                    txt = Helper._normalize_whitespace(txt)
+                    if txt and len(txt)<MAX_TEXT_LENGTH:
+                        texts.append(txt)
+                        if len(texts) == n:
+                            return list(reversed(texts))
+                current = parent
+            except:
+                break
+        return list(reversed(texts)) if texts else ["No label found"]*n
+
+    @staticmethod
+    def _clean_raw_table_html(rawr):
+        rawr = Helper.apply_sub(rawr, r'<th\b', '<td', ignore_case=True)
+        rawr = Helper.apply_sub(rawr, r'</th\b', '</td', ignore_case=True)
+        
+        #tbody
+        rawr = re.sub(r"<thead\b",r"<tbody",rawr, re.IGNORECASE)
+        rawr = re.sub(r"</thead\b",r"</tbody",rawr, re.IGNORECASE)
+        
+        #other tags
+        rawr = Helper.apply_sub(rawr, r"</?(?:strong|sup|b|p|br)(?:\s+[^>]*)?>",ignore_case=True)
+        rawr = Helper.apply_sub(rawr,r'[*@\n\t]+', ignore_case=True)
+        rawr = Helper.apply_sub(rawr,r"<tr[^>]*>\s*(?:&nbsp;|\u00A0|\s)*</tr>", ignore_case=True)
+        rawr = Helper._normalize_whitespace(rawr)
+        
+        soup = BeautifulSoup(rawr, "html.parser")
+        ALLOWED = {"rowspan", "colspan"}
+        for tag in soup.find_all(True):
+            for attr in list(tag.attrs):
+                if attr not in ALLOWED:
+                    del tag.attrs[attr]
+        final_html = str(soup)
+        return final_html
+    
+    @staticmethod
+    def _determine_file_type(url):
+        value = None
+        if ".pdf" in url: value = "pdf"
+        if url.endswith(".csv"): value = "csv"
+        if url.endswith(".docx"): value = "docx"
+        if url.endswith(".xlsx"): value = "xlsx"
+        print(f"The File Type is : {value}")
+        return value
+    
+    @staticmethod
+    def _wait_for_download(folder, initial_files, timeout=30):
+        start_time = time.time()
+        print(f"[INFO] Watching folder: {folder}")
+        print(f"[INFO] Initial files: {initial_files}")
+
+        while time.time() - start_time < timeout:
+            current_files = set(os.listdir(folder))
+            new_files = current_files - initial_files
+
+            for fname in new_files:
+                path = os.path.join(folder, fname)
+
+                if fname.endswith(".crdownload"):
+                    print(f"[DEBUG] Skipping incomplete file: {fname}")
+                    continue
+
+                ext = ActionHelper._determine_file_type(path)
+                if ext:
+                    print(f"[INFO] Detected new file: {fname} with type: {ext}")
+                    return path, ext
+
+            time.sleep(1)
+
+        print("[WARNING] Timeout reached — no valid file detected.")
+        return None, None
+    
+    @staticmethod
+    def build_multiple_urls(base_url, params):
+        from itertools import product
+        urls = []
+        constant_params = {}
+        list_params = {}
+        
+        for key, value in params.items():
+            if key == "date":constant_params[key] = datetime.now().strftime(value)
+            elif isinstance(value, str):constant_params[key] = value
+            elif isinstance(value, list):list_params[key] = value
+
+        if not list_params:
+            query_string = urlencode(constant_params)
+            urls.append(f"{base_url}?{query_string}")
+            return urls
+
+        keys = list(list_params.keys())
+        values = list(list_params.values())
+        for combo in product(*values):
+            combo_dict = dict(zip(keys, combo))
+            full_params = {**constant_params, **combo_dict}
+            query_string = urlencode(full_params)
+            urls.append(f"{base_url}?{query_string}")
+        return urls
+    
+
+    @staticmethod
+    def generate_resp_packet(name="", header="", value=None, type=""): return {"name": name, "title": header, "value": value, "type": type, "data_present": bool(value)}
+

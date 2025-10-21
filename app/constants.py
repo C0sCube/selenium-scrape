@@ -14,30 +14,24 @@ def load_json5(path: str):
     
 def create_dir(root_path: str, *args) -> str:
     full_path = os.path.join(root_path, *args)
+    if os.path.exists(full_path):
+        return full_path
     os.makedirs(full_path, exist_ok=True)
     return full_path
 
 
-
-root_dir = os.path.dirname(os.path.dirname(__file__))
-PATHS = load_json5(r"paths.json5")
-conf_path = os.path.join(root_dir,PATHS["configs"])
-gen_conf_path =os.path.join(root_dir,PATHS["generic_config"])
-
-CONFIG = load_json5(conf_path)
-GENERIC_ACTION_CONFIG = load_json5(gen_conf_path)
+PATHS = load_json(r"paths.json")
+CONFIG = load_json5(os.path.join(root_dir,PATHS["configs"]))
+GENERIC_ACTION_CONFIG = load_json5(os.path.join(root_dir,PATHS["generic_config"]))
 POST_SCRAPE_OPS = CONFIG.get("POST_SCRAPE_OPS")
 SCRIPTS = GENERIC_ACTION_CONFIG["scripts"]
 
-TODAY = datetime.now().strftime("%Y-%m-%d")
 
 #directories
 OUTPUT_PATH = PATHS["output"]
-LOG_DIR = create_dir(OUTPUT_PATH,"logs",TODAY)
-CCH_DIR = create_dir(OUTPUT_PATH,"cache",TODAY) 
-PRS_DIR = create_dir(OUTPUT_PATH,"process",TODAY)
-DATA_DIR = create_dir(OUTPUT_PATH,"data",TODAY)
-CACHE_REP_DIR = create_dir(OUTPUT_PATH,"report",TODAY)
+LOG_DIR = create_dir(OUTPUT_PATH,"log")
+SESSION_ROOT = create_dir(OUTPUT_PATH, "session")
+DATA_DIR = create_dir(OUTPUT_PATH,"data")
 
 #file size constants
 MAX_REQUEST_BYTE_SIZE = 2_000_000 #2mb file

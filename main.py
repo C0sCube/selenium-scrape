@@ -1,71 +1,68 @@
-import os, warnings,time, ssl, traceback
+import os, warnings, ssl, traceback
 from datetime import datetime
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # TensorFlow-specific-selenium
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 warnings.filterwarnings('ignore')
 ssl._create_default_https_context = ssl._create_stdlib_context
 
-
+# --- Internal Imports ---
 from app.constants import *
 from app.logger import setup_logger, set_global_logger
-logger = setup_logger(name="scraper",log_dir=LOG_DIR)
-set_global_logger(logger)
 from app.BankScraper import BankScraper
 from app.utils import Helper
 
-bank_codes = ALL_BANK_CODES  #PUB_BANK_CODES #PVT_BANK_CODES #ALL_BANK_CODES
+today = datetime.now()
+runtime_path = Helper.create_dir(OUTPUT_PATH, "session", f"session_{today.strftime('%y%m%d_%H%M')}")
+latest_dir = Helper.create_dir(SESSION_ROOT, "session_latest")
 
-try:
-    logger.notice("Starting Program.")
-    scraper = BankScraper()
-    final_dict = scraper.get_final_struct()
-    scraper.load_driver(headless=False)
-    for code in bank_codes:
-        if code not in CONFIG:
-            logger.error(f"Code: {code} not in config, skipping..")
-            continue
-        try:
-            bank_params = CONFIG[code]
-            result = scraper.run(bank_params)
-        except Exception as e:
-            logger.error(f"Failed scraping {code}: {e}")
-            result = {"bank_code": code, "scraped_data": [{"error": str(e)}]}
+logger = setup_logger(name="scraper", log_dir=Helper.create_dir(LOG_DIR,today.strftime("%Y-%m-%d")))
+set_global_logger(logger)
+
+
+def main(bank_codes, scraper, process = False, headless = False):
+
+    if not scraper.start_session(headless = headless):
+        raise RuntimeError("Failed to initialize Selenium driver")
+
+    final_dict = scraper.runner(bank_codes)
+    scraper.close_session()
+
+    if process:
+        process_path = os.path.join(runtime_path, final_dict["metadata"]["pfname"])
+        prev_process = os.path.join(latest_dir, "PROCESS_LATEST.json")
+        scraper.process_cache(final_dict, process_path,prev_process)
+
+    # scraper.generate_doc_report(final_dict)
+    cache_path = os.path.join(runtime_path, final_dict["metadata"]["cfname"])
+    Helper.save_json(final_dict, cache_path)
+    logger.save(f"Cache saved at: {cache_path}")
+    
+    logger.info("Scraping Program Completed Successfully.")
+
+
+if __name__ == "__main__":
+    
+    try:
+        logger.notice("Starting Scraper Program.")
+        scraper = BankScraper(runtime_path)
+        bank_codes = ["PVB_2"] #PUB_BANK_CODES #ALL_BANK_CODES 
+        main(bank_codes, scraper)
         
-        clean_result = BankScraper.dedupe_responses(result)
-        final_dict["records"].append(clean_result)
+    except KeyboardInterrupt:
+        logger.warning("Process interrupted by user.")
+        logger.debug(traceback.format_exc())
 
-    scraper.exit_driver()
-    
+    except Exception as e:
+        logger.error(f"Unhandled Error in main.py: [{type(e).__name__}] {e}")
+        logger.debug(traceback.format_exc())    
 
-    #doc report
+    # finally:
+    #     # Always save partial cache if something fails
+    #     try:
+    #         if 'final_dict' in locals():
+    #             cache_path = os.path.join(session_dir, final_dict["metadata"]["cfname"])
+    #             Helper.save_json(final_dict, cache_path, typ="json")
+    #             logger.save(f"(Final) Cache safely written to {cache_path}")
+    #     except Exception as e:
+    #         logger.error(f"Failed to save final cache: {e}")
 
-    # doc_path = os.path.join(CACHE_REP_DIR,f"cache_{datetime.now().strftime("%Y%m%d_%H%M")}_DATA.docx")
-    # BankScraper.generate_cache_report(final_dict, doc_path)
-    # logger.save("Initial Cache Report Saved.")
-    
-    # value = input("DO PROCESSING AS WELL(Y/N):")
-    # if value == 'Y':
-    #     prs = POST_SCRAPE_OPS["sha1"]
-    #     prs_data = BankScraper.generate_prs_cache(final_dict,prs)
-    #     prs_path = os.path.join(PRS_DIR,f"prs_{datetime.now().strftime("%Y%m%d_%H%M")}.json")
-    #     Helper.save_json(prs_data,prs_path)
-    # else:
-    #     print("No processing allowed.")
-    
-    path = os.path.join(CCH_DIR, final_dict["metadata"]["cfname"])
-    Helper.save_json(final_dict, path,typ="json")
-    logger.save(f"Saved At: {path}")
-    logger.info("Ending Program.") 
-    
-except KeyboardInterrupt:
-    logger.warning("Process Interrupted by User!")
-    logger.debug(f"Traceback:\n{traceback.format_exc()}")
-    
-except Exception as e:
-    logger.error(f"Error in Main.py :[{type(e).__name__}] {e}")
-    logger.debug(f"Traceback:\n{traceback.format_exc()}")
-
-# finally:
-#     path = os.path.join(CCH_DIR, final_dict["metadata"]["cfname"])
-#     Helper.save_json(final_dict, path,typ="json")
-#     logger.save(f"Saved At: {path}")
-#     logger.info("Ending Program.")
+    #     logger.info("Program Ended.")
