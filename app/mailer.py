@@ -120,10 +120,3 @@ class Mailer:
         except Exception as e:
             self.logger.error(f"Failed to send email: {e}")
 
-    # def test_connection(self):
-    #     try:
-    #         with smtplib.SMTP(self.SERVER, self.PORT) as server:
-    #             server.noop()
-    #         print("SMTP connection successful.")
-    #     except Exception as e:
-    #         print(f"SMTP connection failed: {e}")

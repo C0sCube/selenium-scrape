@@ -28,7 +28,6 @@ class ActionExecutor:
         self.driver = None
         self.window_stack = None
         self.PARAMS = None
-        self.scripts = SCRIPTS
 
         
         # ========== Locators and Conditions ==========
@@ -52,24 +51,6 @@ class ActionExecutor:
             "attached": EC.element_to_be_selected,
         }
         
-        # self.action_map = {
-        #     "click": self.clickElem,
-        #     "click_save":self.clickSave,
-        #     "html": self.htmlScrape,
-        #     "table": self.tablScrape,
-        #     "scrape": self.textScrape,
-        #     "website": self.webRedir,
-        #     "download": self.downloadElem,
-        #     "pdf": self.genPdf,
-        #     "redir_pdf":self.genPdf,
-        #     "screenshot": self.genSst,
-        #     "tablist": self.tabList,
-        #     "weblist":self.webList,
-        #     "http":self.httpRequest,
-        #     "manual":self.manualAction,
-        #     "execute_script": self.injectScript
-
-        # }
         self.action_map = {
             "html": lambda: htmlScrape(self),
             "table": lambda: tablScrape(self),

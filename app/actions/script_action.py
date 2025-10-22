@@ -1,6 +1,7 @@
 # app/actions/inject_script_action.py
 from app.logger import get_global_logger
 from app.actions.helper import ActionHelper
+from app.constants import SCRIPTS
 
 def injectScript(executor):
     """
@@ -15,7 +16,7 @@ def injectScript(executor):
     try:
         # Load predefined script if script_key provided
         if script_key:
-            js = executor.scripts.get(script_key)
+            js = SCRIPTS.get(script_key)
             if not js:
                 logger.warning(f"No predefined script found for key: {script_key}")
                 return []

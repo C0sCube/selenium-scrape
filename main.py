@@ -31,7 +31,7 @@ def main(bank_codes, scraper, process = False, headless = False):
         prev_process = os.path.join(latest_dir, "PROCESS_LATEST.json")
         scraper.process_cache(final_dict, process_path,prev_process)
 
-    # scraper.generate_doc_report(final_dict)
+    scraper.generate_doc_report(final_dict)
     cache_path = os.path.join(runtime_path, final_dict["metadata"]["cfname"])
     Helper.save_json(final_dict, cache_path)
     logger.save(f"Cache saved at: {cache_path}")
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     try:
         logger.notice("Starting Scraper Program.")
         scraper = BankScraper(runtime_path)
-        bank_codes = ["PVB_2"] #PUB_BANK_CODES #ALL_BANK_CODES 
+        bank_codes = ["PVB_12"] #PUB_BANK_CODES #ALL_BANK_CODES 
         main(bank_codes, scraper)
         
     except KeyboardInterrupt:

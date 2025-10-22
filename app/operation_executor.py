@@ -6,6 +6,10 @@ from io import StringIO, BytesIO
 from docx import Document
 from pdf2docx import Converter
 from docx import Document as DocxReader
+from pdf2image import convert_from_bytes
+import camelot
+from xhtml2pdf import pisa
+from PyPDF2 import PdfMerger, PdfWriter, PdfReader
 
 
 from openpyxl.styles import PatternFill
@@ -80,94 +84,72 @@ class OperationExecutor:
             return f"{inspect.currentframe().f_code.co_name}: input non str"
         return hashlib.sha1(text.encode()).hexdigest()
     
-    def _generalize_table_df(self,html_str)->str:
-        MAX_COLUMN=15
+    def _generalize_table_df(self, html_str) -> str:
+        MAX_COLUMN = 15
         cols = [f"column_{i}" for i in range(1, MAX_COLUMN + 1)]
-        dfs = pd.read_html(StringIO(html_str), flavor='html5lib')
+
+        # 1️⃣ Guard against empty or invalid HTML
+        if not isinstance(html_str, str) or "<table" not in html_str.lower():
+            self.logger.warning("No valid <table> markup found, skipping normalization.")
+            return pd.DataFrame(columns=cols)
+
+        # 2️⃣ Parse safely
+        try:
+            dfs = pd.read_html(StringIO(html_str), flavor='html5lib')
+        except ValueError as e:
+            # pandas raises this exact error
+            self.logger.warning(f"pd.read_html() failed: {e}")
+            return pd.DataFrame(columns=cols)
+
         if not dfs:
             return pd.DataFrame(columns=cols)
-        
+
+        # 3️⃣ Normalize DataFrames
         all_dfs = []
         for df in dfs:
             if df.empty:
                 continue
-
-            df = df.iloc[:, :MAX_COLUMN].copy()  # truncate if too many columns
-            df.columns = cols[:df.shape[1]]      # rename existing columns
+            df = df.iloc[:, :MAX_COLUMN].copy()
+            df.columns = cols[:df.shape[1]]
             for i in range(df.shape[1], MAX_COLUMN):
-                df[cols[i]] = ""                 # fill missing columns with empty strings
-
-            df = df.reindex(columns=cols)        # ensure consistent column order
+                df[cols[i]] = ""
+            df = df.reindex(columns=cols)
             all_dfs.append(df)
 
-        final_df = pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame(columns=cols)
-        
-        norm_df = final_df.to_csv(index=False,header=False, sep='|', lineterminator='\n')
+        if not all_dfs:
+            return pd.DataFrame(columns=cols)
+
+        final_df = pd.concat(all_dfs, ignore_index=True)
+        norm_df = final_df.to_csv(index=False, header=False, sep='|', lineterminator='\n')
         return norm_df
 
-    #Core Functionality
-    # def runner(self, data, function_to_execute):
-    #     p_dict = data.copy()
-    #     records = p_dict.get("records", [])
-
-    #     for record in records:
-    #         # self.logger.info(f"Processing : {record['bank_name']}")
-    #         print(f">>Processing {record['bank_name']}")
-    #         response_data = record.get("scraped_data", [])
-    #         if not response_data:
+    
+    # def _generalize_table_df(self,html_str)->str:
+    #     MAX_COLUMN=15
+    #     cols = [f"column_{i}" for i in range(1, MAX_COLUMN + 1)]
+    #     dfs = pd.read_html(StringIO(html_str), flavor='html5lib')
+    #     if not dfs:
+    #         return pd.DataFrame(columns=cols)
+        
+    #     all_dfs = []
+    #     for df in dfs:
+    #         if df.empty:
     #             continue
 
-    #         new_scraped_data = []
+    #         df = df.iloc[:, :MAX_COLUMN].copy()  # truncate if too many columns
+    #         df.columns = cols[:df.shape[1]]      # rename existing columns
+    #         for i in range(df.shape[1], MAX_COLUMN):
+    #             df[cols[i]] = ""                 # fill missing columns with empty strings
 
-    #         for action in response_data:
-    #             if not action.get("data_present"):
-    #                 continue
+    #         df = df.reindex(columns=cols)        # ensure consistent column order
+    #         all_dfs.append(df)
 
-    #             response = action.get("response")
-    #             if not response:
-    #                 continue
+    #     final_df = pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame(columns=cols)
+        
+    #     norm_df = final_df.to_csv(index=False,header=False, sep='|', lineterminator='\n')
+    #     return norm_df
 
-    #             for _packet_ in response:
-    #                 check_packet = _packet_.copy()
-
-    #                 for stage_name, operations in function_to_execute.items():
-    #                     for operation in operations:
-    #                         # Unpack operation with optional expected_type
-    #                         if len(operation) == 4:
-    #                             func_name, source_key, target_key, expected_type = operation
-    #                         else:
-    #                             func_name, source_key, target_key = operation
-    #                             expected_type = None
-
-    #                         if target_key in check_packet:
-    #                             raise ValueError(
-    #                                 f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}"
-    #                             )
-
-    #                         func = self.procedures.get(func_name)
-    #                         if not func:
-    #                             raise ValueError(f"Function '{func_name}' not found in procedures.")
-
-    #                         input_value = _packet_.get(source_key)
-    #                         if input_value is None:
-    #                             continue
-
-    #                         # Apply type check only in primary stage
-    #                         if stage_name == "primary" and expected_type:
-    #                             packet_type = _packet_.get("type", "").lower()
-    #                             if isinstance(expected_type, list):
-    #                                 if packet_type not in [t.lower() for t in expected_type]:
-    #                                     continue
-    #                             elif packet_type != expected_type.lower():
-    #                                 continue
-
-    #                         _packet_[target_key] = func(input_value)
-
-    #                 new_scraped_data.append(_packet_)
-
-    #         record["scraped_data"] = new_scraped_data
-
-    #     return p_dict
+    #Core Functionality
         
     def runner(self, data, function_to_execute):
         p_dict = data.copy()
@@ -290,6 +272,39 @@ class OperationExecutor:
                 except Exception as e:
                     return pd.DataFrame([[f"Invalid PDF file: {e}"]])
                 return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in PDF"]])
+            # elif content_type == "pdf":
+            #     pdf_bytes = base64.b64decode(raw_content)
+            #     pdf_file = BytesIO(pdf_bytes)
+            #     all_rows = []
+
+            #     try:
+            #         with pdfplumber.open(pdf_file) as pdf:
+            #             for page_num, page in enumerate(pdf.pages, start=1):
+            #                 tables = page.extract_tables()
+            #                 for table in tables:
+            #                     all_rows.append([f"[Page {page_num}]"])
+            #                     all_rows.extend(table)
+            #     except Exception as e:
+            #         self.logger.warning(f"pdfplumber parse failed: {e}")
+
+                # Fallback to Camelot if no tables found or empty
+                # if not all_rows:
+                #     self.logger.notice("No tables found by pdfplumber — trying Camelot fallback...")
+                #     import camelot, tempfile
+                #     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp_pdf:
+                #         tmp_pdf.write(pdf_bytes)
+                #         tmp_pdf.flush()
+                #         tables = camelot.read_pdf(tmp_pdf.name, pages="all", flavor="stream")
+                #         for t in tables:
+                #             df = t.df
+                #             all_rows.append([f"[Page {t.page}]"])
+                #             all_rows.extend(df.values.tolist())
+
+                # return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in PDF (after both methods)"]])
+
+            
+
+            
 
             elif content_type == "redir_pdf":
                 pdf_bytes = base64.b64decode(raw_content)
@@ -391,18 +406,6 @@ class OperationExecutor:
 
         start_row += max_rows + 2  # Leave 2 blank rows below
         return start_row
-
-    # def _write_single_table(self, ws, df, start_row, title=None):
-    #     if title:
-    #         for line in title:
-    #             ws.cell(row=start_row, column=1, value=line)
-    #             start_row += 1
-    #     for r in dataframe_to_rows(df, index=False, header=True):
-    #         for c_idx, value in enumerate(r, start=1):
-    #             ws.cell(row=start_row, column=c_idx, value=value)
-    #         start_row += 1
-    #     return start_row
-    
 
 
     def generate_sorted_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
@@ -578,28 +581,73 @@ class OperationExecutor:
         try:
             if content_type == "pdf":
                 try:
+
                     pdf_bytes = base64.b64decode(raw_content)
+
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_pdf:
                         tmp_pdf.write(pdf_bytes)
                         tmp_pdf_path = tmp_pdf.name
+                        
+                    try:
+                        tables = camelot.read_pdf(tmp_pdf_path, pages='all', flavor='stream')
+                        if tables and len(tables) > 0:
+                            for t in tables:
+                                df = t.df
+                                result["content"].append({"type": "table", "table": df})
+                                result["tables"].append(df)
+                            result["raw_text"] = f"[Extracted {len(tables)} table(s) from PDF]"
+                        else:
+                            result["raw_text"] = "[No tables detected in PDF]"
+                    except Exception as e:
+                        result["content"].append({ "type": "text","text": f"[Table extraction failed: {e}]" })
+                        result["raw_text"] = "[Table extraction failed]"
 
-                    tmp_docx_path = tmp_pdf_path.replace(".pdf", ".docx")
-                    converter = Converter(tmp_pdf_path)
-                    converter.convert(tmp_docx_path, start=0, end=None)
-                    converter.close()
+                    # === Step 3: Convert PDF pages → images (for docx stitching) ===
+                    try:
+                        images = convert_from_bytes(pdf_bytes, dpi=200)
+                        for idx, img in enumerate(images, start=1):
+                            img_buf = BytesIO()
+                            img.save(img_buf, format="PNG")
+                            img_buf.seek(0)
+                            result["content"].append({ "type": "image","image_stream": img_buf.getvalue(),"page": idx})
+                        result["raw_text"] += f" | [Embedded {len(images)} page(s) as images]"
+                    except Exception as e:
+                        result["content"].append({"type": "text", "text": f"[Image stitching failed: {e}]"})
+                        result["raw_text"] += " | [Image stitching failed]"
 
-                    with open(tmp_docx_path, "rb") as f:
-                        docx_bytes = f.read()
-
-                    os.remove(tmp_pdf_path)
-                    os.remove(tmp_docx_path)
-
-                    result["content"].append({"type": "docx","docx_bytes": docx_bytes})
-                    result["raw_text"] = "[DOCX conversion successful]"
+                    # === Step 4: Cleanup ===
+                    if os.path.exists(tmp_pdf_path):
+                        os.remove(tmp_pdf_path)
 
                 except Exception as e:
-                    result["content"].append({"type": "text","text": f"[PDF to DOCX failed: {e}]"})
+                    result["content"].append({ "type": "text", "text": f"[PDF processing failed: {e}]" })
+                    result["raw_text"] = "[PDF processing failed]"
 
+            
+            # if content_type == "pdf":
+            #     try:
+            #         pdf_bytes = base64.b64decode(raw_content)
+            #         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_pdf:
+            #             tmp_pdf.write(pdf_bytes)
+            #             tmp_pdf_path = tmp_pdf.name
+
+            #         tmp_docx_path = tmp_pdf_path.replace(".pdf", ".docx")
+            #         converter = Converter(tmp_pdf_path)
+            #         converter.convert(tmp_docx_path, start=0, end=None)
+            #         converter.close()
+
+            #         with open(tmp_docx_path, "rb") as f:
+            #             docx_bytes = f.read()
+
+            #         os.remove(tmp_pdf_path)
+            #         os.remove(tmp_docx_path)
+
+            #         result["content"].append({"type": "docx","docx_bytes": docx_bytes})
+            #         result["raw_text"] = "[DOCX conversion successful]"
+
+            #     except Exception as e:
+            #         result["content"].append({"type": "text","text": f"[PDF to DOCX failed: {e}]"})
+            
             elif content_type == "html":
                 soup = BeautifulSoup(raw_content, "html.parser")
                 text = soup.get_text(separator="\n").strip()
@@ -751,3 +799,158 @@ class OperationExecutor:
         document.save(output_path)
         return output_path
     
+    
+    def generate_pdf_report(self, cache_data, output_path):
+        """
+        Compact PDF report generator using xhtml2pdf.
+        Groups all packets per bank into a single section,
+        skips empty / trivial content, and adds one bookmark per bank.
+        """
+
+        # def _html_to_pdf_xhtml2pdf(html_content, output_file, bank_name=None):
+        #     # unified compact style
+        #     html_template = f"""
+        #     <html>
+        #     <head>
+        #         <meta charset="utf-8">
+        #         <style>
+        #             @page {{ size: A4; margin: 1cm; }}
+        #             body  {{ font-family: Helvetica, Arial, sans-serif; font-size: 10pt; line-height: 1.3; }}
+        #             h2    {{ color: #1f4e79; margin-bottom: 4px; }}
+        #             h3    {{ color: #3b3b3b; margin: 3px 0 6px 0; }}
+        #             table {{ border-collapse: collapse; width: 90%; margin: 4px auto; }}
+        #             th,td {{ border: 1px solid #999; padding: 3px 5px; font-size: 9pt; }}
+        #             th    {{ background-color: #f2f2f2; }}
+        #             p     {{ margin: 3px 0; }}
+        #         </style>
+        #     </head>
+        #     <body>
+        #         <h2>{bank_name or ''}</h2>
+        #         {html_content}
+        #     </body>
+        #     </html>
+        #     """
+        #     with open(output_file, "wb") as f:
+        #         pisa.CreatePDF(html_template, dest=f)
+        
+        
+        def _html_to_pdf_pdfkit(html_content, output_file, bank_name=None):
+            import pdfkit
+
+            # compact + readable CSS
+            html_template = f"""
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    @page {{ size: A4; margin: 0.7cm; }}
+                    body  {{ font-family: Helvetica, Arial, sans-serif; font-size: 9pt; line-height: 1.15; color: #111; }}
+                    h2    {{ color: #1f4e79; margin: 4px 0 6px 0; font-size: 11pt; }}
+                    h3    {{ color: #333; margin: 2px 0 4px 0; font-size: 9.5pt; }}
+                    table {{ border-collapse: collapse; width: 95%; margin: 3px auto; }}
+                    th,td {{ border: 1px solid #999; padding: 2px 4px; font-size: 8.5pt; }}
+                    th    {{ background-color: #f0f0f0; }}
+                    p     {{ margin: 2px 0; }}
+                    hr    {{ border: none; border-top: 0.5pt solid #ccc; margin: 3px 0; }}
+                </style>
+            </head>
+            <body>
+                <h2>{bank_name or ''}</h2>
+                {html_content}
+            </body>
+            </html>
+            """
+
+            # if wkhtmltopdf isn’t on PATH, point it explicitly
+            config = pdfkit.configuration(
+                wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+            )
+
+            pdfkit.from_string(html_template, output_file, configuration=config)
+
+        
+
+        merger = PdfMerger()
+        bank_titles = []  # one per bank
+
+        # --- iterate through each bank ---
+        for record in cache_data.get("records", []):
+            bank_name = record.get("bank_name", "Unknown Bank")
+            combined_html_parts = []
+            added_anything = False
+
+            for action in record.get("scraped_data", []):
+                for response in action.get("response", []):
+                    typ = response.get("type")
+                    value = response.get("value", "")
+                    if not value:
+                        continue
+
+                    # ----- HTML + TABLE_HTML -----
+                    if typ in ("html", "table_html"):
+                        html_str = value.strip()
+                        if len(html_str) < 150:  # skip short or empty fragments
+                            continue
+                        combined_html_parts.append(f"<h3>{action.get('log_message','')}</h3>{html_str}")
+                        added_anything = True
+
+                    # ----- XLSX -----
+                    elif typ == "xlsx":
+                        try:
+                            xlsx_bytes = base64.b64decode(value)
+                            df = pd.read_excel(BytesIO(xlsx_bytes))
+                            if df.empty:
+                                continue
+                            combined_html_parts.append(
+                                f"<h3>{action.get('log_message','')}</h3>{df.to_html(index=False)}"
+                            )
+                            added_anything = True
+                        except Exception:
+                            continue
+
+                    # ----- PDF (attach existing) -----
+                    elif typ == "pdf":
+                        try:
+                            pdf_bytes = base64.b64decode(value)
+                            tmp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+                            tmp_pdf.write(pdf_bytes)
+                            tmp_pdf.close()
+                            merger.append(tmp_pdf.name)
+                            added_anything = True
+                        except Exception:
+                            continue
+
+            # ----- render combined html if present -----
+            if combined_html_parts:
+                html_combined = "<hr>".join(combined_html_parts)
+                tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+                _html_to_pdf_pdfkit(html_combined, tmp.name, bank_name)
+                merger.append(tmp.name)
+                tmp.close()
+                added_anything = True
+
+            if added_anything:
+                bank_titles.append(bank_name)
+
+        # --- write merged PDF ---
+        merger.write(output_path)
+        merger.close()
+
+        # --- add one bookmark per bank ---
+        reader = PdfReader(output_path)
+        writer = PdfWriter()
+        for page in reader.pages:
+            writer.add_page(page)
+
+        seen = set()
+        for i, title in enumerate(bank_titles):
+            if title not in seen:
+                writer.add_outline_item(title, i)
+                seen.add(title)
+
+        with open(output_path, "wb") as f:
+            writer.write(f)
+
+        print(f"✅ Compact PDF report generated at {output_path}")
+
+
