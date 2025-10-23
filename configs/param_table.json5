@@ -1,28 +1,14 @@
 {
     POST_SCRAPE_OPS: {
-        sha1: {
-            primary: [
-                [
-                    "normalize_df",
-                    "value",
-                    "norm_table",
-                    "table_html"
+        SHAONE:{
+                "primary": [
+                    ["normalize_df", "value", "norm_table", "table_html"],
+                    ["sha1", "value", "SHA_ONE", "pdf"]
                 ],
-                [
-                    "sha1",
-                    "value",
-                    "SHA_ONE",
-                    "pdf"
-                ]
-            ],
-            secondary: [
-                [
-                    "sha1",
-                    "norm_table",
-                    "SHA_ONE"
-                ]
-            ]
-        },
+                "secondary": [
+                    ["sha1", "norm_table", "SHA_ONE"]
+                ],
+            }
     },
     PSB_1: {
         bank_name: "Bank of Baroda",
@@ -220,12 +206,6 @@
         base_url: "https://www.unionbankofindia.co.in/en/details/rate-of-interest",
         blocks: [
             {
-                action: "execute_script",
-                script: "window.scrollTo(0, document.body.scrollHeight);",
-                log_message: "Force JS render",
-                default_wait: 2
-            },
-            {
                 action: "table",
                 table_name: "Union_Bank",
                 by: "tag",
@@ -233,10 +213,16 @@
                 wait_until: "present",
                 multiple: true,
                 skip_if_not_found: true,
-                default_wait: 20,
+                default_wait: 40,
                 timeout: 60,
                 log_message: "Save Html Tables."
             },
+            // {
+            //     action: "execute_script",
+            //     script: "window.scrollTo(0, document.body.scrollHeight);",
+            //     log_message: "Force JS render",
+            //     default_wait: 2
+            // },
             {
                 action: "click_save",
                 by: "xpath",
@@ -638,8 +624,8 @@
                 value: "//a[contains(@href, 'bulk_fixed_deposit_interest_rates_v1_pdf.pdf')]",
                 multiple: false,
                 wait_until: "present",
-                default_wait: 5,
-                timeout: 10
+                default_wait: 20,
+                timeout: 30
             }
         ],
     },

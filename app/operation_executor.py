@@ -1,34 +1,23 @@
-import re,os, hashlib, inspect, dateutil, base64, pdfplumber, ocrmypdf, tempfile
 import pandas as pd
+import time ,re,os, hashlib, inspect, tempfile
+import dateutil, base64, pdfplumber, ocrmypdf
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 from io import StringIO, BytesIO
-from docx import Document
-from pdf2docx import Converter
-from docx import Document as DocxReader
-from pdf2image import convert_from_bytes
-import camelot
-from xhtml2pdf import pisa
-from PyPDF2 import PdfMerger, PdfWriter, PdfReader
 
-
-from openpyxl.styles import PatternFill
-from openpyxl.formatting.rule import FormulaRule
 from openpyxl.utils.dataframe import dataframe_to_rows  
-from openpyxl.formatting.rule import CellIsRule
-import pandas as pd
 from openpyxl.styles import PatternFill, Border, Side, Alignment
 from openpyxl.formatting.rule import CellIsRule, FormulaRule
 
 from app.logger import get_global_logger
 
-class OperationExecutor:
-    
+class OperationExecutorLatest:
+ 
+    cache_doc_name = "" 
     def __init__(self, ):
-        
         self.logger = get_global_logger()
         self.procedures = {
-            "ext_date": self.extract_date,
+            # "ext_date": self.extract_date,
             "sha256": self._generate_hash_sha256,
             "sha1": self._generate_hash_sha1,
             "normalize_df": self._generalize_table_df,
@@ -42,29 +31,44 @@ class OperationExecutor:
             "ext_date": ["html"],
             "original": ["pdf", "html", "table_html"]
         }
+        
+        self.MAX_COLUMN_DF = 15
+        
+        #color fills
+        self.SKY_BLUE_FILL = PatternFill(start_color="B3E5FC", end_color="B3E5FC", fill_type="solid")
+        self.GREY_FILL = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
+        self.RED_FILL = PatternFill(start_color="FF9999", end_color="FF9999", fill_type="solid")
+        
+        # RED_FILL = PatternFill(start_color="FF9999", end_color="FF9999", fill_type="solid")
+        self.YELLOW_FILL = PatternFill(start_color="FFFF99", end_color="FFFF99", fill_type="solid")
+        self.GREEN_FILL = PatternFill(start_color="CCFFCC", end_color="CCFFCC", fill_type="solid")
+        self.RED_NOTE_FILL = PatternFill(start_color="FFCCCC", end_color="FFCCCC", fill_type="solid")
+        self.HEADER_FILL = PatternFill(start_color="E0E0E0", end_color="E0E0E0", fill_type="solid")
+        self.BORDER = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+        
+        #front excel headers
+        self.summary_headers = [
+            "Bank Code", "Bank Name", "Old Total", "New Total",
+            "New Count", "Removed Count", "Unchanged Count", "Change %", "Notes"
+        ]
+        
 
-    
-        self.GREEN_FILL = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid")
-        self.YELLOW_FILL = PatternFill(start_color="FFF2CC", end_color="FFF2CC", fill_type="solid")
-        self.RED_FILL = PatternFill(start_color="F4CCCC", end_color="F4CCCC", fill_type="solid")
-        self.RED_NOTE_FILL = PatternFill(start_color="FFC7CE", end_color="FFC7CE", fill_type="solid")
     #============ PROCEDURES ==============
     @staticmethod
     def extract_date(text: str) -> str:
         if not isinstance(text, str):
             print("Invalid data type. Expected string.")
             return ""
-        
-        output_format = "%Y%m%d"
+    
         date_patterns = [r"(\d{2}[.\-/]+\d{2}[.\-/]+\d{4}",
                         r"\d{1,2}\s*(?:th|st|rd|nd)\s*[A-Za-z]+\s*\d{4}",
                         r"\d{2}[\.\-\/]+[A-Za-z]+[\.\-\/]+\d{4}",
                         r"\d{2}\s*[A-Za-z]+\s*\d{4})"]
         matches = re.findall(r"|".join(date_patterns), text, re.IGNORECASE)
-        
         if matches:
             date_str = " ".join(matches)
             try:
+                output_format = "%Y%m%d"
                 dt_object = parse(date_str, fuzzy=True)
                 return dt_object.strftime(output_format)
             except dateutil.parser._parser.ParserError as e:
@@ -84,73 +88,23 @@ class OperationExecutor:
             return f"{inspect.currentframe().f_code.co_name}: input non str"
         return hashlib.sha1(text.encode()).hexdigest()
     
-    def _generalize_table_df(self, html_str) -> str:
-        MAX_COLUMN = 15
-        cols = [f"column_{i}" for i in range(1, MAX_COLUMN + 1)]
-
-        # 1️⃣ Guard against empty or invalid HTML
-        if not isinstance(html_str, str) or "<table" not in html_str.lower():
-            self.logger.warning("No valid <table> markup found, skipping normalization.")
-            return pd.DataFrame(columns=cols)
-
-        # 2️⃣ Parse safely
-        try:
-            dfs = pd.read_html(StringIO(html_str), flavor='html5lib')
-        except ValueError as e:
-            # pandas raises this exact error
-            self.logger.warning(f"pd.read_html() failed: {e}")
-            return pd.DataFrame(columns=cols)
-
-        if not dfs:
-            return pd.DataFrame(columns=cols)
-
-        # 3️⃣ Normalize DataFrames
+    def _generalize_table_df(self,html_str)->str:
+        cols = [f"column_{i}" for i in range(1, self.MAX_COLUMN_DF + 1)]
+        dfs = pd.read_html(StringIO(html_str), flavor='html5lib')
+        if not dfs: return pd.DataFrame(columns=cols)
+        
         all_dfs = []
         for df in dfs:
-            if df.empty:
-                continue
-            df = df.iloc[:, :MAX_COLUMN].copy()
-            df.columns = cols[:df.shape[1]]
-            for i in range(df.shape[1], MAX_COLUMN):
-                df[cols[i]] = ""
-            df = df.reindex(columns=cols)
+            if df.empty: continue
+            df = df.iloc[:, :self.MAX_COLUMN_DF].copy()  # truncate if too many columns
+            df.columns = cols[:df.shape[1]]      # rename existing columns
+            for i in range(df.shape[1], self.MAX_COLUMN_DF):  df[cols[i]] = "" # fill missing columns with empty strings
+            df = df.reindex(columns=cols)        # ensure consistent column order
             all_dfs.append(df)
 
-        if not all_dfs:
-            return pd.DataFrame(columns=cols)
-
-        final_df = pd.concat(all_dfs, ignore_index=True)
-        norm_df = final_df.to_csv(index=False, header=False, sep='|', lineterminator='\n')
-        return norm_df
-
-    
-    # def _generalize_table_df(self,html_str)->str:
-    #     MAX_COLUMN=15
-    #     cols = [f"column_{i}" for i in range(1, MAX_COLUMN + 1)]
-    #     dfs = pd.read_html(StringIO(html_str), flavor='html5lib')
-    #     if not dfs:
-    #         return pd.DataFrame(columns=cols)
-        
-    #     all_dfs = []
-    #     for df in dfs:
-    #         if df.empty:
-    #             continue
-
-    #         df = df.iloc[:, :MAX_COLUMN].copy()  # truncate if too many columns
-    #         df.columns = cols[:df.shape[1]]      # rename existing columns
-    #         for i in range(df.shape[1], MAX_COLUMN):
-    #             df[cols[i]] = ""                 # fill missing columns with empty strings
-
-    #         df = df.reindex(columns=cols)        # ensure consistent column order
-    #         all_dfs.append(df)
-
-    #     final_df = pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame(columns=cols)
-        
-    #     norm_df = final_df.to_csv(index=False,header=False, sep='|', lineterminator='\n')
-    #     return norm_df
-
-    #Core Functionality
-        
+        final_df = pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame(columns=cols)
+        return final_df.to_csv(index=False,header=False, sep='|', lineterminator='\n')
+   
     def runner(self, data, function_to_execute):
         p_dict = data.copy()
         records = p_dict.get("records", [])
@@ -158,29 +112,35 @@ class OperationExecutor:
         for record in records:
             print(f">>Processing {record['bank_name']}")
             response_data = record.get("scraped_data", [])
-            if not response_data: continue
+            if not response_data:
+                continue
+
             new_scraped_data = []
+
             for action in response_data:
-                if not action.get("data_present"):continue
+                if not action.get("data_present"): continue
                 response = action.get("response")
-                if not response:continue
-
+                if not response:  continue
                 for _packet_ in response:
-                    check_packet = _packet_.copy()
-
                     try:
+                        check_packet = _packet_.copy()
                         for stage_name, operations in function_to_execute.items():
                             for operation in operations:
                                 # Unpack operation with optional expected_type
-                                if len(operation) == 4: func_name, source_key, target_key, expected_type = operation
+                                if len(operation) == 4:
+                                    func_name, source_key, target_key, expected_type = operation
                                 else:
                                     func_name, source_key, target_key = operation
                                     expected_type = None
 
-                                if target_key in check_packet: raise ValueError(f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}")
+                                if target_key in check_packet:
+                                    raise ValueError(
+                                        f"`target_key` cannot be similar to any of these keys: {list(check_packet.keys())}"
+                                    )
 
                                 func = self.procedures.get(func_name)
-                                if not func: raise ValueError(f"Function '{func_name}' not found in procedures.")
+                                if not func:
+                                    raise ValueError(f"Function '{func_name}' not found in procedures.")
 
                                 input_value = _packet_.get(source_key)
                                 if input_value is None:
@@ -199,8 +159,10 @@ class OperationExecutor:
 
                     except Exception as e:
                         error_msg = f"[ERROR] Failed to process packet for bank '{record['bank_name']}': {str(e)}"
-                        if hasattr(self, "logger"): self.logger.error(error_msg)
-                        else: print(error_msg)
+                        if hasattr(self, "logger"):
+                            self.logger.error(error_msg)
+                        else:
+                            print(error_msg)
 
                     new_scraped_data.append(_packet_)
 
@@ -209,42 +171,55 @@ class OperationExecutor:
         return p_dict
     
     def process_comparison(self, old_json: dict, new_json: dict, key: str = "hash256") -> dict:
-        def get_items(data, code):
-            """Return scraped items for a specific bank code."""
+    
+        def __extract_scraped_items(data, bank_code):
             for record in data.get("records", []):
-                if record.get("bank_code") == code:
-                    return [item for item in record.get("scraped_data", []) if key in item]
+                if record.get("bank_code") == bank_code:
+                    return [entry for entry in record.get("scraped_data", []) if key in entry]
             return []
 
-        for new_rec in new_json.get("records", []):
-            bank_code = new_rec.get("bank_code")
-
-            old_items = get_items(old_json, bank_code)
-            new_items = get_items(new_json, bank_code)
-
-            old_keys, new_keys = {i[key] for i in old_items}, {i[key] for i in new_items}
-
-            new_only = new_keys - old_keys
-            removed = old_keys - new_keys
-            same = old_keys & new_keys
-
-            new_rec["comparison_result"] = {
-                "new": [i for i in new_items if i[key] in new_only],
-                "removed": [i for i in old_items if i[key] in removed],
-                "unchanged": list(same),
-                "summary": {
-                    "old_total": len(old_items),
-                    "new_total": len(new_items),
-                    "new_count": len(new_only),
-                    "removed_count": len(removed),
-                    "unchanged_count": len(same)
-                },
+        def __build_comparison_result(result):
+            return {
+                "comparison_result": {
+                    "new": result["new_packets"],
+                    "removed": result["removed_packets"],
+                    "unchanged": list(result["unchanged_keys"]),
+                    "summary": {
+                        "old_total": result["old_total"],
+                        "new_total": result["new_total"],
+                        "new_count": len(result["new_packets"]),
+                        "removed_count": len(result["removed_packets"]),
+                        "unchanged_count": len(result["unchanged_keys"])
+                    }
+                }
             }
-            new_rec.pop("scraped_data", None)
-        return new_json
 
+        for new_record in new_json.get("records", []):
+            bank_code = new_record.get("bank_code")
+            old_items = __extract_scraped_items(old_json, bank_code)
+            new_items = __extract_scraped_items(new_json, bank_code)
+
+            old_keys = {item[key] for item in old_items}
+            new_keys = {item[key] for item in new_items}
+
+            new_only_keys,removed_keys,unchanged_keys = new_keys - old_keys, old_keys - new_keys, old_keys & new_keys
+            result = {
+                "key": key,
+                "new_keys": new_only_keys,
+                "removed_keys": removed_keys,
+                "unchanged_keys": unchanged_keys,
+                "new_packets": [item for item in new_items if item[key] in new_only_keys],
+                "removed_packets": [item for item in old_items if item[key] in removed_keys],
+                "old_total": len(old_items),
+                "new_total": len(new_items)
+            }
+
+            new_record.update(__build_comparison_result(result))
+            new_record.pop("scraped_data", None)
+
+        return new_json
+    
     def _parse_table(self, entry):
-        
         content_type = entry.get("type", "str")
         raw_content = entry.get("value", "")
 
@@ -272,39 +247,6 @@ class OperationExecutor:
                 except Exception as e:
                     return pd.DataFrame([[f"Invalid PDF file: {e}"]])
                 return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in PDF"]])
-            # elif content_type == "pdf":
-            #     pdf_bytes = base64.b64decode(raw_content)
-            #     pdf_file = BytesIO(pdf_bytes)
-            #     all_rows = []
-
-            #     try:
-            #         with pdfplumber.open(pdf_file) as pdf:
-            #             for page_num, page in enumerate(pdf.pages, start=1):
-            #                 tables = page.extract_tables()
-            #                 for table in tables:
-            #                     all_rows.append([f"[Page {page_num}]"])
-            #                     all_rows.extend(table)
-            #     except Exception as e:
-            #         self.logger.warning(f"pdfplumber parse failed: {e}")
-
-                # Fallback to Camelot if no tables found or empty
-                # if not all_rows:
-                #     self.logger.notice("No tables found by pdfplumber — trying Camelot fallback...")
-                #     import camelot, tempfile
-                #     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp_pdf:
-                #         tmp_pdf.write(pdf_bytes)
-                #         tmp_pdf.flush()
-                #         tables = camelot.read_pdf(tmp_pdf.name, pages="all", flavor="stream")
-                #         for t in tables:
-                #             df = t.df
-                #             all_rows.append([f"[Page {t.page}]"])
-                #             all_rows.extend(df.values.tolist())
-
-                # return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in PDF (after both methods)"]])
-
-            
-
-            
 
             elif content_type == "redir_pdf":
                 pdf_bytes = base64.b64decode(raw_content)
@@ -334,15 +276,11 @@ class OperationExecutor:
         # Write bank name and link
         ws.cell(row=start_row, column=1, value="Bank Name")
         ws.cell(row=start_row, column=2, value=bank_name)
-
         ws.cell(row=start_row + 1, column=1, value="Bank Link")
         ws.cell(row=start_row + 1, column=2, value=bank_link)
 
         # Compute totals and change %
-        new_count = summary.get("new_count", 0)
-        removed_count = summary.get("removed_count", 0)
-        unchanged_count = summary.get("unchanged_count", 0)
-
+        new_count,removed_count,unchanged_count = summary.get("new_count", 0),summary.get("removed_count", 0),summary.get("unchanged_count", 0)
         old_total = removed_count + unchanged_count
         new_total = new_count + unchanged_count
         change_percent = round((new_count + removed_count) / max(old_total, 1) * 100, 2)
@@ -360,35 +298,46 @@ class OperationExecutor:
         return start_row + 6  # Next available row
 
     def _write_side_by_side_tables(self, ws, new_df, removed_df, start_row, title=None, gap=2):
+        # --- Handle None or non-DataFrame inputs gracefully ---
+        def to_df(data, placeholder):
+            if data is None: return pd.DataFrame([[placeholder]])
+            if isinstance(data, pd.DataFrame): return data if not data.empty else pd.DataFrame([[placeholder]])
+            if isinstance(data, list):
+                try: return pd.DataFrame(data) if data else pd.DataFrame([[placeholder]])
+                except Exception: return pd.DataFrame([[placeholder]])
+            return pd.DataFrame([[placeholder]])
 
+        new_df,removed_df = to_df(new_df, "⚠️ No new data available"),to_df(removed_df, "⚠️ No old data available")
+
+        # --- Layout setup ---
         new_col_start = 1
         removed_col_start = new_df.shape[1] + new_col_start + gap
         comparison_col_start = removed_col_start + removed_df.shape[1] + gap
-
-        SKY_BLUE_FILL = PatternFill(start_color="B3E5FC", end_color="B3E5FC", fill_type="solid")
-        GREY_FILL = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
-        RED_FILL = PatternFill(start_color="FF9999", end_color="FF9999", fill_type="solid")
-
         start_row += 3 
 
+        # --- Write title (if any) ---
         if title:
             for i, line in enumerate(title):
                 ws.cell(row=start_row + i, column=1, value=line)
             start_row += len(title)
 
+        # --- Compute grid size ---
         max_rows = max(len(new_df), len(removed_df))
         max_cols = max(new_df.shape[1], removed_df.shape[1])
 
+        # --- Write NEW Data Table ---
         for r_idx, row in enumerate(dataframe_to_rows(new_df, index=False, header=True)):
             for c_idx, val in enumerate(row):
                 cell = ws.cell(row=start_row + r_idx, column=new_col_start + c_idx, value=val)
-                cell.fill = SKY_BLUE_FILL
+                cell.fill = self.SKY_BLUE_FILL
 
+        # --- Write OLD Data Table ---
         for r_idx, row in enumerate(dataframe_to_rows(removed_df, index=False, header=True)):
             for c_idx, val in enumerate(row):
                 cell = ws.cell(row=start_row + r_idx, column=removed_col_start + c_idx, value=val)
-                cell.fill = GREY_FILL
+                cell.fill = self.GREY_FILL
 
+        # --- Optional comparison logic (not essential now) ---
         for r in range(start_row + 1, start_row + max_rows + 1):
             for c in range(max_cols):
                 comp_cell = ws.cell(row=r, column=comparison_col_start + c)
@@ -401,69 +350,50 @@ class OperationExecutor:
             formula = f'{col_letter}{start_row + 1}=FALSE'
             ws.conditional_formatting.add(
                 f'{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}',
-                FormulaRule(formula=[formula], fill=RED_FILL)
+                FormulaRule(formula=[formula], fill= self.RED_FILL)
             )
 
-        start_row += max_rows + 2  # Leave 2 blank rows below
+        start_row += max_rows + 2  # space after each block
         return start_row
 
-
     def generate_sorted_excel_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
-        # Define fill styles
-        self.RED_FILL = PatternFill(start_color="FF9999", end_color="FF9999", fill_type="solid")
-        self.YELLOW_FILL = PatternFill(start_color="FFFF99", end_color="FFFF99", fill_type="solid")
-        self.GREEN_FILL = PatternFill(start_color="CCFFCC", end_color="CCFFCC", fill_type="solid")
-        self.RED_NOTE_FILL = PatternFill(start_color="FFCCCC", end_color="FFCCCC", fill_type="solid")
-
-        # Sort records by number of new entries
         sorted_records = sorted(
             comparison_json.get("records", []),
             key=lambda r: len(r.get("comparison_result", {}).get("new", [])),
             reverse=True
         )
 
+        # === 3️⃣ Build Summary Sheet Data ===
         summary_data = []
         for record in sorted_records:
-            bank_name = record.get("bank_name")
-            bank_code = record.get("bank_code")
+            bank_name,bank_code = record.get("bank_name"),record.get("bank_code")
             comparison_result = record.get("comparison_result", {})
+            new_entries,removed_entries = comparison_result.get("new", []),comparison_result.get("removed", [])
             summary = comparison_result.get("summary", {})
-            new_entries = comparison_result.get("new", [])
-            removed_entries = comparison_result.get("removed", [])
-
+            
             old_total = summary.get("old_total", 0)
             new_total = summary.get("new_total", 0)
             new_count = summary.get("new_count", 0)
             removed_count = summary.get("removed_count", 0)
+            new_missing,old_missing = len(new_entries) == 0,len(removed_entries) == 0
+      
+            if new_missing and not old_missing: note = "⚠️ Scraping failed – No NEW data available"
+            elif old_missing and not new_missing: note = "⚠️ No OLD data – First run or cache missing"
+            elif new_missing and old_missing: note = "⚠️ No Data to Compare"
+            else: note = "✓ Changes in Data"
 
-            new_missing = len(new_entries) == 0
-            old_missing = len(removed_entries) == 0
+            change_pct = 100.0 if old_total == 0 and new_count > 0 else \
+                        round((new_count + removed_count) / old_total * 100, 2) if old_total else 0.0
 
-            if new_missing and not old_missing:
-                note = "⚠️ Scraping failed – No NEW data available"
-            elif old_missing and not new_missing:
-                note = "⚠️ No OLD data – First run or cache missing"
-            elif new_missing and old_missing:
-                note = "⚠️ No Data to Compare"
-            else:
-                note = "\u2713 Changes in Data"
-
-            change_pct = 100.0 if old_total == 0 and new_count > 0 else round((new_count + removed_count) / old_total * 100, 2) if old_total else 0.0
-            change_pct = min(change_pct, 100.0)
-
-            summary_row = [
+            summary_data.append([
                 bank_code, bank_name, old_total, new_total,
                 new_count, removed_count, summary.get("unchanged_count", 0),
-                change_pct, note
-            ]
-            summary_data.append(summary_row)
+                min(change_pct, 100.0), note
+            ])
 
-        summary_headers = [
-            "Bank Code", "Bank Name", "Old Total", "New Total",
-            "New Count", "Removed Count", "Unchanged Count", "Change %", "Notes"
-        ]
-        summary_df = pd.DataFrame(summary_data, columns=summary_headers)
+        summary_df = pd.DataFrame(summary_data, columns=self.summary_headers)
 
+        # === 4️⃣ Write Summary Sheet ===
         with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
             summary_df.to_excel(writer, sheet_name="Summary", index=False)
             ws_summary = writer.sheets["Summary"]
@@ -471,37 +401,31 @@ class OperationExecutor:
             # Auto column width
             for col in ws_summary.columns:
                 max_length = max(len(str(cell.value)) if cell.value else 0 for cell in col)
-                column = col[0].column_letter
-                ws_summary.column_dimensions[column].width = max_length + 4
+                ws_summary.column_dimensions[col[0].column_letter].width = max_length + 4
 
-            # Style header
-            header_fill = PatternFill(start_color="E0E0E0", end_color="E0E0E0", fill_type="solid")
-            thin_border = Border(
-                left=Side(style='thin'), right=Side(style='thin'),
-                top=Side(style='thin'), bottom=Side(style='thin')
-            )
+            # Header styling
             for cell in ws_summary[1]:
                 cell.font = cell.font.copy(bold=True)
-                cell.fill = header_fill
+                cell.fill = self.HEADER_FILL
                 cell.alignment = Alignment(horizontal="center", vertical="center")
-
             for row in ws_summary.iter_rows():
                 for cell in row:
-                    cell.border = thin_border
+                    cell.border = self.BORDER
 
-            # Conditional formatting
-            change_col = summary_headers.index("Change %") + 1
+            # Conditional Formatting
+            change_col = self.summary_headers.index("Change %") + 1
             change_range = f"{ws_summary.cell(row=2, column=change_col).coordinate}:{ws_summary.cell(row=len(summary_df)+1, column=change_col).coordinate}"
             ws_summary.conditional_formatting.add(change_range, CellIsRule(operator="greaterThanOrEqual", formula=["50"], fill=self.RED_FILL))
             ws_summary.conditional_formatting.add(change_range, CellIsRule(operator="between", formula=["20", "49.99"], fill=self.YELLOW_FILL))
             ws_summary.conditional_formatting.add(change_range, CellIsRule(operator="lessThan", formula=["20"], fill=self.GREEN_FILL))
 
-            note_col = summary_headers.index("Notes") + 1
+            note_col = self.summary_headers.index("Notes") + 1
             note_range = f"{ws_summary.cell(row=2, column=note_col).coordinate}:{ws_summary.cell(row=len(summary_df)+1, column=note_col).coordinate}"
             ws_summary.conditional_formatting.add(note_range, FormulaRule(formula=[f'LEN({ws_summary.cell(row=2, column=note_col).coordinate})>0'], fill=self.RED_NOTE_FILL))
 
-            # Write individual bank sheets
+            # === 5️⃣ Write Per-Bank Sheets ===
             existing_sheets = set(writer.sheets.keys())
+
             for record in sorted_records:
                 bank_name = record.get("bank_name")
                 bank_code = record.get("bank_code")
@@ -511,446 +435,39 @@ class OperationExecutor:
                 new_entries = comparison_result.get("new", [])
                 removed_entries = comparison_result.get("removed", [])
 
-                new_missing = len(new_entries) == 0
-                old_missing = len(removed_entries) == 0
-
-                base_name = f"{bank_name} ({bank_code})"[:31]
-                sheet_name = base_name
+                sheet_name = f"{bank_name} ({bank_code})"[:31]
                 counter = 1
                 while sheet_name in existing_sheets:
                     suffix = f"_{counter}"
-                    sheet_name = f"{base_name[:31-len(suffix)]}{suffix}"
+                    sheet_name = f"{bank_name[:31-len(suffix)]}{suffix}"
                     counter += 1
                 existing_sheets.add(sheet_name)
 
                 pd.DataFrame().to_excel(writer, sheet_name=sheet_name, index=False)
                 ws = writer.sheets[sheet_name]
-                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=bank_name, bank_link=bank_link)
 
+                row_cursor = self._write_summary(ws, summary, start_row=1, bank_name=bank_name, bank_link=bank_link)
                 max_tables = max(len(new_entries), len(removed_entries), 1)
+
                 for i in range(max_tables):
                     new_entry = new_entries[i] if i < len(new_entries) else None
                     removed_entry = removed_entries[i] if i < len(removed_entries) else None
 
                     title = ""
-                    if isinstance(new_entry, dict):
-                        title = new_entry.get("title", "")
-                    elif isinstance(removed_entry, dict):
-                        title = removed_entry.get("title", "")
+                    if isinstance(new_entry, dict): title = new_entry.get("title", "")
+                    elif isinstance(removed_entry, dict): title = removed_entry.get("title", "")
                     title = [title] if isinstance(title, str) else title or []
 
-                    if new_missing and removed_entry:
-                        removed_df = self._parse_table(removed_entry)
-                        row_cursor = self._write_side_by_side_tables(
-                            ws,
-                            pd.DataFrame([["--- Missing NEW Data ---"]]),
-                            removed_df,
-                            start_row=row_cursor,
-                            title=title + ["⚠️ Scraper failed – using OLD data only"]
-                        )
-                    elif old_missing and new_entry:
-                        new_df = self._parse_table(new_entry)
-                        row_cursor = self._write_side_by_side_tables(
-                            ws,
-                            new_df,
-                            pd.DataFrame([["--- Missing OLD Data ---"]]),
-                            start_row=row_cursor,
-                            title=title + ["⚠️ No old data available – first run"]
-                        )
-                    elif new_entry and removed_entry:
-                        new_df = self._parse_table(new_entry)
-                        removed_df = self._parse_table(removed_entry)
-                        row_cursor = self._write_side_by_side_tables(
-                            ws, new_df, removed_df, start_row=row_cursor, title=title
-                        )
-                    else:
-                        ws.cell(row=row_cursor, column=1, value="⚠️ No data available for comparison")
-                        row_cursor += 2
-
-        return output_path
-    
-    #==============================================
-    #==============================================
-    @staticmethod
-    def __parse_entry(entry):
-
-        content_type = entry.get("type", "str")
-        raw_content = entry.get("value", "")
-        result = {"type": content_type, "content": [], "tables": [], "raw_text": ""}
-
-        try:
-            if content_type == "pdf":
-                try:
-
-                    pdf_bytes = base64.b64decode(raw_content)
-
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_pdf:
-                        tmp_pdf.write(pdf_bytes)
-                        tmp_pdf_path = tmp_pdf.name
-                        
-                    try:
-                        tables = camelot.read_pdf(tmp_pdf_path, pages='all', flavor='stream')
-                        if tables and len(tables) > 0:
-                            for t in tables:
-                                df = t.df
-                                result["content"].append({"type": "table", "table": df})
-                                result["tables"].append(df)
-                            result["raw_text"] = f"[Extracted {len(tables)} table(s) from PDF]"
-                        else:
-                            result["raw_text"] = "[No tables detected in PDF]"
-                    except Exception as e:
-                        result["content"].append({ "type": "text","text": f"[Table extraction failed: {e}]" })
-                        result["raw_text"] = "[Table extraction failed]"
-
-                    # === Step 3: Convert PDF pages → images (for docx stitching) ===
-                    try:
-                        images = convert_from_bytes(pdf_bytes, dpi=200)
-                        for idx, img in enumerate(images, start=1):
-                            img_buf = BytesIO()
-                            img.save(img_buf, format="PNG")
-                            img_buf.seek(0)
-                            result["content"].append({ "type": "image","image_stream": img_buf.getvalue(),"page": idx})
-                        result["raw_text"] += f" | [Embedded {len(images)} page(s) as images]"
-                    except Exception as e:
-                        result["content"].append({"type": "text", "text": f"[Image stitching failed: {e}]"})
-                        result["raw_text"] += " | [Image stitching failed]"
-
-                    # === Step 4: Cleanup ===
-                    if os.path.exists(tmp_pdf_path):
-                        os.remove(tmp_pdf_path)
-
-                except Exception as e:
-                    result["content"].append({ "type": "text", "text": f"[PDF processing failed: {e}]" })
-                    result["raw_text"] = "[PDF processing failed]"
-
-            
-            # if content_type == "pdf":
-            #     try:
-            #         pdf_bytes = base64.b64decode(raw_content)
-            #         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_pdf:
-            #             tmp_pdf.write(pdf_bytes)
-            #             tmp_pdf_path = tmp_pdf.name
-
-            #         tmp_docx_path = tmp_pdf_path.replace(".pdf", ".docx")
-            #         converter = Converter(tmp_pdf_path)
-            #         converter.convert(tmp_docx_path, start=0, end=None)
-            #         converter.close()
-
-            #         with open(tmp_docx_path, "rb") as f:
-            #             docx_bytes = f.read()
-
-            #         os.remove(tmp_pdf_path)
-            #         os.remove(tmp_docx_path)
-
-            #         result["content"].append({"type": "docx","docx_bytes": docx_bytes})
-            #         result["raw_text"] = "[DOCX conversion successful]"
-
-            #     except Exception as e:
-            #         result["content"].append({"type": "text","text": f"[PDF to DOCX failed: {e}]"})
-            
-            elif content_type == "html":
-                soup = BeautifulSoup(raw_content, "html.parser")
-                text = soup.get_text(separator="\n").strip()
-                result["content"].append({"type": "text", "text": text})
-                result["raw_text"] = text
-
-            elif content_type == "table_html":
-                df = pd.read_html(StringIO(raw_content))[0]
-                result["content"].append({"type": "table", "table": df})
-                result["tables"].append(df)
-            
-            elif content_type == "xlsx":
-                xlsx_bytes = base64.b64decode(raw_content)
-                xlsx_stream = BytesIO(xlsx_bytes)
-
-                # Read all sheets
-                sheets = pd.read_excel(xlsx_stream, sheet_name=None)
-
-                for sheet_name, df in sheets.items():
-                    result["content"].append({
-                        "type": "table",
-                        "sheet": sheet_name,
-                        "table": df
-                    })
-                    result["tables"].append(df)
-
-                result["raw_text"] = f"[XLSX with {len(sheets)} sheet(s) parsed]"
-            else:
-                result["content"].append({"type": "text", "text": f"[Unsupported Datatype: {content_type}]"})
-
-        except Exception as e:
-            result["content"].append({"type": "text", "text": f"[Failed to parse: {e}]"})
-
-        return result
-    
-    @classmethod
-    def generate_cache_doc_report(cls, comparison_json, output_path="DepositRate_Comparison_Report.docx"):
-        document = Document()
-        sorted_records = comparison_json.get("records", [])
-        metadata = comparison_json.get("metadata", {})
-
-        document.add_heading("Metadata Overview", level=1)
-        document.add_paragraph("==============================================================")
-        for key, value in metadata.items():
-            document.add_paragraph(f"{key}: {value}")
-        document.add_page_break()
-
-
-        for record in sorted_records:
-            bank_name = record.get("bank_name", "")
-            bank_code = record.get("bank_code", "")
-            scraped_data = record.get("scraped_data", [])
-
-            document.add_heading(f">> {bank_code} : {bank_name}", level=2)
-            document.add_paragraph("==============================================================")
-
-            for scrape in scraped_data:
-                responses = scrape.get("response", [])
-                data_present = scrape.get("data_present", "")
-
-                document.add_heading(
-                    f"Action: {scrape.get("action", "")} | Timestamp: {scrape.get("timestamp", "")} | Present: {str(scrape.get("data_present", ""))} | Count: {scrape.get("response_count", "") if data_present else 0}",
-                    level=3
-                )
-                document.add_paragraph(f"Website: {scrape.get("webpage", "")}")
-
-                for response_entry in responses:
-                    titles = response_entry.get("title", [])
-                    titles = [titles] if isinstance(titles, str) else titles
-
-                    parsed = cls.__parse_entry(response_entry)
-                    content_stream = parsed["content"]
-
-                    document.add_paragraph("-----------------------------------------------------")
-                    for idx, line in enumerate(titles):
-                        document.add_paragraph(f"TITLE {idx+1}: {line}")
-
-                    for item in content_stream:
-                        if item["type"] == "text":
-                            document.add_paragraph(item["text"])
-                            
-                        elif item["type"] == "table":
-                            df = item["table"]
-                            table = document.add_table(rows=1, cols=len(df.columns))
-                            table.style = 'Table Grid'
-                            for i, col_name in enumerate(df.columns):
-                                table.cell(0, i).text = str(col_name)
-                            for _, row in df.iterrows():
-                                row_cells = table.add_row().cells
-                                for i, val in enumerate(row):
-                                    row_cells[i].text = str(val)
-                                    
-                        elif item["type"] == "docx":
-                            docx_bytes = item["docx_bytes"]
-                            docx_stream = BytesIO(docx_bytes)
-                            converted_doc = DocxReader(docx_stream)
-
-                            for para in converted_doc.paragraphs:
-                                if para.text.strip():
-                                    document.add_paragraph(f"{para.text}")
-
-                            for idx, tbl in enumerate(converted_doc.tables):
-                                rows = tbl.rows
-                                if rows:
-                                    document.add_paragraph(f"TABLE {idx + 1}")
-                                    table = document.add_table(rows=1, cols=len(rows[0].cells))
-                                    table.style = 'Table Grid'
-                                    for i, cell in enumerate(rows[0].cells):
-                                        table.cell(0, i).text = cell.text.strip()
-                                    for row in rows[1:]:
-                                        row_cells = table.add_row().cells
-                                        for i, cell in enumerate(row.cells):
-                                            row_cells[i].text = cell.text.strip()
-                                    document.add_paragraph("")
-                                    document.add_paragraph("")             
                     
-                        elif item["type"] == "xlsx":
-                            # Decode the base64 string to bytes
-                            xlsx_bytes = base64.b64decode(item["value"])
-                            xlsx_stream = BytesIO(xlsx_bytes)
+                    # --- Unified, aligned side-by-side layout ---
+                    new_df = self._parse_table(new_entry) if new_entry else pd.DataFrame([["⚠️ No new data available"]])
+                    removed_df = self._parse_table(removed_entry) if removed_entry else pd.DataFrame([["⚠️ No old data available"]])
 
-                            # Read all sheets
-                            sheets = pd.read_excel(xlsx_stream, sheet_name=None)
+                    # Keep structure consistent: left = NEW, right = OLD
+                    row_cursor = self._write_side_by_side_tables( ws,new_df, removed_df, start_row=row_cursor, title=title )
 
-                            for sheet_name, df in sheets.items():
-                                document.add_paragraph(f"SHEET: {sheet_name}")
 
-                                if df.empty:
-                                    document.add_paragraph("[Empty sheet]")
-                                    continue
-
-                                table = document.add_table(rows=1, cols=len(df.columns))
-                                table.style = 'Table Grid'
-
-                                # Header row
-                                for i, col in enumerate(df.columns):
-                                    table.cell(0, i).text = str(col)
-
-                                # Data rows
-                                for _, row in df.iterrows():
-                                    row_cells = table.add_row().cells
-                                    for i, val in enumerate(row):
-                                        row_cells[i].text = "" if pd.isna(val) else str(val)
-
-                                document.add_paragraph("")  # spacing
-
-            document.add_page_break()
-
-        document.save(output_path)
+        print(f"✅ Excel comparison report generated successfully at {output_path}")
         return output_path
+
     
-    
-    def generate_pdf_report(self, cache_data, output_path):
-        """
-        Compact PDF report generator using xhtml2pdf.
-        Groups all packets per bank into a single section,
-        skips empty / trivial content, and adds one bookmark per bank.
-        """
-
-        # def _html_to_pdf_xhtml2pdf(html_content, output_file, bank_name=None):
-        #     # unified compact style
-        #     html_template = f"""
-        #     <html>
-        #     <head>
-        #         <meta charset="utf-8">
-        #         <style>
-        #             @page {{ size: A4; margin: 1cm; }}
-        #             body  {{ font-family: Helvetica, Arial, sans-serif; font-size: 10pt; line-height: 1.3; }}
-        #             h2    {{ color: #1f4e79; margin-bottom: 4px; }}
-        #             h3    {{ color: #3b3b3b; margin: 3px 0 6px 0; }}
-        #             table {{ border-collapse: collapse; width: 90%; margin: 4px auto; }}
-        #             th,td {{ border: 1px solid #999; padding: 3px 5px; font-size: 9pt; }}
-        #             th    {{ background-color: #f2f2f2; }}
-        #             p     {{ margin: 3px 0; }}
-        #         </style>
-        #     </head>
-        #     <body>
-        #         <h2>{bank_name or ''}</h2>
-        #         {html_content}
-        #     </body>
-        #     </html>
-        #     """
-        #     with open(output_file, "wb") as f:
-        #         pisa.CreatePDF(html_template, dest=f)
-        
-        
-        def _html_to_pdf_pdfkit(html_content, output_file, bank_name=None):
-            import pdfkit
-
-            # compact + readable CSS
-            html_template = f"""
-            <html>
-            <head>
-                <meta charset="utf-8">
-                <style>
-                    @page {{ size: A4; margin: 0.7cm; }}
-                    body  {{ font-family: Helvetica, Arial, sans-serif; font-size: 9pt; line-height: 1.15; color: #111; }}
-                    h2    {{ color: #1f4e79; margin: 4px 0 6px 0; font-size: 11pt; }}
-                    h3    {{ color: #333; margin: 2px 0 4px 0; font-size: 9.5pt; }}
-                    table {{ border-collapse: collapse; width: 95%; margin: 3px auto; }}
-                    th,td {{ border: 1px solid #999; padding: 2px 4px; font-size: 8.5pt; }}
-                    th    {{ background-color: #f0f0f0; }}
-                    p     {{ margin: 2px 0; }}
-                    hr    {{ border: none; border-top: 0.5pt solid #ccc; margin: 3px 0; }}
-                </style>
-            </head>
-            <body>
-                <h2>{bank_name or ''}</h2>
-                {html_content}
-            </body>
-            </html>
-            """
-
-            # if wkhtmltopdf isn’t on PATH, point it explicitly
-            config = pdfkit.configuration(
-                wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
-            )
-
-            pdfkit.from_string(html_template, output_file, configuration=config)
-
-        
-
-        merger = PdfMerger()
-        bank_titles = []  # one per bank
-
-        # --- iterate through each bank ---
-        for record in cache_data.get("records", []):
-            bank_name = record.get("bank_name", "Unknown Bank")
-            combined_html_parts = []
-            added_anything = False
-
-            for action in record.get("scraped_data", []):
-                for response in action.get("response", []):
-                    typ = response.get("type")
-                    value = response.get("value", "")
-                    if not value:
-                        continue
-
-                    # ----- HTML + TABLE_HTML -----
-                    if typ in ("html", "table_html"):
-                        html_str = value.strip()
-                        if len(html_str) < 150:  # skip short or empty fragments
-                            continue
-                        combined_html_parts.append(f"<h3>{action.get('log_message','')}</h3>{html_str}")
-                        added_anything = True
-
-                    # ----- XLSX -----
-                    elif typ == "xlsx":
-                        try:
-                            xlsx_bytes = base64.b64decode(value)
-                            df = pd.read_excel(BytesIO(xlsx_bytes))
-                            if df.empty:
-                                continue
-                            combined_html_parts.append(
-                                f"<h3>{action.get('log_message','')}</h3>{df.to_html(index=False)}"
-                            )
-                            added_anything = True
-                        except Exception:
-                            continue
-
-                    # ----- PDF (attach existing) -----
-                    elif typ == "pdf":
-                        try:
-                            pdf_bytes = base64.b64decode(value)
-                            tmp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-                            tmp_pdf.write(pdf_bytes)
-                            tmp_pdf.close()
-                            merger.append(tmp_pdf.name)
-                            added_anything = True
-                        except Exception:
-                            continue
-
-            # ----- render combined html if present -----
-            if combined_html_parts:
-                html_combined = "<hr>".join(combined_html_parts)
-                tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-                _html_to_pdf_pdfkit(html_combined, tmp.name, bank_name)
-                merger.append(tmp.name)
-                tmp.close()
-                added_anything = True
-
-            if added_anything:
-                bank_titles.append(bank_name)
-
-        # --- write merged PDF ---
-        merger.write(output_path)
-        merger.close()
-
-        # --- add one bookmark per bank ---
-        reader = PdfReader(output_path)
-        writer = PdfWriter()
-        for page in reader.pages:
-            writer.add_page(page)
-
-        seen = set()
-        for i, title in enumerate(bank_titles):
-            if title not in seen:
-                writer.add_outline_item(title, i)
-                seen.add(title)
-
-        with open(output_path, "wb") as f:
-            writer.write(f)
-
-        print(f"✅ Compact PDF report generated at {output_path}")
-
-

@@ -22,9 +22,9 @@ def create_dir(root_path: str, *args) -> str:
 
 PATHS = load_json(r"paths.json")
 CONFIG = load_json5(os.path.join(root_dir,PATHS["configs"]))
-GENERIC_ACTION_CONFIG = load_json5(os.path.join(root_dir,PATHS["generic_config"]))
+GENERIC_ACTIONS = load_json5(os.path.join(root_dir,PATHS["generic_config"]))
 POST_SCRAPE_OPS = CONFIG.get("POST_SCRAPE_OPS")
-SCRIPTS = GENERIC_ACTION_CONFIG["scripts"]
+SCRIPTS = GENERIC_ACTIONS.get("scripts",{})
 
 
 #directories
@@ -32,6 +32,11 @@ OUTPUT_PATH = PATHS["output"]
 LOG_DIR = create_dir(OUTPUT_PATH,"log")
 SESSION_ROOT = create_dir(OUTPUT_PATH, "session")
 DATA_DIR = create_dir(OUTPUT_PATH,"data")
+
+
+#schedule times
+SCHEDULE_TIMES = PATHS.get("schedule_time",["0900","0230"])
+RUN_DAYS =PATHS.get("schedule_days",["mon", "tue", "wed", "thu", "fri"]) 
 
 #file size constants
 MAX_REQUEST_BYTE_SIZE = 2_000_000 #2mb file
@@ -45,8 +50,6 @@ DRIVER_LOAD_RETRIES = 5
 LOAD_IN_BETWEEN_DELAY = 10 #seconds
 
 COOL_DOWN = 30
-SCHEDULE_START_TIME = "09:58"
-SCHEDULE_INTERVAL = 24000
 
 PVT_BANK_CODES = [f"PVB_{i}" for i in range(1,23)]
 PUB_BANK_CODES = [f"PSB_{i}" for i in range(1,13)]

@@ -79,6 +79,24 @@ class ActionExecutor:
         self.logger.info(f"Download folder set to: {self.OUTPUT_PATH} for bank: {params['bank_name']}")
     
     def create_uc_driver(self, headless=False, minimized=True):
+        
+        # --headless                         # Run Chrome in headless mode (no GUI)
+        # --disable-gpu                     # Disable GPU hardware acceleration
+        # --no-sandbox                      # Bypass OS security model (useful in Docker)
+        # --disable-dev-shm-usage          # Avoid shared memory issues in containers
+        # --start-maximized                # Start browser maximized
+        # --window-size=1920,1080          # Set specific window size
+        # --incognito                      # Launch in incognito mode
+        # --disable-extensions             # Disable all Chrome extensions
+        # --disable-blink-features=AutomationControlled  # Hide automation flags
+        # --user-data-dir="path"           # Use custom Chrome user profile directory
+        # --profile-directory="Profile 2"  # Specify profile folder inside user-data-dir
+        # --remote-debugging-port=9222     # Enable remote debugging
+        # --lang=en                        # Set browser language
+        # --ignore-certificate-errors      # Skip SSL certificate errors
+        # --disable-popup-blocking         # Allow popups
+        # --disable-infobars               # Hide "Chrome is being controlled..." banner
+        
         options = uc.ChromeOptions()
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--disable-extensions")
@@ -99,22 +117,30 @@ class ActionExecutor:
         width, height = 900, 700
         self.driver.set_window_size(width, height)
 
+        # if minimized and not headless:
+        #     try:
+        #         time.sleep(1)
+        #         current_title = self.driver.title or "data:,"
+        #         for window in gw.getWindowsWithTitle(current_title):
+        #             window.minimize()
+        #             break
+        #         else:
+        #             self.driver.set_window_position(-2000, 0)
+
+        #     except Exception as e:
+        #         self.logger.warning(f"Failed to minimize properly: {e}")
+        #         self.driver.set_window_position(-2000, 0)
+        
         if minimized and not headless:
             try:
-                time.sleep(1)
-                current_title = self.driver.title or "data:,"
-                for window in gw.getWindowsWithTitle(current_title):
-                    window.minimize()
-                    break
-                else:
-                    self.driver.set_window_position(-2000, 0)
-
+                # Instead of minimizing, place Chrome offscreen but keep it visible
+                self.driver.set_window_size(900, 700)
+                self.driver.set_window_position(-3000, 0)
+                self.logger.notice("Driver window hidden offscreen (visible, not minimized).")
             except Exception as e:
-                self.logger.warning(f"Failed to minimize properly: {e}")
-                self.driver.set_window_position(-2000, 0)
-
-        self.window_stack = [self.driver.current_window_handle]
-        return self.driver
+                self.logger.warning(f"Failed to hide window offscreen: {e}")
+                self.window_stack = [self.driver.current_window_handle]
+                return self.driver
     
     def get_website(self):
         if self.driver:
@@ -288,7 +314,7 @@ class ActionExecutor:
     #BLOCK EXECUTION
     def execute_blocks(self):
         block_data = []
-        generic_actions = GENERIC_ACTION_CONFIG
+        generic_actions = GENERIC_ACTIONS
 
         block = self.PARAMS["blocks"]
         self.logger.notice(f"Total Action(s) {len(block)}")

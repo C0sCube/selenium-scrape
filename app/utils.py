@@ -100,6 +100,17 @@ class Helper:
         with open(path, "r", encoding="utf-8") as f:
             return json5.load(f)
     
+    @staticmethod
+    def read_html(path: str) -> str:
+        try:
+            if not os.path.exists(path): return ""
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read()
+        except Exception as e:
+            print(f"Failed to read HTML file: {path} | {e}")
+            return ""
+
+    
     #WRITE TEXT
     @staticmethod
     def save_text(data,path:str,mode = 'w'):

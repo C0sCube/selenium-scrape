@@ -1,13 +1,10 @@
 from app.action_executor import ActionExecutor
-from app.operation_executor import OperationExecutor
-from selenium.common.exceptions import NoSuchWindowException, WebDriverException, TimeoutException, InvalidSessionIdException
-import traceback, pprint, hashlib, time
-from datetime import datetime
-from app.logger import get_global_logger
-
+from app.operation_executor import  OperationExecutorLatest
+from app.pdf_report import PDFReportBuilderPro
+from selenium.common.exceptions import WebDriverException
 
 # app/BankScraper.py
-import traceback, time, hashlib, pprint, os
+import traceback, time, hashlib, pprint, os, time
 from datetime import datetime
 from selenium.common.exceptions import WebDriverException
 from app.logger import get_global_logger
@@ -25,7 +22,10 @@ class BankScraper:
             logger: Shared logger instance
         """
         self.executor = ActionExecutor()
-        self.operator = OperationExecutor()
+        self.operator = OperationExecutorLatest()
+        
+        self.reporter = PDFReportBuilderPro()
+        
         self.logger = get_global_logger()
         self.errors = []  # structured error store
         
@@ -37,6 +37,8 @@ class BankScraper:
     # =====================================================
 
     def start_session(self, headless=False, retries=3, retry_delay=10):
+        
+
         """Initialize Selenium driver with retries."""
         attempt = 0
         while attempt < retries:
@@ -51,6 +53,7 @@ class BankScraper:
                 return True
             except WebDriverException as e:
                 self.logger.error(f"WebDriver error: {e}. Retrying...")
+                self.record_error(bank_name="GLOBAL", exception=e, source="DRIVER")
                 attempt += 1
                 time.sleep(retry_delay)
             except Exception as e:
@@ -157,79 +160,172 @@ class BankScraper:
                     unique.append(resp)
             action["response"] = unique
         return result
-
-    def record_error(self, bank_name, exception):
-        """Capture and log structured errors."""
+    
+    def record_error(self, bank_name, exception=None, source="BLOCK", note=None, severity="ERROR"):
+        """
+        Record structured errors or 'no data' notes for each bank.
+        Args:
+            bank_name (str): Name of the bank.
+            exception (Exception, optional): Exception object if any.
+            source (str): 'DRIVER', 'BLOCK', 'DATA', etc.
+            note (str): Optional human-readable message.
+            severity (str): 'ERROR' or 'INFO'
+        """
         error_entry = {
             "bank": bank_name,
-            "type": type(exception).__name__,
-            "message": str(exception),
-            "traceback": traceback.format_exc(),
-            "timestamp": datetime.now().isoformat()
+            "source": source,
+            "severity": severity,
+            "type": type(exception).__name__ if exception else "None",
+            "message": str(exception) if exception else note,
+            "note": note or "",
+            "traceback": traceback.format_exc() if exception else "",
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        self.errors.append(error_entry)
-        self.logger.error(f"[{bank_name}] {type(exception).__name__}: {exception}")
 
-    # def export_error_log(self, path):
-    #     """Write all captured errors to a text file."""
-    #     if not self.errors:
-    #         self.logger.info("No errors captured this run.")
-    #         return
-    #     Helper.save_text(
-    #         [f"{e['timestamp']} | {e['bank']} | {e['type']} | {e['message']}" for e in self.errors],
-    #         path,
-    #         mode='w'
-    #     )
-    #     self.logger.save(f"Error log written to {path}")
+        self.errors.append(error_entry)
+
+        # Logging appropriately
+        if severity == "ERROR":
+            self.logger.error(f"[{source}] [{bank_name}] {error_entry['type']}: {error_entry['message']}")
+        else:
+            self.logger.info(f"[{source}] [{bank_name}] {error_entry['note']}")
+
+    def export_error_log(self):
+        """Export human-readable text and HTML error summaries. Always returns file paths."""
+        if not self.errors:
+            self.logger.info("✅ No errors or missing-data notes to export.")
+            return None, None
+
+        errors = [e for e in self.errors if e["severity"] == "ERROR"]
+        infos = [e for e in self.errors if e["severity"] == "INFO"]
+
+        # --- Build TEXT Summary ---
+        text_lines = [
+            "📘 SCRAPER EXECUTION SUMMARY",
+            f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            "=" * 70, ""
+        ]
+
+        if infos:
+            text_lines.append("🟡 BANKS WITH NO DATA (INFO):")
+            for e in infos:
+                text_lines.append(f" - {e['bank']} → {e['note']} [{e['timestamp']}]")
+
+        if errors:
+            text_lines.append("\n🟥 BANKS WITH ERRORS:")
+            for e in errors:
+                text_lines.append(f" - {e['bank']} | {e['source']} | {e['type']} → {e['message']} [{e['timestamp']}]")
+
+        # --- Build HTML Summary ---
+        html_lines = [
+            "<html><body style='font-family:Arial, sans-serif;'>",
+            f"<h2>📘 Scraper Execution Summary — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</h2>",
+            "<hr>"
+        ]
+
+        if infos:
+            html_lines.append("<h3 style='color:#c9a300;'>🟡 Banks With No Data</h3><ul>")
+            for e in infos:
+                html_lines.append(f"<li><b>{e['bank']}</b> → {e['note']}</li>")
+            html_lines.append("</ul>")
+
+        if errors:
+            html_lines.append("<h3 style='color:#b30000;'>🟥 Banks With Errors</h3><ul>")
+            for e in errors:
+                html_lines.append(f"<li><b>{e['bank']}</b> ({e['source']}) — {e['message']}</li>")
+            html_lines.append("</ul>")
+
+        html_lines.append("<hr><p style='font-size:10pt;color:#777;'>Auto-generated scraper error summary.</p></body></html>")
+
+        # --- Save Files ---
+        timestamp = datetime.now().strftime("%d%m%y_%H%M")
+        txt_path = os.path.join(self.RUNTIME_PATH, f"SCRAPER_ERROR_SUMMARY_{timestamp}.txt")
+        html_path = os.path.join(self.RUNTIME_PATH, f"SCRAPER_ERROR_SUMMARY_{timestamp}.html")
+
+        Helper.save_text(text_lines, txt_path)
+        Helper.save_text("\n".join(html_lines), html_path)
+
+        self.logger.save(f"Error logs written: {txt_path}, {html_path}")
+        return txt_path, html_path
 
     def process_cache(self, final_dict, save_path, prev_path):
+        """Process scraped cache, compare with previous processed cache, 
+        generate comparison reports, and update the baseline cache."""
+
         try:
-            processed_cache = self.operator.runner(final_dict, POST_SCRAPE_OPS["sha1"])
+            # ===== Stage 1: Run Transformation Pipeline =====
+            processing_pipeline = {
+                "primary": [
+                    ["normalize_df", "value", "norm_table", "table_html"],
+                    ["sha1", "value", "SHA_ONE", "pdf"]
+                ],
+                "secondary": [
+                    ["sha1", "norm_table", "SHA_ONE"]
+                ],
+            }
+
+            self.logger.notice("Starting cache processing pipeline...")
+            processed_cache = self.operator.runner(final_dict, processing_pipeline)
+
+            # Deepcopy to keep a clean version for baseline
             import copy
-            paste_cache = copy.deepcopy(processed_cache)
+            baseline_cache = copy.deepcopy(processed_cache)
 
             Helper.save_json(processed_cache, save_path)
             self.logger.save(f"Processed cache saved at: {save_path}")
 
-        
-            timestamp = datetime.now().strftime("%d%m%yT%H%M")
-            compare_path = os.path.join(self.RUNTIME_PATH, f"COMPARE{timestamp}.json")
-            excel_path = os.path.join(self.RUNTIME_PATH, f"RATE_COMPARISON_{timestamp}.xlsx")
+            # ===== Stage 2: Compare with Previous Processed Cache =====
+            ts = datetime.now().strftime("%d%m%yT%H%M")
+            compare_file = os.path.join(self.RUNTIME_PATH, f"COMPARE{ts}.json")
+            excel_file = os.path.join(self.RUNTIME_PATH, f"RATE_COMPARISON_{ts}.xlsx")
 
-            if os.path.exists(prev_path):
-                try:
+            try:
+                if os.path.exists(prev_path):
                     old_data = Helper.load_json(prev_path)
                     if isinstance(old_data, dict):
                         self.logger.notice("Loaded previous processed cache for comparison.")
-                        comparison = self.operator.process_comparison(old_data, processed_cache, key="sha1")
-                        Helper.save_json(comparison, compare_path)
-                        self.operator.generate_sorted_excel_report(comparison, excel_path)
-                        self.logger.save(f"Comparison report generated:\nJSON → {compare_path}\nExcel → {excel_path}")
-                    # else:
-                    #     self.logger.warning("Invalid previous processed cache format. Skipping comparison.")
-                except Exception as e:
-                    self.logger.warning(f"Comparison failed: {type(e).__name__} - {e}")
-            else:
-                self.logger.warning("No previous processed cache found for comparison.")
+                        comparison = self.operator.process_comparison(old_data, processed_cache, key="SHA_ONE")
 
-            # Update baseline for next run
-            Helper.save_json(paste_cache, prev_path)
+                        Helper.save_json(comparison, compare_file)
+                        self.logger.save(f"Comparison JSON saved: {compare_file}")
+
+                        self.operator.generate_sorted_excel_report(comparison, excel_file)
+                        self.logger.save(f"Comparison report:\n→ {excel_file}")
+                    else:
+                        self.logger.warning("Invalid previous cache format. Skipping comparison.")
+                else:
+                    self.logger.warning("No previous cache found for comparison.")
+            except Exception as e:
+                self.logger.warning(f"Comparison failed: {type(e).__name__} - {e}")
+
+            # ===== Stage 3: Update Baseline for Next Run =====
+            Helper.save_json(baseline_cache, prev_path)
             self.logger.notice(f"Updated baseline processed cache for next run at: {prev_path}")
+
+            # ===== Stage 4: Success Log =====
+            self.logger.info("✅ Cache processing and comparison completed successfully.")
+            
+            return excel_file
 
         except Exception as e:
             self.logger.error(f"process_cache failed: {type(e).__name__} - {e}")
             self.logger.debug(traceback.format_exc())
             
-    def generate_doc_report(self, cache_data):
+            return None
+           
+    def create_scrape_report(self, cache_data):
         """Generate DOCX report for the cache."""
         try:
             timestamp = datetime.now().strftime("%d%m%yT%H%M")
-            doc_path = os.path.join(self.RUNTIME_PATH, f"SCRAPE_REPORT_{timestamp}.docx")
-            self.operator.generate_cache_doc_report(cache_data, doc_path)
-            self.logger.save(f"Cache DOCX report generated at: {doc_path}")
+            doc_path = os.path.join(self.RUNTIME_PATH, f"SCRAPE-REPORT-{timestamp}.pdf")
+            self.reporter.build(cache_data, doc_path)
+            self.logger.save(f"Cache pdf report generated at: {doc_path}")
+            return doc_path
         except Exception as e:
-            self.logger.error(f"generate_doc_report failed: {type(e).__name__} - {e}")
+            self.logger.error(f"Report creation failed: {type(e).__name__} - {e}")
             self.logger.debug(traceback.format_exc())
+            return None
+            
 
     def runner(self,bank_codes):
         
@@ -240,13 +336,20 @@ class BankScraper:
                 continue
             bank_params = CONFIG[code]
             
-            #set correct driver
-            # is_headless = bank_params.get("headless",True)
-            # self.executor.driver = self.executor.headless_driver if is_headless else self.executor.visible_driver
-            
             try:
                 result = self.scrape_bank(bank_params)
                 result = BankScraper.dedupe_responses(result)
+                
+                # 🟡 Detect banks with no data in any scrape
+                scraped_blocks = result.get("scraped_data", [])
+                if not scraped_blocks or all(not block.get("data_present", False) for block in scraped_blocks):
+                    self.record_error(
+                        bank_params.get("bank_name"),
+                        source="DATA",
+                        note="No data extracted — possible empty table or maintenance page.",
+                        severity="INFO"
+                    )
+                
             except Exception as e:
                 self.record_error(bank_params.get("bank_name"), e)
                 result = {"bank_code": code, "scraped_data": [{"error": str(e)}]}
