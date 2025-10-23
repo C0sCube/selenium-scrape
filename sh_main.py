@@ -38,6 +38,7 @@ def main(bank_codes, process=False, is_headless=False, send_mail = False):
     
     #start mail
     if send_mail:
+        logger.info("Sending start email...")
         mailer.start_mail(
             program= PROGRAM_NAME,
             data = bank_codes
@@ -69,6 +70,7 @@ def main(bank_codes, process=False, is_headless=False, send_mail = False):
 
     #end mail
     if send_mail:
+        logger.info("Sending completion email...")
         attatchments = [ report_path, comparison_path]
         mailer.end_mail(
             program=PROGRAM_NAME,
@@ -78,8 +80,6 @@ def main(bank_codes, process=False, is_headless=False, send_mail = False):
     
     logger.info("Scraping Program Completed Successfully.")
         
-
-
 def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_days=None, send_mail = False):
     """
     Wraps the main() scraper function to run at specific times (HHMM format)
@@ -160,8 +160,6 @@ def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_day
                 exception_obj=e
             )
         
-
-
 if __name__ == "__main__":
     logger.notice("Starting Scraper Scheduler...")
     bank_codes = ["PVB_1","PVB_2"] #ALL_BANK_CODES
@@ -169,8 +167,8 @@ if __name__ == "__main__":
     scheduler_loop(
         bank_codes,
         process=True,
-        times= ["1855","1902","1909"],  #SCHEDULE_TIMES,
+        times= ["2235"],  #SCHEDULE_TIMES,
         run_days=RUN_DAYS,
-        send_mail=False
+        send_mail=True
     )
 

@@ -52,7 +52,8 @@ class Mailer:
         </html>
         """
         
-        attachments = [a for a in attachments if isinstance(a,str)]
+        if attachments:
+            attachments = [a for a in attachments if isinstance(a,str)]
         msg = self.construct_mail(subject=subject, body_html=body, attachments = attachments)
         self.send_mail(msg)
    
@@ -67,6 +68,9 @@ class Mailer:
             </body>
         </html>
         """
+        if attachments:
+            attachments = [a for a in attachments if isinstance(a,str)]
+        
         msg = self.construct_mail(subject=subject, body_html=body, attachments=attachments, custom_html=custom_html)
         self.send_mail(msg)
 

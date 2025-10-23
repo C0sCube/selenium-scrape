@@ -237,7 +237,7 @@ class PDFReportBuilderPro:
         self.merger = PdfMerger()
         self.bank_titles = []
         self.config = pdfkit.configuration(
-            wkhtmltopdf=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+            wkhtmltopdf=r"C:\Users\kaustubh.keny\wkhtmltopdf\bin\wkhtmltopdf.exe"
         )
 
         # color palette for per-bank tinting (soft pastels)

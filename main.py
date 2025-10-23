@@ -54,8 +54,8 @@ if __name__ == "__main__":
     
     try:
         logger.notice("Starting Scraper Program.")
-        bank_codes = PUB_BANK_CODES #["PVB_1","PVB_2"] #PUB_BANK_CODES #ALL_BANK_CODES 
-        main(bank_codes, process=False)
+        bank_codes = ["PVB_1","PVB_2"] #PUB_BANK_CODES #ALL_BANK_CODES 
+        main(bank_codes, process=True)
         
     except KeyboardInterrupt:
         logger.warning("Process interrupted by user.")
