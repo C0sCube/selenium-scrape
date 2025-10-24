@@ -279,6 +279,8 @@ class BankScraper:
             compare_file = os.path.join(self.RUNTIME_PATH, f"COMPARE{ts}.json")
             excel_file = os.path.join(self.RUNTIME_PATH, f"RATE_COMPARISON_{ts}.xlsx")
 
+            email_msg = ""
+            
             try:
                 if os.path.exists(prev_path):
                     old_data = Helper.load_json(prev_path)
@@ -290,7 +292,12 @@ class BankScraper:
                         self.logger.save(f"Comparison JSON saved: {compare_file}")
 
                         self.operator.generate_sorted_excel_report(comparison, excel_file)
-                        self.logger.save(f"Comparison report:\n→ {excel_file}")
+                        self.logger.save(f"Comparison report → {excel_file}")
+                        
+                        ots = old_data["metadata"]["pfname"].replace("PROCESS","").replace(".json","")
+                        nts = processed_cache["metadata"]["pfname"].replace("PROCESS","").replace(".json","")
+                        
+                        email_msg = f"Scraped between {ots} and  {nts}"
                     else:
                         self.logger.warning("Invalid previous cache format. Skipping comparison.")
                 else:
@@ -305,7 +312,7 @@ class BankScraper:
             # ===== Stage 4: Success Log =====
             self.logger.info("✅ Cache processing and comparison completed successfully.")
             
-            return excel_file
+            return excel_file, email_msg
 
         except Exception as e:
             self.logger.error(f"process_cache failed: {type(e).__name__} - {e}")

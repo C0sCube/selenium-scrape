@@ -57,13 +57,17 @@ class Mailer:
         msg = self.construct_mail(subject=subject, body_html=body, attachments = attachments)
         self.send_mail(msg)
    
-    def end_mail(self, program, data=None, attachments=None, custom_html=None):
+    def end_mail(self, program:str, data=None, attachments=None, custom_html=None):
         subject = f"{program} — Execution Completed"
+        
+        if isinstance(data,list): data = " ".join(data)
+        
         body = f"""
         <html>
             <body>
                 <p>Hello Team,</p>
                 <p>The program <b>{program}</b> has <b>completed</b> execution.</p>
+                <p>{data}</p>
                 <p>Regards,<br>Kaustubh</p>
             </body>
         </html>

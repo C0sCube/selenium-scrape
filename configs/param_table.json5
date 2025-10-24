@@ -625,7 +625,7 @@
                 multiple: false,
                 wait_until: "present",
                 default_wait: 20,
-                timeout: 30
+                timeout: 120
             }
         ],
     },
