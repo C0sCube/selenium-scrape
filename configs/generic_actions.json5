@@ -12,7 +12,7 @@
         wait_until: "present",
         multiple: true,
         skip_if_not_found: true,
-        default_wait: 5,
+        default_wait: 3,
         timeout: 20,
         clean_table: true,
         log_message: "Save Html Table(s)",
@@ -46,8 +46,17 @@
         wait_until: "clickable",
         default_wait: 5,
         timeout: 20,
-        file_save:true,
+        file_save: true,
         log_message: "Axis Bank",
+    },
+    "action_http": {
+        "action": "http",
+        by: "css",
+        value: "body",
+        "log_message": "Downloading file directly via HTTP GET (DLP safe)",
+        "default_wait": 4,
+        "timeout": 30,
+        "file_save": true
     },
     action_website: {
         action: "website",

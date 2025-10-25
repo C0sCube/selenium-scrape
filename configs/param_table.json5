@@ -1,14 +1,28 @@
 {
     POST_SCRAPE_OPS: {
-        SHAONE:{
-                "primary": [
-                    ["normalize_df", "value", "norm_table", "table_html"],
-                    ["sha1", "value", "SHA_ONE", "pdf"]
+        SHAONE: {
+            "primary": [
+                [
+                    "normalize_df",
+                    "value",
+                    "norm_table",
+                    "table_html"
                 ],
-                "secondary": [
-                    ["sha1", "norm_table", "SHA_ONE"]
-                ],
-            }
+                [
+                    "sha1",
+                    "value",
+                    "SHA_ONE",
+                    "pdf"
+                ]
+            ],
+            "secondary": [
+                [
+                    "sha1",
+                    "norm_table",
+                    "SHA_ONE"
+                ]
+            ],
+        }
     },
     PSB_1: {
         bank_name: "Bank of Baroda",

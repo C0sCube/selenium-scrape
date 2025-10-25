@@ -5,9 +5,10 @@ from selenium.common.exceptions import WebDriverException
 
 # app/BankScraper.py
 import traceback, time, hashlib, pprint, os, time
+from copy import deepcopy
 from datetime import datetime
 from selenium.common.exceptions import WebDriverException
-from app.logger import get_global_logger
+from app.logger import get_global_logger, log_exceptions
 from app.utils import Helper
 from app.constants import POST_SCRAPE_OPS, CONFIG
 
@@ -36,43 +37,33 @@ class BankScraper:
     # LIFECYCLE METHODS
     # =====================================================
 
-    def start_session(self, headless=False, retries=3, retry_delay=10):
-        
-
+    @log_exceptions(level="critical", return_value=False)
+    def start_session(self, headless=False,window_position = False, retries=3, retry_delay=10):
         """Initialize Selenium driver with retries."""
-        attempt = 0
-        while attempt < retries:
+        for attempt in range(retries):
             try:
                 self.logger.notice(f"Attempt {attempt + 1} to create driver...")
-                self.executor.create_uc_driver(headless=headless)
+                self.executor.create_uc_driver(headless=headless,window_position = window_position)
                 if not self.executor.driver:
                     raise RuntimeError("Driver creation returned None")
 
                 self.executor.driver.set_page_load_timeout(50)
                 self.logger.save("Driver created successfully.")
                 return True
+
             except WebDriverException as e:
                 self.logger.error(f"WebDriver error: {e}. Retrying...")
                 self.record_error(bank_name="GLOBAL", exception=e, source="DRIVER")
-                attempt += 1
-                time.sleep(retry_delay)
-            except Exception as e:
-                self.logger.error(f"Unexpected error: {e}. Retrying...")
-                self.logger.debug(traceback.format_exc())
-                attempt += 1
                 time.sleep(retry_delay)
         self.logger.critical("Failed to create driver after multiple attempts.")
         return False
 
+    @log_exceptions(level="warning")
     def close_session(self):
-        """Safely quit driver session."""
-        try:
-            if self.executor.driver:
-                self.logger.info("Closing browser session...")
-                self.executor.driver.quit()
-                self.logger.save("Driver closed successfully.")
-        except Exception as e:
-            self.logger.warning(f"Error while closing driver: {e}")
+        if self.executor.driver:
+            self.logger.info("Closing browser session...")
+            self.executor.driver.quit()
+            self.logger.save("Driver closed successfully.")
 
     # =====================================================
     # SCRAPING LOGIC
@@ -135,11 +126,12 @@ class BankScraper:
                 "cfname": f"CACHE{date}T{timestamp}.json",
                 "pfname": f"PROCESS{date}T{timestamp}.json"
             },
-            "records": [],
-            "registry": {}
+            "registry": {},
+            "records": []
         }
 
     @staticmethod
+    @log_exceptions(level="error")
     def dedupe_responses(result: dict) -> dict:
         """Remove duplicate hashes. Currently Used only for PDF data"""
         if "scraped_data" not in result:
@@ -248,83 +240,53 @@ class BankScraper:
         self.logger.save(f"Error logs written: {txt_path}, {html_path}")
         return txt_path, html_path
 
+    @log_exceptions(level="critical", raise_error=True)
     def process_cache(self, final_dict, save_path, prev_path):
-        """Process scraped cache, compare with previous processed cache, 
-        generate comparison reports, and update the baseline cache."""
+        """Process, compare, and update cache files."""
+        pipeline = {
+            "primary": [
+                ["normalize_df", "value", "norm_table", "table_html"],
+                ["sha1", "value", "SHA_ONE", "pdf"],
+            ],
+            "secondary": [["sha1", "norm_table", "SHA_ONE"]],
+        }
 
-        try:
-            # ===== Stage 1: Run Transformation Pipeline =====
-            processing_pipeline = {
-                "primary": [
-                    ["normalize_df", "value", "norm_table", "table_html"],
-                    ["sha1", "value", "SHA_ONE", "pdf"]
-                ],
-                "secondary": [
-                    ["sha1", "norm_table", "SHA_ONE"]
-                ],
-            }
+        self.logger.notice("Starting cache processing pipeline...")
+        processed = self.operator.runner(final_dict, pipeline)
+        baseline = deepcopy(processed)
 
-            self.logger.notice("Starting cache processing pipeline...")
-            processed_cache = self.operator.runner(final_dict, processing_pipeline)
+        Helper.save_json(processed, save_path)
+        self.logger.save(f"Processed cache saved at: {save_path}")
 
-            # Deepcopy to keep a clean version for baseline
-            import copy
-            baseline_cache = copy.deepcopy(processed_cache)
+        ts = datetime.now().strftime("%d%m%yT%H%M")
+        compare_file = os.path.join(self.RUNTIME_PATH, f"COMPARE{ts}.json")
+        excel_file = os.path.join(self.RUNTIME_PATH, f"RATE_COMPARISON_{ts}.xlsx")
 
-            Helper.save_json(processed_cache, save_path)
-            self.logger.save(f"Processed cache saved at: {save_path}")
+        if os.path.exists(prev_path):
+            old = Helper.load_json(prev_path)
+            if isinstance(old, dict):
+                self.logger.notice("Loaded previous processed cache for comparison.")
+                comp = self.operator.process_comparison(old, processed, key="SHA_ONE")
+                Helper.save_json(comp, compare_file)
+                self.operator.generate_sorted_excel_report(comp, excel_file)
+                self.logger.save(f"Comparison reports generated: {excel_file}")
+            else:
+                self.logger.warning("Invalid previous processed cache. Skipping comparison.")
+        else:
+            self.logger.warning("No previous processed cache found for comparison.")
 
-            # ===== Stage 2: Compare with Previous Processed Cache =====
-            ts = datetime.now().strftime("%d%m%yT%H%M")
-            compare_file = os.path.join(self.RUNTIME_PATH, f"COMPARE{ts}.json")
-            excel_file = os.path.join(self.RUNTIME_PATH, f"RATE_COMPARISON_{ts}.xlsx")
-
-            try:
-                if os.path.exists(prev_path):
-                    old_data = Helper.load_json(prev_path)
-                    if isinstance(old_data, dict):
-                        self.logger.notice("Loaded previous processed cache for comparison.")
-                        comparison = self.operator.process_comparison(old_data, processed_cache, key="SHA_ONE")
-
-                        Helper.save_json(comparison, compare_file)
-                        self.logger.save(f"Comparison JSON saved: {compare_file}")
-
-                        self.operator.generate_sorted_excel_report(comparison, excel_file)
-                        self.logger.save(f"Comparison report:\n→ {excel_file}")
-                    else:
-                        self.logger.warning("Invalid previous cache format. Skipping comparison.")
-                else:
-                    self.logger.warning("No previous cache found for comparison.")
-            except Exception as e:
-                self.logger.warning(f"Comparison failed: {type(e).__name__} - {e}")
-
-            # ===== Stage 3: Update Baseline for Next Run =====
-            Helper.save_json(baseline_cache, prev_path)
-            self.logger.notice(f"Updated baseline processed cache for next run at: {prev_path}")
-
-            # ===== Stage 4: Success Log =====
-            self.logger.info("✅ Cache processing and comparison completed successfully.")
-            
-            return excel_file
-
-        except Exception as e:
-            self.logger.error(f"process_cache failed: {type(e).__name__} - {e}")
-            self.logger.debug(traceback.format_exc())
-            
-            return None
-           
+        Helper.save_json(baseline, prev_path)
+        self.logger.notice(f"Updated baseline at {prev_path}")
+        self.logger.info("✅ Cache processing completed successfully.")
+   
+    @log_exceptions(level="error", return_value=None)
     def create_scrape_report(self, cache_data):
-        """Generate DOCX report for the cache."""
-        try:
-            timestamp = datetime.now().strftime("%d%m%yT%H%M")
-            doc_path = os.path.join(self.RUNTIME_PATH, f"SCRAPE-REPORT-{timestamp}.pdf")
-            self.reporter.build(cache_data, doc_path)
-            self.logger.save(f"Cache pdf report generated at: {doc_path}")
-            return doc_path
-        except Exception as e:
-            self.logger.error(f"Report creation failed: {type(e).__name__} - {e}")
-            self.logger.debug(traceback.format_exc())
-            return None
+        """Generate PDF scrape report."""
+        timestamp = datetime.now().strftime("%d%m%yT%H%M")
+        doc_path = os.path.join(self.RUNTIME_PATH, f"SCRAPE-REPORT-{timestamp}.pdf")
+        self.reporter.build(cache_data, doc_path)
+        self.logger.save(f"Cache pdf report generated at: {doc_path}")
+        return doc_path
             
 
     def runner(self,bank_codes):
@@ -356,7 +318,7 @@ class BankScraper:
             final_dict["records"].append(result)
 
         return final_dict
-        pass
+
     
             
         

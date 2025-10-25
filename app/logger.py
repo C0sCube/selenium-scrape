@@ -1,6 +1,6 @@
 import logging
-import os
-import sys
+import os, traceback
+import sys,functools
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
@@ -157,3 +157,33 @@ def set_global_logger(logger):
 
 def get_global_logger():
     return _active_logger or logging.getLogger("default_logger")
+
+
+def log_exceptions(level="error", return_value=None, raise_error=False):
+    """
+    Logs exceptions with traceback and context.
+    If raise_error=True, re-raises after logging.
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            logger = get_global_logger()
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                cls_name = args[0].__class__.__name__ if args else ""
+                file_name = getattr(args[0], "FILE_NAME", None) if args else None
+
+                context = f"[{cls_name}.{func.__name__}]"
+                if file_name:
+                    context += f" ({file_name})"
+
+                log_func = getattr(logger, level, logger.error)
+                log_func(f"{context} {type(e).__name__}: {e}")
+                logger.debug(traceback.format_exc())
+
+                if raise_error:
+                    raise
+                return return_value
+        return wrapper
+    return decorator

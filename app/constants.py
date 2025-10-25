@@ -32,7 +32,7 @@ OUTPUT_PATH = PATHS["output"]
 LOG_DIR = create_dir(OUTPUT_PATH,"log")
 SESSION_ROOT = create_dir(OUTPUT_PATH, "session")
 DATA_DIR = create_dir(OUTPUT_PATH,"data")
-
+HTMLTOPDF_PATH = PATHS["htmltopdf_path"]
 
 #schedule times
 SCHEDULE_TIMES = PATHS.get("schedule_time",["0900","0230"])

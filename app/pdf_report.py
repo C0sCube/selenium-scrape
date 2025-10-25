@@ -226,9 +226,9 @@
 
 import os, base64, tempfile, pdfkit, pandas as pd
 from io import BytesIO
-from PyPDF2 import PdfMerger, PdfReader, PdfWriter
+from PyPDF2 import PdfMerger
 from datetime import datetime
-
+from app.constants import HTMLTOPDF_PATH
 
 class PDFReportBuilderPro:
     def __init__(self, cache_data = None, output_path = None):
@@ -237,7 +237,7 @@ class PDFReportBuilderPro:
         self.merger = PdfMerger()
         self.bank_titles = []
         self.config = pdfkit.configuration(
-            wkhtmltopdf=r"C:\Users\kaustubh.keny\wkhtmltopdf\bin\wkhtmltopdf.exe"
+            wkhtmltopdf=HTMLTOPDF_PATH
         )
 
         # color palette for per-bank tinting (soft pastels)

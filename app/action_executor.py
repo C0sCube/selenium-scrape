@@ -78,7 +78,7 @@ class ActionExecutor:
         })
         self.logger.info(f"Download folder set to: {self.OUTPUT_PATH} for bank: {params['bank_name']}")
     
-    def create_uc_driver(self, headless=False, minimized=True):
+    def create_uc_driver(self, headless=False, minimized=True, window_position = False):
         
         # --headless                         # Run Chrome in headless mode (no GUI)
         # --disable-gpu                     # Disable GPU hardware acceleration
@@ -135,7 +135,7 @@ class ActionExecutor:
             try:
                 # Instead of minimizing, place Chrome offscreen but keep it visible
                 self.driver.set_window_size(900, 700)
-                self.driver.set_window_position(-3000, 0)
+                if window_position: self.driver.set_window_position(-3000, 0)
                 self.logger.notice("Driver window hidden offscreen (visible, not minimized).")
             except Exception as e:
                 self.logger.warning(f"Failed to hide window offscreen: {e}")

@@ -16,7 +16,7 @@ logger = setup_logger(name="scraper", log_dir=LOG_DIR)
 set_global_logger(logger)
 
 
-def main(bank_codes, process = False, is_headless = False):
+def main(bank_codes, process = False, is_headless = False,window_position = False):
     
     #set path
     today = datetime.now()
@@ -26,7 +26,7 @@ def main(bank_codes, process = False, is_headless = False):
     
     scraper = BankScraper(session_path)
 
-    if not scraper.start_session(headless = is_headless):  raise RuntimeError("Failed to initialize Selenium driver")
+    if not scraper.start_session(headless = is_headless,window_position = window_position):  raise RuntimeError("Failed to initialize Selenium driver")
 
     final_dict = scraper.runner(bank_codes)
     scraper.close_session()
@@ -54,8 +54,8 @@ if __name__ == "__main__":
     
     try:
         logger.notice("Starting Scraper Program.")
-        bank_codes = ["PVB_1","PVB_2"] #PUB_BANK_CODES #ALL_BANK_CODES 
-        main(bank_codes, process=True)
+        bank_codes = ALL_BANK_CODES #PUB_BANK_CODES #ALL_BANK_CODES 
+        main(bank_codes, process=False, window_position = True)
         
     except KeyboardInterrupt:
         logger.warning("Process interrupted by user.")

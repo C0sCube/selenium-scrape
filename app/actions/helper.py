@@ -11,42 +11,42 @@ class ActionHelper:
     def __init__(self):
         pass
     
-    @staticmethod
-    def _find_preceding_texts(table, n=2):
-        texts = []
-        current = table
-        label_tags = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "strong", "a", "span","div"}
-        MAX_TEXT_LENGTH = 350
-        while len(texts) < n:
-            try:
-                parent = current.find_element(By.XPATH, "..")
-                siblings = parent.find_elements(By.XPATH, "preceding-sibling::*")
-                for sib in reversed(siblings):
-                    if sib.tag_name.lower() in ["table", "br", "hr"]:
-                        continue
+    # @staticmethod
+    # def _find_preceding_texts(table, n=2):
+    #     texts = []
+    #     current = table
+    #     label_tags = {"h1", "h2", "h3", "h4", "h5", "h6", "p", "strong", "a", "span","div"}
+    #     MAX_TEXT_LENGTH = 350
+    #     while len(texts) < n:
+    #         try:
+    #             parent = current.find_element(By.XPATH, "..")
+    #             siblings = parent.find_elements(By.XPATH, "preceding-sibling::*")
+    #             for sib in reversed(siblings):
+    #                 if sib.tag_name.lower() in ["table", "br", "hr"]:
+    #                     continue
                     
-                    if sib.find_elements(By.TAG_NAME,"table"):
-                        continue
+    #                 if sib.find_elements(By.TAG_NAME,"table"):
+    #                     continue
                     
-                    if sib.tag_name.lower() not in label_tags:
-                        continue
+    #                 if sib.tag_name.lower() not in label_tags:
+    #                     continue
                     
-                    if sib.tag_name.lower() == "div":
-                        if not sib.find_elements(By.XPATH, ".//h1 | .//h2 | .//h3 | .//p | .//strong | .//a | .//span"):
-                            continue
+    #                 if sib.tag_name.lower() == "div":
+    #                     if not sib.find_elements(By.XPATH, ".//h1 | .//h2 | .//h3 | .//p | .//strong | .//a | .//span"):
+    #                         continue
 
-                    txt = sib.get_attribute("innerText").strip()
-                    # txt = sib.text.strip()
-                    txt = Helper._remove_tabspace(txt)
-                    txt = Helper._normalize_whitespace(txt)
-                    if txt and len(txt)<MAX_TEXT_LENGTH:
-                        texts.append(txt)
-                        if len(texts) == n:
-                            return list(reversed(texts))
-                current = parent
-            except:
-                break
-        return list(reversed(texts)) if texts else ["No label found"]*n
+    #                 txt = sib.get_attribute("innerText").strip()
+    #                 # txt = sib.text.strip()
+    #                 txt = Helper._remove_tabspace(txt)
+    #                 txt = Helper._normalize_whitespace(txt)
+    #                 if txt and len(txt)<MAX_TEXT_LENGTH:
+    #                     texts.append(txt)
+    #                     if len(texts) == n:
+    #                         return list(reversed(texts))
+    #             current = parent
+    #         except:
+    #             break
+    #     return list(reversed(texts)) if texts else ["No label found"]*n
 
     @staticmethod
     def _clean_raw_table_html(rawr):
@@ -135,7 +135,75 @@ class ActionHelper:
             urls.append(f"{base_url}?{query_string}")
         return urls
     
-
     @staticmethod
-    def generate_resp_packet(name="", header="", value=None, type=""): return {"name": name, "title": header, "value": value, "type": type, "data_present": bool(value)}
+    def _find_preceding_texts(table, n=2, max_depth=5):
+        """
+        Finds up to `n` pieces of readable text above a <table>.
+        It climbs the DOM tree up to `max_depth` levels to find headings like <h2> or <p>.
+        """
+
+        texts = []
+        current = table
+        seen = set()
+
+        LABEL_TAGS = {"h1","h2","h3","h4","h5","h6","p","strong","b","a","span","div"}
+        MAX_TEXT_LENGTH = 350
+
+        for depth in range(max_depth):  # climb up a few times
+            try:
+                # Move up one level
+                parent = current.find_element(By.XPATH, "..")
+
+                # Look at everything *before* this parent
+                siblings = parent.find_elements(By.XPATH, "preceding-sibling::*")
+
+                for sib in reversed(siblings):
+                    if sib in seen: 
+                        continue
+                    seen.add(sib)
+
+                    tag = sib.tag_name.lower()
+
+                    # Skip junk or nested tables
+                    if tag in ["table", "br", "hr"]:
+                        continue
+                    if sib.find_elements(By.TAG_NAME, "table"):
+                        continue
+
+                    # Only consider label-like elements
+                    if tag not in LABEL_TAGS:
+                        continue
+
+                    # Extract visible text
+                    txt = sib.get_attribute("innerText") or ""
+                    txt = Helper._normalize_whitespace(Helper._remove_tabspace(txt))
+
+                    if txt and len(txt) < MAX_TEXT_LENGTH:
+                        texts.append(txt)
+                        if len(texts) >= n:
+                            return list(reversed(texts))
+
+                # Go up again
+                current = parent
+            except Exception:
+                break
+
+        # Nothing found
+        return list(reversed(texts)) if texts else ["Header not found"] * n
+
+    
+    
+    @staticmethod
+    def generate_resp_packet(
+        name="", 
+        header="", 
+        value=None, 
+        type=""
+    ): return {
+        "name": name, 
+        "title": header, 
+        "value": value, 
+        "type": type, 
+        "data_present": bool(value)
+    }
 

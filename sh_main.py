@@ -20,7 +20,7 @@ logger = setup_logger(name="scraper", log_dir=LOG_DIR)
 set_global_logger(logger)
 
 
-def main(bank_codes, process=False, is_headless=False, send_mail = False):
+def main(bank_codes, process=False,window_position = False, is_headless=False, send_mail = False):
     """
     Core scraping and processing routine.
     1️⃣ Starts Selenium session
@@ -44,7 +44,7 @@ def main(bank_codes, process=False, is_headless=False, send_mail = False):
             data = bank_codes
         )
     
-    if not scraper.start_session(headless=is_headless):
+    if not scraper.start_session(headless=is_headless, window_position = window_position):
         raise RuntimeError("Failed to initialize Selenium driver")
 
     final_dict = scraper.runner(bank_codes)
@@ -80,7 +80,7 @@ def main(bank_codes, process=False, is_headless=False, send_mail = False):
     
     logger.info("Scraping Program Completed Successfully.")
         
-def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_days=None, send_mail = False):
+def scheduler_loop(bank_codes, process=True, headless=False,window_position = False, times=None, run_days=None, send_mail = False):
     """
     Wraps the main() scraper function to run at specific times (HHMM format)
     and only on specified weekdays.
@@ -127,7 +127,7 @@ def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_day
                 try:
                     logger.save("=" * 60)
                     logger.notice(f"Running scraper at {datetime.now().strftime('%H:%M')} ({weekday_str.upper()})")
-                    main(bank_codes, process=process, is_headless=headless, send_mail=send_mail)
+                    main(bank_codes, process=process, is_headless=headless,window_position = window_position, send_mail=send_mail)
                     logger.info(f"Completed run at {datetime.now().strftime('%H:%M')}")
                 except Exception as e:
                     logger.critical(f"Run failed: {type(e).__name__}: {e}")
@@ -169,6 +169,7 @@ if __name__ == "__main__":
         process=True,
         times= ["2235"],  #SCHEDULE_TIMES,
         run_days=RUN_DAYS,
-        send_mail=True
+        send_mail=True,
+        window_position = False
     )
 
