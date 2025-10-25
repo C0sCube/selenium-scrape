@@ -262,24 +262,47 @@ class BankScraper:
         compare_file = os.path.join(self.RUNTIME_PATH, f"COMPARE{ts}.json")
         excel_file = os.path.join(self.RUNTIME_PATH, f"RATE_COMPARISON_{ts}.xlsx")
 
-        if os.path.exists(prev_path):
-            old = Helper.load_json(prev_path)
-            if isinstance(old, dict):
-                self.logger.notice("Loaded previous processed cache for comparison.")
-                comp = self.operator.process_comparison(old, processed, key="SHA_ONE")
-                Helper.save_json(comp, compare_file)
-                self.operator.generate_sorted_excel_report(comp, excel_file)
-                self.logger.save(f"Comparison reports generated: {excel_file}")
-            else:
-                self.logger.warning("Invalid previous processed cache. Skipping comparison.")
-        else:
-            self.logger.warning("No previous processed cache found for comparison.")
+            email_msg = ""
+            
+            try:
+                if os.path.exists(prev_path):
+                    old_data = Helper.load_json(prev_path)
+                    if isinstance(old_data, dict):
+                        self.logger.notice("Loaded previous processed cache for comparison.")
+                        comparison = self.operator.process_comparison(old_data, processed_cache, key="SHA_ONE")
 
-        Helper.save_json(baseline, prev_path)
-        self.logger.notice(f"Updated baseline at {prev_path}")
-        self.logger.info("✅ Cache processing completed successfully.")
-   
-    @log_exceptions(level="error", return_value=None)
+                        Helper.save_json(comparison, compare_file)
+                        self.logger.save(f"Comparison JSON saved: {compare_file}")
+
+                        self.operator.generate_sorted_excel_report(comparison, excel_file)
+                        self.logger.save(f"Comparison report → {excel_file}")
+                        
+                        ots = old_data["metadata"]["pfname"].replace("PROCESS","").replace(".json","")
+                        nts = processed_cache["metadata"]["pfname"].replace("PROCESS","").replace(".json","")
+                        
+                        email_msg = f"Scraped between {ots} and  {nts}"
+                    else:
+                        self.logger.warning("Invalid previous cache format. Skipping comparison.")
+                else:
+                    self.logger.warning("No previous cache found for comparison.")
+            except Exception as e:
+                self.logger.warning(f"Comparison failed: {type(e).__name__} - {e}")
+
+            # ===== Stage 3: Update Baseline for Next Run =====
+            Helper.save_json(baseline_cache, prev_path)
+            self.logger.notice(f"Updated baseline processed cache for next run at: {prev_path}")
+
+            # ===== Stage 4: Success Log =====
+            self.logger.info("✅ Cache processing and comparison completed successfully.")
+            
+            return excel_file, email_msg
+
+        except Exception as e:
+            self.logger.error(f"process_cache failed: {type(e).__name__} - {e}")
+            self.logger.debug(traceback.format_exc())
+            
+            return None
+           
     def create_scrape_report(self, cache_data):
         """Generate PDF scrape report."""
         timestamp = datetime.now().strftime("%d%m%yT%H%M")
