@@ -224,7 +224,7 @@
 
 #         print(f"✅ Final Linked PDF report generated at {self.output_path}")
 
-import os, base64, tempfile, pdfkit, pandas as pd
+import base64, tempfile, pdfkit, pandas as pd
 from io import BytesIO
 from PyPDF2 import PdfMerger
 from datetime import datetime

@@ -17,7 +17,7 @@ class OperationExecutorLatest:
     def __init__(self, ):
         self.logger = get_global_logger()
         self.procedures = {
-            # "ext_date": self.extract_date,
+            "ext_date": self.extract_date,
             "sha256": self._generate_hash_sha256,
             "sha1": self._generate_hash_sha1,
             "normalize_df": self._generalize_table_df,
