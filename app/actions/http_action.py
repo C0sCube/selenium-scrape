@@ -43,7 +43,9 @@ def httpRequest(executor):
         logger.error(f"HTTP download failed: {type(e).__name__} - {e}")
         return []
 
-
+# ----------------------------
+# Internal helper
+# ----------------------------
 def download_file(executor, file_url, output_dir, idx, extension):
     """
     Helper for downloading and optionally saving a file.
@@ -53,23 +55,8 @@ def download_file(executor, file_url, output_dir, idx, extension):
     driver = executor.driver
 
     try:
-        # Extract cookies + browser fingerprint from Selenium
         cookies = {c["name"]: c["value"] for c in driver.get_cookies()}
-        user_agent = driver.execute_script("return navigator.userAgent;")
-        referer = executor.PARAMS.get("base_url", file_url)
-
-        headers = {
-            "User-Agent": user_agent,
-            "Accept": "text/html,application/pdf,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Referer": referer,
-            "Connection": "keep-alive",
-            "Upgrade-Insecure-Requests": "1",
-        }
-
-        session = requests.Session()
-        response = session.get(file_url, headers=headers, cookies=cookies, timeout=60, verify=False)
+        response = requests.get(file_url, cookies=cookies, verify=False, timeout=40)
         logger.notice(f"[{idx}] GET {extension.upper()} → Status: {response.status_code}")
 
         if response.status_code != 200:
@@ -89,7 +76,6 @@ def download_file(executor, file_url, output_dir, idx, extension):
         return "", ""
 
     # --- determine file name ---
-    from urllib.parse import urlparse
     parsed_url = urlparse(file_url)
     raw_filename = os.path.basename(parsed_url.path)
     safe_filename = Helper.sanitize_Win_filename(raw_filename) or f"file_{idx}.{extension}"
@@ -107,9 +93,8 @@ def download_file(executor, file_url, output_dir, idx, extension):
 
 
 
-# ----------------------------
-# Internal helper
-# ----------------------------
+
+
 # def download_file(executor, file_url, output_dir, idx, extension):
 #     """
 #     Helper for downloading and optionally saving a file.
@@ -119,8 +104,23 @@ def download_file(executor, file_url, output_dir, idx, extension):
 #     driver = executor.driver
 
 #     try:
+#         # Extract cookies + browser fingerprint from Selenium
 #         cookies = {c["name"]: c["value"] for c in driver.get_cookies()}
-#         response = requests.get(file_url, cookies=cookies, verify=False, timeout=40)
+#         user_agent = driver.execute_script("return navigator.userAgent;")
+#         referer = executor.PARAMS.get("base_url", file_url)
+
+#         headers = {
+#             "User-Agent": user_agent,
+#             "Accept": "text/html,application/pdf,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+#             "Accept-Encoding": "gzip, deflate, br",
+#             "Accept-Language": "en-US,en;q=0.9",
+#             "Referer": referer,
+#             "Connection": "keep-alive",
+#             "Upgrade-Insecure-Requests": "1",
+#         }
+
+#         session = requests.Session()
+#         response = session.get(file_url, headers=headers, cookies=cookies, timeout=60, verify=False)
 #         logger.notice(f"[{idx}] GET {extension.upper()} → Status: {response.status_code}")
 
 #         if response.status_code != 200:
@@ -140,6 +140,7 @@ def download_file(executor, file_url, output_dir, idx, extension):
 #         return "", ""
 
 #     # --- determine file name ---
+#     from urllib.parse import urlparse
 #     parsed_url = urlparse(file_url)
 #     raw_filename = os.path.basename(parsed_url.path)
 #     safe_filename = Helper.sanitize_Win_filename(raw_filename) or f"file_{idx}.{extension}"

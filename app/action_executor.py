@@ -71,7 +71,7 @@ class ActionExecutor:
     
     def set_params(self,params):
         self.PARAMS = params
-        self.OUTPUT_PATH = Helper.create_dir(DATA_DIR,params['bank_name'],f"download_{datetime.now().strftime("%H%M")}")
+        self.OUTPUT_PATH = Helper.create_dir(DATA_DIR,self.today.strftime("%Y-%m-%d"),params['bank_name'],f"download_{datetime.now().strftime("%H%M")}")
         self.driver.execute_cdp_cmd("Page.setDownloadBehavior", {
             "behavior": "allow",
             "downloadPath": self.OUTPUT_PATH

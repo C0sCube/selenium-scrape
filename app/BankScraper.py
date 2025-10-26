@@ -240,6 +240,7 @@ class BankScraper:
         self.logger.save(f"Error logs written: {txt_path}, {html_path}")
         return txt_path, html_path
 
+
     @log_exceptions(level="critical", raise_error=True)
     def process_cache(self, final_dict, save_path, prev_path):
         """Process, compare, and update cache files."""
@@ -251,36 +252,39 @@ class BankScraper:
             "secondary": [["sha1", "norm_table", "SHA_ONE"]],
         }
 
-        self.logger.notice("Starting cache processing pipeline...")
-        processed = self.operator.runner(final_dict, pipeline)
-        baseline = deepcopy(processed)
+        try:
+            # ===== Stage 1: Process Current Cache =====
+            self.logger.notice("Starting cache processing pipeline...")
+            processed_cache = self.operator.runner(final_dict, pipeline)
+            baseline = deepcopy(processed_cache)
 
-        Helper.save_json(processed, save_path)
-        self.logger.save(f"Processed cache saved at: {save_path}")
+            Helper.save_json(processed_cache, save_path)
+            self.logger.save(f"Processed cache saved at: {save_path}")
 
-        ts = datetime.now().strftime("%d%m%yT%H%M")
-        compare_file = os.path.join(self.RUNTIME_PATH, f"COMPARE{ts}.json")
-        excel_file = os.path.join(self.RUNTIME_PATH, f"RATE_COMPARISON_{ts}.xlsx")
+            ts = datetime.now().strftime("%d%m%yT%H%M")
+            compare_file = os.path.join(self.RUNTIME_PATH, f"COMPARE{ts}.json")
+            excel_file = os.path.join(self.RUNTIME_PATH, f"RATE_COMPARISON_{ts}.xlsx")
 
+            # ===== Stage 2: Compare with Previous Cache =====
             email_msg = ""
-            
             try:
                 if os.path.exists(prev_path):
                     old_data = Helper.load_json(prev_path)
                     if isinstance(old_data, dict):
                         self.logger.notice("Loaded previous processed cache for comparison.")
-                        comparison = self.operator.process_comparison(old_data, processed_cache, key="SHA_ONE")
+                        comparison = self.operator.process_comparison(
+                            old_data, processed_cache, key="SHA_ONE"
+                        )
 
                         Helper.save_json(comparison, compare_file)
                         self.logger.save(f"Comparison JSON saved: {compare_file}")
 
                         self.operator.generate_sorted_excel_report(comparison, excel_file)
                         self.logger.save(f"Comparison report → {excel_file}")
-                        
-                        ots = old_data["metadata"]["pfname"].replace("PROCESS","").replace(".json","")
-                        nts = processed_cache["metadata"]["pfname"].replace("PROCESS","").replace(".json","")
-                        
-                        email_msg = f"Scraped between {ots} and  {nts}"
+
+                        ots = old_data["metadata"]["pfname"].replace("PROCESS", "").replace(".json", "")
+                        nts = processed_cache["metadata"]["pfname"].replace("PROCESS", "").replace(".json", "")
+                        email_msg = f"Scraped between {ots} and {nts}"
                     else:
                         self.logger.warning("Invalid previous cache format. Skipping comparison.")
                 else:
@@ -289,20 +293,19 @@ class BankScraper:
                 self.logger.warning(f"Comparison failed: {type(e).__name__} - {e}")
 
             # ===== Stage 3: Update Baseline for Next Run =====
-            Helper.save_json(baseline_cache, prev_path)
+            Helper.save_json(baseline, prev_path)
             self.logger.notice(f"Updated baseline processed cache for next run at: {prev_path}")
 
             # ===== Stage 4: Success Log =====
-            self.logger.info("✅ Cache processing and comparison completed successfully.")
-            
+            self.logger.info("Cache processing and comparison completed successfully.")
             return excel_file, email_msg
 
         except Exception as e:
             self.logger.error(f"process_cache failed: {type(e).__name__} - {e}")
             self.logger.debug(traceback.format_exc())
-            
             return None
-           
+
+
     def create_scrape_report(self, cache_data):
         """Generate PDF scrape report."""
         timestamp = datetime.now().strftime("%d%m%yT%H%M")

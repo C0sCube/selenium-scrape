@@ -217,7 +217,7 @@
         bank_name: "Union Bank of India",
         bank_type: "PUBLIC SECTOR BANKS",
         bank_type_code: "PSB_12",
-        base_url: "https://www.unionbankofindia.co.in/en/details/rate-of-interest",
+        base_url: "https://www.unionbankofindia.bank.in/en/details/rate-of-interest",
         blocks: [
             {
                 action: "table",
@@ -231,12 +231,6 @@
                 timeout: 60,
                 log_message: "Save Html Tables."
             },
-            // {
-            //     action: "execute_script",
-            //     script: "window.scrollTo(0, document.body.scrollHeight);",
-            //     log_message: "Force JS render",
-            //     default_wait: 2
-            // },
             {
                 action: "click_save",
                 by: "xpath",
@@ -521,9 +515,10 @@
                 action: "http",
                 by: "css",
                 value: "body",
-                base_url: "https://eapp.jkbank.com/eintraweb/domestic-rates",
+                url: "https://eapp.jkbank.com/eintraweb/domestic-rates",
                 default_wait: 2,
-                timeout: 10
+                timeout: 10,
+                "export_format":"pdf"
             }
         ],
     },

@@ -39,7 +39,7 @@ SCHEDULE_TIMES = PATHS.get("schedule_time",["0900","0230"])
 RUN_DAYS =PATHS.get("schedule_days",["mon", "tue", "wed", "thu", "fri"]) 
 
 #file size constants
-MAX_REQUEST_BYTE_SIZE = 2_000_000 #2mb file
+MAX_REQUEST_BYTE_SIZE = 3_000_000 #2mb file
 
 #Manual
 MAX_DOWNLOAD_TIMEOUT = 45
