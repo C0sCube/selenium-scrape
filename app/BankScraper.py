@@ -279,7 +279,7 @@ class BankScraper:
                         Helper.save_json(comparison, compare_file)
                         self.logger.save(f"Comparison JSON saved: {compare_file}")
 
-                        self.operator.generate_sorted_excel_report(comparison, excel_file)
+                        self.operator.generate_comparison_report(comparison, excel_file)
                         self.logger.save(f"Comparison report → {excel_file}")
 
                         ots = old_data["metadata"]["pfname"].replace("PROCESS", "").replace(".json", "")

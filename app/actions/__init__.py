@@ -13,11 +13,12 @@ from .table_action import tablScrape
 from .text_action import textScrape
 from .clicksave_action import clickSave
 from .download_action import downloadElem
+from .apiget_action import apiGet
 
 __all__ = [
     "htmlScrape", "clickElem", "webRedir",
     "httpRequest", "tablScrape","textScrape", 
     "downloadElem","genPdf", "genSst",
     "injectScript","tabList","webList",
-    "manualAction", "clickSave"
+    "manualAction", "clickSave", "apiGet"
 ]

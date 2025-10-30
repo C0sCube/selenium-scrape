@@ -14,7 +14,7 @@ from app.constants import *
 from app.actions import (
     downloadElem,textScrape, htmlScrape, 
     clickSave,clickElem, genPdf,genSst, 
-    webRedir, httpRequest, injectScript, 
+    webRedir, httpRequest, injectScript, apiGet,
     tabList, webList, manualAction,tablScrape
 )
 
@@ -67,6 +67,7 @@ class ActionExecutor:
             "http": lambda: httpRequest(self),
             "manual": lambda: manualAction(self),
             "execute_script": lambda: injectScript(self),
+            "api_get":lambda: apiGet(self),
         }
     
     def set_params(self,params):
@@ -76,7 +77,7 @@ class ActionExecutor:
             "behavior": "allow",
             "downloadPath": self.OUTPUT_PATH
         })
-        self.logger.info(f"Download folder set to: {self.OUTPUT_PATH} for bank: {params['bank_name']}")
+        self.logger.info(f"Download Folder: {self.OUTPUT_PATH}")
     
     def create_uc_driver(self, headless=False, minimized=True, window_position = False):
         
@@ -116,20 +117,6 @@ class ActionExecutor:
         self.driver = uc.Chrome(options=options)
         width, height = 900, 700
         self.driver.set_window_size(width, height)
-
-        # if minimized and not headless:
-        #     try:
-        #         time.sleep(1)
-        #         current_title = self.driver.title or "data:,"
-        #         for window in gw.getWindowsWithTitle(current_title):
-        #             window.minimize()
-        #             break
-        #         else:
-        #             self.driver.set_window_position(-2000, 0)
-
-        #     except Exception as e:
-        #         self.logger.warning(f"Failed to minimize properly: {e}")
-        #         self.driver.set_window_position(-2000, 0)
         
         if minimized and not headless:
             try:
@@ -145,6 +132,9 @@ class ActionExecutor:
     def get_website(self):
         if self.driver:
             self.driver.get(self.PARAMS["base_url"])
+            self.logger.info("Website Fetched.")
+            
+            
             return
         self.logger.warning(f"Driver not created. Couldnt get website.")
     
@@ -161,7 +151,9 @@ class ActionExecutor:
                 cond = self.__get_condition(self.WAIT_UNTIL, self.WAIT_BY, self.WAIT_VALUE)
                 try:
                     WebDriverWait(self.driver, self.TIMEOUT).until(cond)
-                    
+                    # self.driver.execute_script("window.stop();")
+                    # self.logger.info(f"Website Loading paused as {self.WAIT_VALUE} present in DOMME")
+                
                 except TimeoutException:
                     
                     page_state = self.driver.execute_script("return document.readyState")
@@ -208,12 +200,27 @@ class ActionExecutor:
         self.WEBLINKS = _action_.get("web_links",None)
         self.WEBLINKS_HEADER = _action_.get("web_link_headers",[])
         
+        #cookies
+        self.COOKIES = {c['name']: c['value'] for c in self.driver.get_cookies()}
+        
+        #headers
+        self.HEADERS = dict(_action_.get("headers", {}))
+        self.HEADERS.update({"User-Agent":self.driver.execute_script("return navigator.userAgent")})
+        self.HEADERS.update({"Referer": self.driver.current_url})
+        
+        #API data
+        
+        self.BASE_API = _action_.get("base_api", None)  # can be a list or dict
+        self.DOMAIN = _action_.get("domain", None)  # domain for cookies
+        self.VERIFY_REQUEST = _action_.get("verify_request", True)
+        
         #time
         self.DEFAULT_WAIT = _action_.get("default_wait", 2)
         self.TIMEOUT = _action_.get("timeout", 15)
         self.WAIT_UNTIL = _action_.get("wait_until")
         self.WAIT_BY = _action_.get("wait_by", self.BY) #dependent
         self.WAIT_VALUE = _action_.get("wait_value", self.VALUE) #dependent
+        self.WAIT_TIMEOUT = _action_.get("wait_timeout", self.TIMEOUT)
             
         #name 
         self.table_name = _action_.get("table_name","table")
