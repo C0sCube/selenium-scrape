@@ -213,6 +213,8 @@ class ActionExecutor:
         self.BASE_API = _action_.get("base_api", None)  # can be a list or dict
         self.DOMAIN = _action_.get("domain", None)  # domain for cookies
         self.VERIFY_REQUEST = _action_.get("verify_request", True)
+        self.API_RULE = _action_.get("resp_structure",{})
+        self.NULL_RESPONSE = _action_.get("null_response",{})
         
         #time
         self.DEFAULT_WAIT = _action_.get("default_wait", 2)

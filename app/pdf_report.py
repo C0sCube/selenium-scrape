@@ -1,9 +1,13 @@
-import base64, tempfile, pdfkit, pandas as pd
+import base64, tempfile, pdfkit,json, pandas as pd, os, pdfplumber, re
 from io import BytesIO
 from PyPDF2 import PdfMerger
 from datetime import datetime
 from app.constants import HTMLTOPDF_PATH
 
+import pandas as pd
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 class PDFReportBuilderPro:
     def __init__(self, cache_data = None, output_path = None):
         self.cache_data = cache_data
@@ -75,6 +79,55 @@ class PDFReportBuilderPro:
                     margin:12px 0;'>──── End of Section ────</div>
         """
 
+    # def _html_to_pdf(self, html_content, output_file):
+    #     """Convert HTML string to PDF using pdfkit."""
+    #     html_template = f"""
+    #     <html>
+    #     <head>
+    #         <meta charset="utf-8">
+    #         <style>
+    #             @page {{
+    #                 size: A4;
+    #                 margin: 1.5cm 1cm 1.5cm 1cm;
+    #             }}
+    #             body {{
+    #                 font-family: Helvetica, Arial, sans-serif;
+    #                 font-size: 9pt;
+    #                 line-height: 1.25;
+    #                 color: #111;
+    #             }}
+    #             h1,h2,h3 {{ color: #1f4e79; }}
+    #             table {{
+    #                 border-collapse: collapse;
+    #                 width: 95%;
+    #                 margin: 6px auto;
+    #             }}
+    #             th,td {{
+    #                 border: 1px solid #999;
+    #                 padding: 3px 5px;
+    #                 font-size: 8.5pt;
+    #             }}
+    #             th {{
+    #                 background-color: #f0f0f0;
+    #             }}
+    #             tr:nth-child(even) {{
+    #                 background-color: #fafafa;
+    #             }}
+    #             tr:hover {{
+    #                 background-color: #eaf2fb;
+    #             }}
+    #             p {{ margin: 2px 0; }}
+    #             a {{ color: #1f4e79; text-decoration: none; }}
+                
+    #         </style>
+    #     </head>
+    #     <body>
+    #         {html_content}
+    #     </body>
+    #     </html>
+    #     """
+    #     pdfkit.from_string(html_template, output_file, configuration=self.config, options=self.pdf_options)
+
     def _html_to_pdf(self, html_content, output_file):
         """Convert HTML string to PDF using pdfkit."""
         html_template = f"""
@@ -114,6 +167,40 @@ class PDFReportBuilderPro:
                 }}
                 p {{ margin: 2px 0; }}
                 a {{ color: #1f4e79; text-decoration: none; }}
+
+                /* ===== API Response Styling ===== */
+                .api-block {{
+                    background: #f5f9ff;
+                    border-left: 4px solid #0078d7;
+                    border-radius: 6px;
+                    padding: 8px 10px;
+                    margin: 10px 0;
+                }}
+                .api-header {{
+                    font-weight: bold;
+                    color: #0f4c81;
+                    font-size: 9pt;
+                    margin-bottom: 6px;
+                }}
+                .api-block h4 {{
+                    color: #0f4c81;
+                    margin-top: 6px;
+                    font-size: 9pt;
+                    text-transform: uppercase;
+                }}
+                .api-block table {{
+                    width: 94%;
+                    margin: 4px auto;
+                }}
+                .api-block p {{
+                    margin: 2px 0;
+                    font-size: 9pt;
+                }}
+                .api-block .api-url {{
+                    color: #555;
+                    font-size: 8pt;
+                    margin-top: 4px;
+                }}
             </style>
         </head>
         <body>
@@ -121,7 +208,12 @@ class PDFReportBuilderPro:
         </body>
         </html>
         """
-        pdfkit.from_string(html_template, output_file, configuration=self.config, options=self.pdf_options)
+        pdfkit.from_string(
+            html_template,
+            output_file,
+            configuration=self.config,
+            options=self.pdf_options
+        )
 
     # ---------- main build ----------
     def build(self,cache_json,path):
@@ -212,6 +304,46 @@ class PDFReportBuilderPro:
                             added_anything = True
                         except Exception:
                             continue
+                        
+                    elif typ == "json":
+                        try:
+                            value = response.get("value")
+                            structure = response.get("structure", {})
+                            sections = self.parse_structured_json_for_report(value, structure)
+
+                            html_parts.append("<div class='api-block'>")
+                            html_parts.append("<div class='api-header'>📡 API Response</div>")
+
+                            # Optional: show source URL if present
+                            if "api_url" in response:
+                                html_parts.append(f"<p class='api-url'>Source: {response['api_url']}</p>")
+
+                            for key, section in sections:
+                                if isinstance(section, str):
+                                    html_parts.append(section)
+                                elif hasattr(section, "to_html"):
+                                    # add small visual polish
+                                    html_parts.append(f"<h4 style='margin-top:8px;color:#1f4e79;'>{key}</h4>")
+                                    if section.empty:
+                                        html_parts.append(f"<p style='font-size:8.5pt;color:#888;'>No data for {key}</p>")
+                                    else:
+                                        html_parts.append(section.to_html(index=False))
+                                html_parts.append("<br>")
+
+                            html_parts.append("</div>")  # end .api-block
+                            html_parts.append(self._make_table_separator())
+                            added_anything = True
+
+                        except Exception as e:
+                            html_parts.append(f"""
+                            <div class="api-block">
+                                <p style="color:red;font-size:9pt;">
+                                    ⚠️ Error rendering JSON: {str(e)}
+                                </p>
+                            </div>
+                            """)
+                            html_parts.append(self._make_table_separator())
+                            added_anything = True
 
             if added_anything:
                 combined_html = "".join(html_parts)
@@ -243,6 +375,246 @@ class PDFReportBuilderPro:
 
         print(f"✅ Final PDF report generated at {self.output_path}")
 
+
+    def parse_structured_json_for_report(self, data: dict, structure: dict):
+        """
+        Parse structured API JSON as per your apiGet() format.
+        Supports both ['str', 1, 'string'] and 'str|1|string' rule formats.
+        Returns list of tuples: (title, rendered_html or DataFrame).
+        """
+        if not data or not structure: return [("⚠ No Data", pd.DataFrame([["No data found in API response."]]))]
+
+        sections = []
+
+        # Convert all rules into a consistent 3-tuple (type, order, interpret)
+        normalized_structure = []
+        for key, rule in structure.items():
+            if isinstance(rule, str):  # e.g. "str|1|string"
+                parts = rule.split("|")
+                val_type, order, interpret_as = parts
+                order = int(order)
+                normalized_structure.append((key, val_type, order, interpret_as))
+        ordered = sorted(normalized_structure, key=lambda x: x[2])  # sort by order
+
+        for key, val_type, order, interpret_as in ordered:
+            if key not in data:
+                continue
+            val = data[key]
+
+            # --- Case: API returned "Null Response" placeholder ---
+            if (key == "data"and isinstance(val, list)and len(val) == 1 and isinstance(val[0], dict) and val[0].get("symbol") == "Null Response from API" ):
+                html_block = f"""
+                <p style='font-size:9pt;margin:2px 0;color:#777;'>
+                    ⚠️ <b>No usable data returned from API.</b>
+                </p>
+                """
+                sections.append((key, html_block))
+                continue
+
+            # --- Handle string types ---
+            if val_type == "str":
+                html_block = f""" <p style='font-size:9pt;margin:2px 0;'><b>{key}:</b> {val if val not in [None, '', 'null'] else '—'}  </p> """
+                sections.append((key, html_block))
+                continue
+
+            # --- Handle dicts and lists (table structures) ---
+            if isinstance(val, dict):
+                df = pd.DataFrame(list(val.values()), columns=["Field", "Value"])
+                sections.append((key, df))
+
+            elif isinstance(val, list):
+                if val and isinstance(val[0], dict):
+                    df = pd.json_normalize(val)
+                elif val:
+                    df = pd.DataFrame({key: val})
+                else:
+                    df = pd.DataFrame([[f"No data found for '{key}'"]], columns=[key])
+                sections.append((key, df))
+
+            else:
+                df = pd.DataFrame([[str(val)]], columns=[key])
+                sections.append((key, df))
+
+        return sections
+
+    
+    def write_excel_report(self, cache_json, path):
+        """Generate a detailed Excel report mirroring the PDF structure."""
+        self.cache_data = cache_json
+        self.output_path = path
+
+        wb = Workbook()
+        ws_summary = wb.active
+        ws_summary.title = "Summary"
+        
+        def sanitize_Win_filename(name):
+            # Replace illegal Windows characters with underscores
+            return re.sub(r'[<>:"/\\|?*]', '_', name)
+
+        # Style helpers
+        header_fill = PatternFill(start_color="DCE6F1", end_color="DCE6F1", fill_type="solid")
+        border = Border(left=Side(style="thin"), right=Side(style="thin"),
+                        top=Side(style="thin"), bottom=Side(style="thin"))
+        align_center = Alignment(horizontal="center", vertical="center")
+
+        # ===== SUMMARY HEADERS =====
+        ws_summary.append(["#", "Bank Code", "Bank Name", "Type", "Sources Found"])
+        for cell in ws_summary[1]:
+            cell.font = Font(bold=True)
+            cell.fill = header_fill
+            cell.alignment = align_center
+            cell.border = border
+
+        summary_row = 2
+
+        # ===== PER BANK SHEETS =====
+        for i, record in enumerate(self.cache_data.get("records", []), start=1):
+            bank_name = record.get("bank_name", "Unknown Bank")
+            bank_code = record.get("bank_code", "N/A")
+            bank_type = record.get("bank_type", "Commercial Bank")
+            sheet_name = f"{bank_name[:28]}_{i}"[:31]  # Excel sheet name limit
+
+            ws = wb.create_sheet(title=sheet_name)
+            ws.append(["Bank Name", bank_name])
+            ws.append(["Bank Code", bank_code])
+            ws.append(["Bank Type", bank_type])
+            ws.append([])
+
+            scraped_data = record.get("scraped_data", [])
+            total_sources = len(scraped_data)
+            row_cursor = 5
+
+            for scrape in scraped_data:
+                ws.append([f"Action: {scrape.get('action','')}"])
+                ws.append([f"Timestamp: {scrape.get('timestamp','')}"])
+                ws.append([f"Webpage: {scrape.get('webpage','')}"])
+                ws.append([])
+                row_cursor += 4
+
+                responses = scrape.get("response", [])
+                for response in responses:
+                    typ = response.get("type")
+                    value = response.get("value", "")
+                    if not value:
+                        continue
+
+                    titles = response.get("title", [])
+                    titles = [titles] if isinstance(titles, str) else titles or []
+                    if titles:
+                        ws.append(["Title: " + ", ".join(titles)])
+
+                    # ========== TYPE HANDLING ==========
+                    try:
+                        if typ in ("html", "table_html"):
+                            df = pd.read_html(value)[0]
+                            for r in dataframe_to_rows(df, index=False, header=True):
+                                ws.append(r)
+
+                        elif typ == "xlsx":
+                            xlsx_bytes = base64.b64decode(value)
+                            df = pd.read_excel(BytesIO(xlsx_bytes))
+                            for r in dataframe_to_rows(df, index=False, header=True):
+                                ws.append(r)
+
+                        # elif typ == "json":
+                        #     json_bytes = base64.b64decode(value)
+                        #     json_text = json_bytes.decode("utf-8", errors="ignore")
+                        #     data = json.loads(json_text)
+                        #     df = pd.json_normalize(data)
+                        #     for r in dataframe_to_rows(df, index=False, header=True):
+                        #         ws.append(r)
+                        
+                        elif typ == "json":
+                            value = response.get("value")
+                            structure = response.get("structure", {})
+                            sections = self.parse_structured_json_for_report(value, structure)
+
+                            ws.append(["📡 API Response"])
+                            if "api_url" in response: ws.append([f"Source: {response['api_url']}"])
+
+                            for key, section in sections:
+                                ws.append([f"{key.upper()}"])
+                                if isinstance(section, str):
+                                    # Strip HTML tags for Excel readability
+                                    clean_text = re.sub("<.*?>", "", section).strip()
+                                    ws.append([clean_text])
+
+                                elif hasattr(section, "to_numpy"):
+                                    df = section
+                                    if df.empty:
+                                        ws.append(["⚠ No data available"])
+                                    else:
+                                        for r in dataframe_to_rows(df, index=False, header=True):
+                                            ws.append(r)
+
+                                else:
+                                    ws.append(["⚠ Unknown data format"])
+
+                                ws.append([])
+
+
+                        elif typ == "pdf":
+                            try:
+                                # Decode and save the PDF locally
+                                pdf_bytes = base64.b64decode(value)
+
+                                # Build attachment folder & filename
+                                safe_name = sanitize_Win_filename("_".join(titles)) or f"attachment_{i}"
+                                pdf_name = f"{safe_name}.pdf"
+                                pdf_folder = os.path.join(os.path.dirname(path), "attachments")
+                                os.makedirs(pdf_folder, exist_ok=True)
+                                pdf_path = os.path.join(pdf_folder, pdf_name)
+
+                                with open(pdf_path, "wb") as f:
+                                    f.write(pdf_bytes)
+
+                                # Extract tables from the saved PDF using pdfplumber
+                                with pdfplumber.open(pdf_path) as pdf:
+                                    for page in pdf.pages:
+                                        tables = page.extract_tables()
+                                        if not tables:
+                                            ws.append([f"No tables found in {pdf_name} (Page {page.page_number})"])
+                                            continue
+                                        for table in tables:
+                                            df = pd.DataFrame(table)
+                                            ws.append([f"📎 PDF Table — {pdf_name} (Page {page.page_number})"])
+                                            for row in dataframe_to_rows(df, index=False, header=False):
+                                                ws.append(row)
+                                            ws.append([])
+
+                                # Add hyperlink to file
+                                link_cell = ws.cell(row=ws.max_row + 1, column=1, value=f"Open PDF → {pdf_name}")
+                                link_cell.hyperlink = pdf_path
+                                link_cell.style = "Hyperlink"
+
+                            except Exception as e:
+                                ws.append([f"[Error handling PDF] {e}"])
+                        else:
+                            ws.append([f"Unsupported type: {typ}"])
+
+                    except Exception as e:
+                        ws.append([f"[Error parsing {typ}] {e}"])
+
+                    ws.append([])  # add spacing between responses
+
+            # ===== Append to Summary =====
+            ws_summary.append([i, bank_code, bank_name, bank_type, total_sources])
+            summary_row += 1
+
+        # ===== Apply styling to Summary =====
+        for row in ws_summary.iter_rows(min_row=2, max_row=summary_row, min_col=1, max_col=5):
+            for cell in row:
+                cell.alignment = align_center
+                cell.border = border
+
+        # Auto width
+        for column_cells in ws_summary.columns:
+            length = max(len(str(cell.value)) if cell.value else 0 for cell in column_cells)
+            ws_summary.column_dimensions[column_cells[0].column_letter].width = length + 4
+
+        # ===== Save file =====
+        wb.save(path)
+        print(f"✅ Excel report generated at {path}")
 
 
 
