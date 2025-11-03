@@ -79,7 +79,7 @@ class ActionExecutor:
         })
         self.logger.info(f"Download Folder: {self.OUTPUT_PATH}")
     
-    def create_uc_driver(self, headless=False, minimized=True, window_position = False):
+    def create_uc_driver(self, headless=False, minimized=True):
         
         # --headless                         # Run Chrome in headless mode (no GUI)
         # --disable-gpu                     # Disable GPU hardware acceleration
@@ -118,25 +118,46 @@ class ActionExecutor:
         width, height = 900, 700
         self.driver.set_window_size(width, height)
         
+        # if minimized and not headless:
+        #     try:
+        #         # Instead of minimizing, place Chrome offscreen but keep it visible
+        #         self.driver.set_window_size(900, 700)
+        #         if window_position: self.driver.set_window_position(-3000, 0)
+        #         self.logger.notice("Driver window hidden offscreen (visible, not minimized).")
+        #     except Exception as e:
+        #         self.logger.warning(f"Failed to hide window offscreen: {e}")
+        #         self.window_stack = [self.driver.current_window_handle]
+        #         return self.driver
+        
         if minimized and not headless:
             try:
-                # Instead of minimizing, place Chrome offscreen but keep it visible
-                self.driver.set_window_size(900, 700)
-                if window_position: self.driver.set_window_position(-3000, 0)
-                self.logger.notice("Driver window hidden offscreen (visible, not minimized).")
+                time.sleep(1)
+                title = self.driver.title or "data:,"
+                for w in gw.getWindowsWithTitle(title):
+                    w.minimize()
+                    self.logger.notice("Chrome window minimized safely.")
+                    break
             except Exception as e:
-                self.logger.warning(f"Failed to hide window offscreen: {e}")
-                self.window_stack = [self.driver.current_window_handle]
-                return self.driver
+                self.logger.warning(f"Minimize failed, fallback to visible small window: {e}")
+                self.driver.set_window_position(50, 50)
+                self.driver.set_window_size(800, 600)
+
     
-    def get_website(self):
+    def get_website(self, timeout = 60):
         if self.driver:
-            self.driver.get(self.PARAMS["base_url"])
-            self.logger.info("Website Fetched.")
-            
-            
-            return
+            try:
+                self.driver.set_page_load_timeout(timeout)
+                self.driver.get(self.PARAMS["base_url"])
+                self.logger.info("Website Fetched.")
+                WebDriverWait(self.driver, 10).until(lambda d: d.execute_script("return document.readyState") in ["interactive", "complete"])
+                return
+            except Exception:
+                self.logger.warning("Page load hung — stopping manually.")
+                self.driver.execute_script("window.stop();")
+                return
+
         self.logger.warning(f"Driver not created. Couldnt get website.")
+        return
     
     def execute(self, _action_: dict):
         self.__set_website_parameters(_action_)

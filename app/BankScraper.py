@@ -38,12 +38,12 @@ class BankScraper:
     # =====================================================
 
     @log_exceptions(level="critical", return_value=False)
-    def start_session(self, headless=False,window_position = False, retries=3, retry_delay=10):
+    def start_session(self, headless=False,minimized = False, retries=3, retry_delay=10):
         """Initialize Selenium driver with retries."""
         for attempt in range(retries):
             try:
                 self.logger.notice(f"Attempt {attempt + 1} to create driver...")
-                self.executor.create_uc_driver(headless=headless,window_position = window_position)
+                self.executor.create_uc_driver(headless=headless, minimized=minimized)
                 if not self.executor.driver:
                     raise RuntimeError("Driver creation returned None")
 
@@ -88,7 +88,9 @@ class BankScraper:
         scraped_data = []
         try:
             self.executor.set_params(bank_params)
-            self.executor.get_website()
+            
+            timeout = bank_params.get("base_timeout",40)
+            self.executor.get_website(timeout)
             data = self.executor.execute_blocks()
             scraped_data.extend(data)
         except Exception as e:
