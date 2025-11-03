@@ -377,33 +377,35 @@ class PDFReportBuilderPro:
 
 
     def parse_structured_json_for_report(self, data: dict, structure: dict):
-        """
-        Parse structured API JSON as per your apiGet() format.
-        Supports both ['str', 1, 'string'] and 'str|1|string' rule formats.
-        Returns list of tuples: (title, rendered_html or DataFrame).
-        """
-        if not data or not structure: return [("⚠ No Data", pd.DataFrame([["No data found in API response."]]))]
+        if not data or not structure:
+            return [("⚠ No Data", pd.DataFrame([["No data found in API response."]]))]
+        if structure: data = {k: v for k, v in data.items() if k in structure}
 
         sections = []
-
-        # Convert all rules into a consistent 3-tuple (type, order, interpret)
         normalized_structure = []
-        for key, rule in structure.items():
-            if isinstance(rule, str):  # e.g. "str|1|string"
-                parts = rule.split("|")
-                val_type, order, interpret_as = parts
-                order = int(order)
-                normalized_structure.append((key, val_type, order, interpret_as))
-        ordered = sorted(normalized_structure, key=lambda x: x[2])  # sort by order
 
-        for key, val_type, order, interpret_as in ordered:
+        # Normalize structure definitions
+        for key, rule in structure.items():
+            parts = rule.split("|")
+            val_type, order, interpret_as = parts
+            order = int(order)
+            normalized_structure.append((key, val_type, order, interpret_as))
+
+        # Process each key
+        for key, val_type, order, interpret_as in sorted(normalized_structure, key=lambda x: x[2]):
             if key not in data:
                 continue
             val = data[key]
 
-            # --- Case: API returned "Null Response" placeholder ---
-            if (key == "data"and isinstance(val, list)and len(val) == 1 and isinstance(val[0], dict) and val[0].get("symbol") == "Null Response from API" ):
-                html_block = f"""
+            # --- Case: Null Response placeholder ---
+            if (
+                key == "data"
+                and isinstance(val, list)
+                and len(val) == 1
+                and isinstance(val[0], dict)
+                and val[0].get("symbol") == "Null Response from API"
+            ):
+                html_block = """
                 <p style='font-size:9pt;margin:2px 0;color:#777;'>
                     ⚠️ <b>No usable data returned from API.</b>
                 </p>
@@ -411,33 +413,99 @@ class PDFReportBuilderPro:
                 sections.append((key, html_block))
                 continue
 
-            # --- Handle string types ---
+            # --- Handle string values ---
             if val_type == "str":
-                html_block = f""" <p style='font-size:9pt;margin:2px 0;'><b>{key}:</b> {val if val not in [None, '', 'null'] else '—'}  </p> """
+                html_block = f"""
+                <p style='font-size:9pt;margin:2px 0;'>
+                    <b>{key}:</b> {val if val not in [None, '', 'null'] else '—'}
+                </p>
+                """
                 sections.append((key, html_block))
                 continue
 
-            # --- Handle dicts and lists (table structures) ---
+            # --- Handle dicts (two-column tables) ---
             if isinstance(val, dict):
-                df = pd.DataFrame(list(val.values()), columns=["Field", "Value"])
+                df = pd.DataFrame(list(val.items()), columns=["Field", "Value"])
                 sections.append((key, df))
+                continue
 
-            elif isinstance(val, list):
+            # --- Handle lists (multi-row tables) ---
+            if isinstance(val, list):
                 if val and isinstance(val[0], dict):
-                    df = pd.json_normalize(val)
+                    df = pd.json_normalize(val, sep=".")
                 elif val:
                     df = pd.DataFrame({key: val})
                 else:
                     df = pd.DataFrame([[f"No data found for '{key}'"]], columns=[key])
                 sections.append((key, df))
+                continue
 
-            else:
-                df = pd.DataFrame([[str(val)]], columns=[key])
-                sections.append((key, df))
+            # --- Fallback (single value) ---
+            df = pd.DataFrame([[str(val)]], columns=[key])
+            sections.append((key, df))
 
         return sections
 
-    
+
+    def parse_structured_json_for_excel(self, data: dict, structure: dict):
+        if not data or not structure:
+            return [("⚠ No Data", "No data found in API response.")]
+        
+        if structure:
+            data = {k: v for k, v in data.items() if k in structure}
+
+
+        sections = []
+        normalized = []
+
+        # Normalize rule set
+        for key, rule in structure.items():
+            parts = rule.split("|")
+            val_type, order, interpret_as = parts
+            normalized.append((key, val_type.strip(), int(order), interpret_as.strip()))
+
+        for key, val_type, order, interpret_as in sorted(normalized, key=lambda x: x[2]):
+            if key not in data:
+                continue
+            val = data[key]
+
+            # 🟡 Case 1: Null API Response
+            if (
+                key == "data"
+                and isinstance(val, list)
+                and len(val) == 1
+                and isinstance(val[0], dict)
+                and str(val[0].get("symbol", "")).lower() == "null response from api"
+            ):
+                sections.append((key, "⚠ No usable data returned from API"))
+                continue
+            
+            if val_type == "str":
+                text_value = val if val not in [None, "", "null"] else "—"
+                sections.append((key, f"{key}: {text_value}"))
+                continue
+
+            if isinstance(val, dict):
+                df = pd.DataFrame(list(val.items()), columns=["Field", "Value"])
+                sections.append((key, df))
+                continue
+
+            # 🟣 Case 4: List (API dataset → multi-row table)
+            if isinstance(val, list):
+                if val and isinstance(val[0], dict):
+                    df = pd.json_normalize(val, sep=".")  # flatten nested
+                    sections.append((key, df))
+                elif val:
+                    df = pd.DataFrame({key: val})  # list of scalars
+                    sections.append((key, df))
+                else:
+                    sections.append((key, f"No data found for '{key}'"))
+                continue
+            
+            sections.append((key, str(val)))
+
+        return sections
+
     def write_excel_report(self, cache_json, path):
         """Generate a detailed Excel report mirroring the PDF structure."""
         self.cache_data = cache_json
@@ -527,31 +595,18 @@ class PDFReportBuilderPro:
                         elif typ == "json":
                             value = response.get("value")
                             structure = response.get("structure", {})
-                            sections = self.parse_structured_json_for_report(value, structure)
-
-                            ws.append(["📡 API Response"])
-                            if "api_url" in response: ws.append([f"Source: {response['api_url']}"])
-
+                            sections = self.parse_structured_json_for_excel(value, structure)
+                            if "api_url" in response:  ws.append([f"Source: {response['api_url']}"])
+                            
                             for key, section in sections:
-                                ws.append([f"{key.upper()}"])
                                 if isinstance(section, str):
-                                    # Strip HTML tags for Excel readability
-                                    clean_text = re.sub("<.*?>", "", section).strip()
-                                    ws.append([clean_text])
-
+                                    ws.append([section])
                                 elif hasattr(section, "to_numpy"):
                                     df = section
-                                    if df.empty:
-                                        ws.append(["⚠ No data available"])
-                                    else:
-                                        for r in dataframe_to_rows(df, index=False, header=True):
-                                            ws.append(r)
-
+                                    for r in dataframe_to_rows(df, index=False, header=True):
+                                        ws.append(r)
                                 else:
-                                    ws.append(["⚠ Unknown data format"])
-
-                                ws.append([])
-
+                                    ws.append(["⚠ Unknown data type"])
 
                         elif typ == "pdf":
                             try:

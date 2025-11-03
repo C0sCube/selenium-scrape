@@ -60,7 +60,7 @@ def apiGet(executor):
             if not api_data or all(v in [[], {}, None] for v in api_data.values()):
                 api_data = null_resp
 
-            api_data.update({"api_url":api_url})
+            # api_data.update({"api_url":api_url})
             
             response_block = {
                 "api_url": api_url,

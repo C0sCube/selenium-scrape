@@ -20,18 +20,13 @@ logger = setup_logger(name="scraper", log_dir=LOG_DIR)
 set_global_logger(logger)
 
 
-def main(bank_codes, process=False, is_headless=False, send_mail = False):
+def main(bank_codes, process=False, is_headless=False, send_mail = False, report_type = "pdf"):
     """Core scraping and processing routine.
     1️⃣ Starts Selenium session
     2️⃣ Runs scraping for given bank codes
     3️⃣ Saves raw cache
     4️⃣ Optionally processes, compares, and generates reports"""
-
-    today = datetime.now()
-    session_path = Helper.create_dir(OUTPUT_PATH, "session", f"session_{today.strftime('%y%m%d_%H%M')}")
-    latest_dir = Helper.create_dir(SESSION_ROOT, "session_latest")
-
-    scraper = BankScraper(session_path)
+    scraper = BankScraper()
     mailer = Mailer()
     
     #start mail
@@ -46,34 +41,20 @@ def main(bank_codes, process=False, is_headless=False, send_mail = False):
         raise RuntimeError("Failed to initialize Selenium driver")
     
     final_dict = scraper.runner(bank_codes)
-    scraper.close_session()
-    #report
-    report_path = scraper.create_scrape_report(final_dict)
-
-    #cache + save
-    cache_path = os.path.join(session_path, final_dict["metadata"]["cfname"])
-    Helper.save_json(final_dict, cache_path)
-    logger.save(f"Cache saved at: {cache_path}")
-    
-    #error + log + save
-    error_txt, error_html = scraper.export_error_log()
-    custom_html = Helper.read_html(error_html)
-
-    #process + compare + save
-    if process:
-        process_path = os.path.join(session_path, final_dict["metadata"]["pfname"])
-        prev_process = os.path.join(latest_dir, "PROCESS_LATEST.json")
-        comparison_path, email_msg = scraper.process_cache(final_dict, process_path, prev_process)
+    #report pdf,xlsx
+    scraper.create_scrape_report(final_dict,report_type)
+    scraper.export_error_log()
+    if process: scraper.process_cache(final_dict)
 
     #end mail
     if send_mail:
         logger.info("Sending completion email...")
-        attatchments = [ report_path, comparison_path]
+        attatchments = [ scraper.pdf_path,scraper.xls_path, scraper.comparison_xlsx]
         mailer.end_mail(
             program=PROGRAM_NAME,
-            data = email_msg,
+            data = scraper.email_msg,
             attachments=attatchments,
-            custom_html=custom_html
+            custom_html=Helper.read_html(scraper.error_html_path)
         )
     
     logger.info("Scraping Program Completed Successfully.")
