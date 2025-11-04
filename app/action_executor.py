@@ -15,7 +15,8 @@ from app.actions import (
     downloadElem,textScrape, htmlScrape, 
     clickSave,clickElem, genPdf,genSst, 
     webRedir, httpRequest, injectScript, apiGet,
-    tabList, webList, manualAction,tablScrape
+    tabList, webList, manualAction,tablScrape,
+    selectList
 )
 
 
@@ -28,6 +29,7 @@ class ActionExecutor:
         self.driver = None
         self.window_stack = None
         self.PARAMS = None
+        self.GENERIC_ACTIONS = load_gen_config()
 
         
         # ========== Locators and Conditions ==========
@@ -68,6 +70,7 @@ class ActionExecutor:
             "manual": lambda: manualAction(self),
             "execute_script": lambda: injectScript(self),
             "api_get":lambda: apiGet(self),
+            "select":lambda: selectList(self)
         }
     
     def set_params(self,params):
@@ -115,8 +118,8 @@ class ActionExecutor:
         })
 
         self.driver = uc.Chrome(options=options)
-        width, height = 900, 700
-        self.driver.set_window_size(width, height)
+        # width, height = 900, 700
+        # self.driver.set_window_size(width, height)
         
         # if minimized and not headless:
         #     try:
@@ -344,7 +347,7 @@ class ActionExecutor:
     #BLOCK EXECUTION
     def execute_blocks(self):
         block_data = []
-        generic_actions = GENERIC_ACTIONS
+        generic_actions = self.GENERIC_ACTIONS
 
         block = self.PARAMS["blocks"]
         self.logger.notice(f"Total Action(s) {len(block)}")

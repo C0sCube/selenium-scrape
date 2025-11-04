@@ -10,7 +10,7 @@ from datetime import datetime
 from selenium.common.exceptions import WebDriverException
 from app.logger import get_global_logger, log_exceptions
 from app.utils import Helper
-from app.constants import CONFIG, OUTPUT_PATH, SESSION_ROOT
+from app.constants import OUTPUT_PATH, SESSION_ROOT, load_config
 
 class BankScraper:
     """Main controller for orchestrating scraping per bank."""
@@ -26,6 +26,7 @@ class BankScraper:
         self.operator = OperationExecutorLatest()
         
         self.reporter = PDFReportBuilderPro()
+        self.CONFIG = load_config()
         
         self.logger = get_global_logger()
         self.errors = []  # structured error store
@@ -43,7 +44,6 @@ class BankScraper:
         self.comparison_xlsx = None
         self.email_msg = None #post comparison
         self.error_html_path = None
-        self.CONFIG = CONFIG
 
         
 
@@ -149,7 +149,7 @@ class BankScraper:
         self.compare_path = os.path.join(self.RUNTIME_PATH, f"COMPARE{date}T{timestamp}.json")
         self.cache_path = os.path.join(self.RUNTIME_PATH, final_dict["metadata"]["cfname"])
         self.process_path = os.path.join(self.RUNTIME_PATH, final_dict["metadata"]["pfname"])
-        self.comparison_xlsx = os.path.join(self.RUNTIME_PATH, f"COMPARE{date}T{timestamp}.json")
+        self.comparison_xlsx = os.path.join(self.RUNTIME_PATH, f"COMPARE{date}T{timestamp}.xlsx")
         
         self.error_html_path =  os.path.join(self.RUNTIME_PATH, f"ERROR_SUMMARY_{date}T{timestamp}.html")
         
@@ -250,7 +250,6 @@ class BankScraper:
         Helper.save_text("\n".join(html_lines), self.error_html_path)
         return self.error_html_path
 
-
     @log_exceptions(level="critical", raise_error=True)
     def process_cache(self, final_dict):
         """Process, compare, and update cache files."""
@@ -284,10 +283,10 @@ class BankScraper:
                         )
 
                         Helper.save_json(comparison, self.compare_path)
-                        self.logger.save(f"Comparison JSON saved: {self.compare_path}")
+                        self.logger.debug(f"Comparison JSON saved: {self.compare_path}")
 
                         self.operator.generate_comparison_report(comparison, self.comparison_xlsx)
-                        self.logger.save(f"Comparison report → {self.comparison_xlsx}")
+                        self.logger.debug(f"Comparison report → {self.comparison_xlsx}")
                         
                         #write email msg
                         ots = old_data["metadata"]["pfname"].replace("PROCESS", "").replace(".json", "")
@@ -302,7 +301,7 @@ class BankScraper:
 
             # ===== Stage 3: Update Baseline for Next Run =====
             Helper.save_json(baseline, self.prev_path)
-            self.logger.notice(f"Updated baseline processed cache for next run at: {self.prev_path}")
+            self.logger.debug(f"Updated baseline processed cache for next run at: {self.prev_path}")
 
             # ===== Stage 4: Success Log =====
             self.logger.info("Cache processing and comparison completed successfully.")
@@ -327,16 +326,15 @@ class BankScraper:
             self.logger.save(f"Cache Excel report generated at: {self.xls_path}")
 
         return self.pdf_path, self.xls_path
-
-            
+       
     def runner(self,bank_codes):
         
         final_dict = self.get_final_struct()
         for code in bank_codes:
-            if code not in CONFIG:
+            if code not in self.CONFIG:
                 self.logger.error(f"Code: {code} not found in config. Skipping...")
                 continue
-            bank_params = CONFIG[code]
+            bank_params = self.CONFIG[code]
             
             try:
                 result = self.scrape_bank(bank_params)

@@ -1,7 +1,5 @@
 import json,json5, os
 from datetime import datetime
-
-
 root_dir = os.path.dirname(os.path.dirname(__file__))
 
 def load_json(path: str):
@@ -21,11 +19,12 @@ def create_dir(root_path: str, *args) -> str:
 
 
 PATHS = load_json(r"paths.json")
-CONFIG = load_json5(os.path.join(root_dir,PATHS["configs"]))
-GENERIC_ACTIONS = load_json5(os.path.join(root_dir,PATHS["generic_config"]))
-POST_SCRAPE_OPS = CONFIG.get("POST_SCRAPE_OPS")
-SCRIPTS = GENERIC_ACTIONS.get("scripts",{})
 
+def load_config():
+    return load_json5(os.path.join(root_dir,PATHS["configs"]))
+
+def load_gen_config():
+    return load_json5(os.path.join(root_dir,PATHS["generic_config"]))
 
 #directories
 OUTPUT_PATH = PATHS["output"]
@@ -34,9 +33,30 @@ SESSION_ROOT = create_dir(OUTPUT_PATH, "session")
 DATA_DIR = create_dir(OUTPUT_PATH,"data")
 HTMLTOPDF_PATH = PATHS["htmltopdf_path"]
 
-#schedule times
-SCHEDULE_TIMES = PATHS.get("schedule_time",["0900","0230"])
-RUN_DAYS =PATHS.get("schedule_days",["mon", "tue", "wed", "thu", "fri"]) 
+
+def load_days():
+    paths = load_json(r"paths.json")
+    return paths.get("schedule_days",["mon", "tue", "wed", "thu", "fri"])
+
+def load_times():
+    paths = load_json(r"paths.json")
+    return paths.get("schedule_time",["0900","0230"])
+
+def load_mail_data():
+    paths = load_json(r"paths.json")
+    return paths.get("mail_data",{
+        "sender": "newsrssfetch.fornse@cogencis.com",
+        "dev_recipients": [
+            "Kaustubh.Keny@cogencis.com"
+        ],
+        "recipients": [
+            "Kaustubh.Keny@cogencis.com"
+        ],
+        "cc": [],
+        "bcc": [],
+        "server": "172.17.0.126",
+        "port": 25
+    })
 
 #file size constants
 MAX_REQUEST_BYTE_SIZE = 3_000_000 #2mb file

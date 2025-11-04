@@ -37,13 +37,13 @@ if __name__ == "__main__":
     
     try:
         logger.notice("Starting Scraper Program.")
-        bank_codes = ["NSE_1"] #PUB_BANK_CODES #ALL_BANK_CODES 
+        bank_codes = ["BSE_1"] #PUB_BANK_CODES #ALL_BANK_CODES 
         main(
             bank_codes, 
             process=False, 
             is_headless=False, 
             minimize=True,
-            report_type="both"
+            report_type="pdf"
         )
         
     except KeyboardInterrupt:

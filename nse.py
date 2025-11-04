@@ -12,10 +12,9 @@ from app.BankScraper import BankScraper
 from app.utils import Helper
 from app.mailer import Mailer
 
-PROGRAM_NAME = "Interest Rates WebScraper"
+PROGRAM_NAME = "Interest Rates Bank WebScraper"
 
 # --- Setup Global Logger ---
-global logger
 logger = setup_logger(name="scraper", log_dir=LOG_DIR, log_level=5)
 set_global_logger(logger)
 
@@ -29,14 +28,13 @@ def main(bank_codes, process=False, is_headless=False, send_mail = False, report
     scraper = BankScraper()
     mailer = Mailer()
     
-    #logger
-    logger = setup_logger(name="scraper", log_dir=LOG_DIR, log_level=5)
-    set_global_logger(logger)
-    
     #start mail
     if send_mail:
         logger.info("Sending start email...")
-        mailer.start_mail(program= PROGRAM_NAME, data = bank_codes)
+        mailer.start_mail(
+            program= PROGRAM_NAME,
+            data = bank_codes
+        )
 
     if not scraper.start_session(headless=is_headless,minimized=minimize):
         raise RuntimeError("Failed to initialize Selenium driver")
@@ -44,7 +42,7 @@ def main(bank_codes, process=False, is_headless=False, send_mail = False, report
     final_dict = scraper.runner(bank_codes)
     #report pdf,xlsx
     scraper.create_scrape_report(final_dict,report_type)
-    error_html_path = scraper.export_error_log()
+    scraper.export_error_log()
     if process: scraper.process_cache(final_dict)
 
     #end mail
@@ -53,13 +51,23 @@ def main(bank_codes, process=False, is_headless=False, send_mail = False, report
         attatchments = [ scraper.pdf_path,scraper.xls_path, scraper.comparison_xlsx]
         mailer.end_mail(
             program=PROGRAM_NAME,
+            data = scraper.email_msg,
             attachments=attatchments,
-            custom_html=Helper.read_html(error_html_path),
+            custom_html=Helper.read_html(scraper.error_html_path)
         )
     
     logger.info("Scraping Program Completed Successfully.")
         
-def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_days=None, send_mail = False,minimize = False):
+def scheduler_loop(
+    bank_codes, 
+    process=True, 
+    headless=False, 
+    times=None, 
+    run_days=None, 
+    send_mail = False,
+    minimize = False,
+    report_type = "pdf",
+    ):
     """
     Wraps the main() scraper function to run at specific times (HHMM format)
     and only on specified weekdays.
@@ -111,7 +119,8 @@ def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_day
                         process=process, 
                         is_headless=headless, 
                         send_mail=send_mail,
-                        minimize=minimize
+                        minimize=minimize,
+                        report_type=report_type
                     )
                     logger.info(f"Completed run at {datetime.now().strftime('%H:%M')}")
                 except Exception as e:
@@ -129,8 +138,7 @@ def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_day
                 program=f"{PROGRAM_NAME}: {datetime.now().strftime("%d-%m-%y")}",
                 custom_msg="Keyboard Interrupt",
                 error_message="User manually stopped the scheduler.",
-                exception_obj=None,
-                dev=True
+                exception_obj=None
             )
         
 
@@ -143,21 +151,21 @@ def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_day
                 program=f"{PROGRAM_NAME}: {datetime.now().strftime("%d-%m-%y")}",
                 custom_msg="Unexpected error in scheduler loop",
                 error_message=str(e),
-                exception_obj=e,
-                dev=True
+                exception_obj=e
             )
         
 if __name__ == "__main__":
     logger.notice("Starting Scraper Scheduler...")
-    bank_codes = ["PVB_2"] #ALL_BANK_CODES
+    bank_codes = ["NSE_1"]
     
 
     scheduler_loop(
         bank_codes,
-        process=True,
-        times= ["1802"], #load_times(), 
+        process=False,
+        times= ["1146","1150","1210","1230","1250","1310","1330"], #load_times(), 
         run_days=load_days(),
-        send_mail=True,
-        minimize = True
+        send_mail=False,
+        minimize = True,
+        report_type = "xlsx"
     )
 

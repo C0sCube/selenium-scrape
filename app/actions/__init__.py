@@ -14,11 +14,13 @@ from .text_action import textScrape
 from .clicksave_action import clickSave
 from .download_action import downloadElem
 from .apiget_action import apiGet
+from .select_action import selectList
 
 __all__ = [
     "htmlScrape", "clickElem", "webRedir",
     "httpRequest", "tablScrape","textScrape", 
     "downloadElem","genPdf", "genSst",
     "injectScript","tabList","webList",
-    "manualAction", "clickSave", "apiGet"
+    "manualAction", "clickSave", "apiGet",
+    "selectList"
 ]

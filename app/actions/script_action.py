@@ -1,7 +1,7 @@
 # app/actions/inject_script_action.py
 from app.logger import get_global_logger
 from app.actions.helper import ActionHelper
-from app.constants import SCRIPTS
+from app.constants import load_gen_config
 
 def injectScript(executor):
     """
@@ -12,11 +12,14 @@ def injectScript(executor):
     driver = executor.driver
     script_key = getattr(executor, "SCRIPT_KEY", None)
     raw_script = getattr(executor, "SCRIPT", None)
+    
+    generic_actions = load_gen_config()
+    scripts = generic_actions.get("scripts",{})
 
     try:
         # Load predefined script if script_key provided
         if script_key:
-            js = SCRIPTS.get(script_key)
+            js = scripts.get(script_key)
             if not js:
                 logger.warning(f"No predefined script found for key: {script_key}")
                 return []
