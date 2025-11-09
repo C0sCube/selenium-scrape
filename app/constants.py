@@ -1,5 +1,5 @@
 import json,json5, os
-from datetime import datetime
+# from datetime import datetime
 root_dir = os.path.dirname(os.path.dirname(__file__))
 
 def load_json(path: str):
@@ -17,22 +17,22 @@ def create_dir(root_path: str, *args) -> str:
     os.makedirs(full_path, exist_ok=True)
     return full_path
 
-
-PATHS = load_json(r"paths.json")
+def get_paths():
+    return load_json(r"paths.json")
 
 def load_config():
-    return load_json5(os.path.join(root_dir,PATHS["configs"]))
+    output = get_paths()
+    return load_json5(os.path.join(root_dir,output["configs"]))
 
 def load_gen_config():
-    return load_json5(os.path.join(root_dir,PATHS["generic_config"]))
+    output = get_paths()
+    return load_json5(os.path.join(root_dir,output["generic_config"]))
 
-#directories
-OUTPUT_PATH = PATHS["output"]
-LOG_DIR = create_dir(OUTPUT_PATH,"log")
-SESSION_ROOT = create_dir(OUTPUT_PATH, "session")
-DATA_DIR = create_dir(OUTPUT_PATH,"data")
-HTMLTOPDF_PATH = PATHS["htmltopdf_path"]
+def output_path():
+    return get_paths()["output"]
 
+def out_nse_path():
+    return get_paths()["output_nsepath"]
 
 def load_days():
     paths = load_json(r"paths.json")

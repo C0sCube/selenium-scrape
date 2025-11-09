@@ -15,8 +15,6 @@ def clickSave(executor):
     element = executor.ELEMENT
     output_path = executor.OUTPUT_PATH
     pdf_name = executor.pdf_name
-    timeout = executor.TIMEOUT
-
     logger.info("Starting click-save action...")
 
     scrape_content = []
@@ -65,7 +63,7 @@ def clickSave(executor):
         file_path, ext = ActionHelper._wait_for_download(
             output_path,
             initial_files,
-            timeout=timeout
+            timeout=executor.TIMEOUT
         )
 
         if file_path:

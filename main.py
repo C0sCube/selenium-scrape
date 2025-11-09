@@ -5,8 +5,8 @@ warnings.filterwarnings('ignore')
 ssl._create_default_https_context = ssl._create_stdlib_context
 
 # --- Internal Imports ---
-from app.constants import LOG_DIR, ALL_BANK_CODES
-from app.constants import load_days, load_times
+from app.constants import ALL_BANK_CODES
+from app.constants import load_days, load_times,output_path
 from app.logger import setup_logger, set_global_logger
 from app.BankScraper import BankScraper
 from app.utils import Helper
@@ -15,30 +15,39 @@ from app.mailer import Mailer
 PROGRAM_NAME = "Interest Rates WebScraper"
 
 # --- Setup Global Logger ---
-global logger
-logger = setup_logger(name="scraper", log_dir=LOG_DIR, log_level=5)
+global logger, log_path
+log_path = os.path.join(output_path(),"log")
+logger = setup_logger(name="scraper", log_dir=log_path, log_level=5)
 set_global_logger(logger)
 
 
-def main(bank_codes, process=False, is_headless=False, send_mail = False, report_type = "pdf", minimize = False):
+def main(bank_codes, process=False, send_mail = False, report_type = "pdf", minimize = False):
     """Core scraping and processing routine.
     1️⃣ Starts Selenium session
     2️⃣ Runs scraping for given bank codes
     3️⃣ Saves raw cache
     4️⃣ Optionally processes, compares, and generates reports"""
-    scraper = BankScraper()
+    
+    output_root = output_path()
+    
+    runtime_path = Helper.create_dir(output_root, "session", f"session_{datetime.now().strftime('%y%m%d_%H%M')}")
+    session_latest_path = os.path.join(output_root,"session","session_latest")
+    scraper = BankScraper(
+        runtime_path=runtime_path, 
+        session_latest_path=session_latest_path
+    )
     mailer = Mailer()
     
     #logger
-    logger = setup_logger(name="scraper", log_dir=LOG_DIR, log_level=5)
+    logger = setup_logger(name="scraper", log_dir=log_path, log_level=5)
     set_global_logger(logger)
     
     #start mail
     if send_mail:
         logger.info("Sending start email...")
-        mailer.start_mail(program= PROGRAM_NAME, data = bank_codes)
+        mailer.start_mail(program= PROGRAM_NAME, data = bank_codes, dev=True)
 
-    if not scraper.start_session(headless=is_headless,minimized=minimize):
+    if not scraper.start_session(minimized=minimize):
         raise RuntimeError("Failed to initialize Selenium driver")
     
     final_dict = scraper.runner(bank_codes)
@@ -59,7 +68,7 @@ def main(bank_codes, process=False, is_headless=False, send_mail = False, report
     
     logger.info("Scraping Program Completed Successfully.")
         
-def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_days=None, send_mail = False,minimize = False):
+def scheduler_loop(bank_codes, process=True, times=None, run_days=None, send_mail = False,minimize = False):
     """
     Wraps the main() scraper function to run at specific times (HHMM format)
     and only on specified weekdays.
@@ -109,7 +118,6 @@ def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_day
                     main(
                         bank_codes, 
                         process=process, 
-                        is_headless=headless, 
                         send_mail=send_mail,
                         minimize=minimize
                     )
@@ -149,13 +157,13 @@ def scheduler_loop(bank_codes, process=True, headless=False, times=None, run_day
         
 if __name__ == "__main__":
     logger.notice("Starting Scraper Scheduler...")
-    bank_codes = ["PVB_2"] #ALL_BANK_CODES
+    bank_codes = ALL_BANK_CODES
     
 
     scheduler_loop(
         bank_codes,
         process=True,
-        times= ["1802"], #load_times(), 
+        times= ["1455"], #load_times(), 
         run_days=load_days(),
         send_mail=True,
         minimize = True

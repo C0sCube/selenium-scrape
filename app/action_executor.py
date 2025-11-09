@@ -24,7 +24,7 @@ class ActionExecutor:
     def __init__(self):
         self.logger = get_global_logger()
         self.today = datetime.now()
-        self.OUTPUT_PATH = Helper.create_dir(DATA_DIR,self.today.strftime("%Y-%m-%d"))
+        self.OUTPUT_PATH = None
         self.data = {}
         self.driver = None
         self.window_stack = None
@@ -75,12 +75,12 @@ class ActionExecutor:
     
     def set_params(self,params):
         self.PARAMS = params
-        self.OUTPUT_PATH = Helper.create_dir(DATA_DIR,self.today.strftime("%Y-%m-%d"),params['bank_name'],f"download_{datetime.now().strftime("%H%M")}")
+        self.OUTPUT_PATH = Helper.create_dir(output_path(),"data",self.today.strftime("%Y-%m-%d"),params['bank_name'],f"d_{datetime.now().strftime("%H")}")
         self.driver.execute_cdp_cmd("Page.setDownloadBehavior", {
             "behavior": "allow",
             "downloadPath": self.OUTPUT_PATH
         })
-        self.logger.info(f"Download Folder: {self.OUTPUT_PATH}")
+        self.logger.debug(f"Download Folder: {self.OUTPUT_PATH}")
     
     def create_uc_driver(self, headless=False, minimized=True):
         
@@ -135,6 +135,19 @@ class ActionExecutor:
         if minimized and not headless:
             try:
                 time.sleep(1)
+                
+                # self.driver.set_window_size(80,60)
+                # self.driver.set_window_position(-10,10)
+                # self.logger.notice("Driver window minimized to small visible size.")
+                
+                # title = self.driver.title or "data:,"
+                # time.sleep(0.5)
+                # for w in gw.getWindowsWithTitle(title):
+                #     w.moveTo(10,10)
+                #     w.lower()
+                #     self.logger.notice("Chrome window minimized safely.")
+                #     break
+                
                 title = self.driver.title or "data:,"
                 for w in gw.getWindowsWithTitle(title):
                     w.minimize()
@@ -162,11 +175,63 @@ class ActionExecutor:
         self.logger.warning(f"Driver not created. Couldnt get website.")
         return
     
+    def _restore_window(self):
+        """Restore or bring Chrome to front if minimized/tiny."""
+        try:
+            self.logger.trace("Restoring Chrome window...")
+            self.driver.set_window_size(900, 700)
+            self.driver.set_window_position(50, 50)
+            title = self.driver.title or "data:,"
+            for w in gw.getWindowsWithTitle(title):
+                w.activate()
+                break
+            time.sleep(0.5)
+            self.logger.trace("Chrome restored to visible window.")
+        except Exception as e:
+            self.logger.warning(f"Could not restore window: {e}")
+
+    def _minimize_window(self):
+        """Minimize or shrink Chrome after action completes."""
+        try:
+            self.logger.trace("Minimizing Chrome window...")
+            title = self.driver.title or "data:,"
+            for w in gw.getWindowsWithTitle(title):
+                w.minimize()
+                break
+            time.sleep(0.3)
+            self.logger.trace("Chrome minimized again.")
+        except Exception as e:
+            # Fallback to shrink if minimize fails
+            try:
+                self.driver.set_window_size(250, 200)
+                self.driver.set_window_position(10, 10)
+                self.logger.trace("Fallback: Chrome shrunk to 250x200.")
+            except Exception as e2:
+                self.logger.warning(f"Could not minimize or shrink: {e2}")
+
+    
     def execute(self, _action_: dict):
         self.__set_website_parameters(_action_)
         time.sleep(random.uniform(self.DEFAULT_WAIT / 1.2, self.DEFAULT_WAIT))
         self.ELEMENT = None
-
+        
+        if self.MINIMIZE_TOGGLE: self._restore_window()
+        
+        #auto scroll
+        try:
+            if _action_.get("scroll",False):
+                self.logger.trace("Auto-scrolling to load lazy elements...")
+                scroll_height = self.driver.execute_script("return document.body.scrollHeight")
+                for y in range(0,scroll_height,400):
+                    self.driver.execute_script(f"window.scrollTo(0,{y});")
+                    time.sleep(0.1)
+                self.driver.execute_script("window.scrollTo(0,document.body.scrollHeight);")
+                time.sleep(1)
+                    
+        except Exception as e:
+            self.logger.warning(f"Auto-scroll Failed: {e}")
+            
+        #perform action
         try:
             self.logger.notice(f"Performing _action_: {self.ACTION_TYPE} on {self.VALUE}")
 
@@ -200,11 +265,14 @@ class ActionExecutor:
         except Exception as e:
             self.logger.error(f"Error in self.execute: [{type(e).__name__}] {str(e)}")
             self.logger.debug(f"Traceback:\n{traceback.format_exc()}")
+            if self.MINIMIZE_TOGGLE: self._minimize_window()
             return self.__generate_packet([{
                 "error_type": type(e).__name__,
                 "error_message": str(e),
                 "error_from": "ActionExecutor.execute"
             }])
+            
+        if self.MINIMIZE_TOGGLE: self._minimize_window()
 
         return self.__generate_packet(content) if content else self.__generate_packet([{
             "error_type": "NoneType",
@@ -233,12 +301,16 @@ class ActionExecutor:
         self.HEADERS.update({"Referer": self.driver.current_url})
         
         #API data
-        
         self.BASE_API = _action_.get("base_api", None)  # can be a list or dict
         self.DOMAIN = _action_.get("domain", None)  # domain for cookies
         self.VERIFY_REQUEST = _action_.get("verify_request", True)
         self.API_RULE = _action_.get("resp_structure",{})
         self.NULL_RESPONSE = _action_.get("null_response",{})
+        self.THROTTLE = _action_.get("throttle",4)
+        
+        #toggle minimize
+        self.MINIMIZE_TOGGLE = _action_.get("minimize_toggle",False)
+        self.PAGE_SCROLL = _action_.get("scroll",False)
         
         #time
         self.DEFAULT_WAIT = _action_.get("default_wait", 2)
@@ -366,12 +438,14 @@ class ActionExecutor:
                 if action_key == "action_website":
                     do_action.update({"url": content[0]})
                 elif action_key == "action_download":
-                    by, value, multiple, wait_until = content
+                    by, value, multiple, wait_until,minimize_toggle,scroll = content
                     do_action.update({
                         "by": by,
                         "value": value,
                         "multiple": bool(multiple),
-                        "wait_until": wait_until
+                        "wait_until": wait_until,
+                        "minimize_toggle":bool(minimize_toggle),
+                        "scroll":bool(scroll)
                     })
 
             elif isinstance(_action_, dict):

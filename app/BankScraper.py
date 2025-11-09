@@ -4,18 +4,18 @@ from app.pdf_report import PDFReportBuilderPro
 from selenium.common.exceptions import WebDriverException
 
 # app/BankScraper.py
-import traceback, time, hashlib, pprint, os, time
+import traceback, time, hashlib, pprint, os, time, shutil
 from copy import deepcopy
 from datetime import datetime
 from selenium.common.exceptions import WebDriverException
 from app.logger import get_global_logger, log_exceptions
 from app.utils import Helper
-from app.constants import OUTPUT_PATH, SESSION_ROOT, load_config
+from app.constants import load_config
 
 class BankScraper:
     """Main controller for orchestrating scraping per bank."""
 
-    def __init__(self):
+    def __init__(self, runtime_path = "",session_latest_path = ""):
         """
         Args:
             executor: Instance of ActionExecutor
@@ -31,11 +31,11 @@ class BankScraper:
         self.logger = get_global_logger()
         self.errors = []  # structured error store
         
-        self.RUNTIME_PATH = Helper.create_dir(OUTPUT_PATH, "session", f"session_{datetime.now().strftime('%y%m%d_%H%M')}")
-        self.SESSION_LATEST = Helper.create_dir(SESSION_ROOT, "session_latest")
+        self.RUNTIME_PATH = runtime_path#Helper.create_dir(OUTPUT_PATH, "session", f"session_{datetime.now().strftime('%y%m%d_%H%M')}")
+        self.SESSION_LATEST = session_latest_path #Helper.create_dir(SESSION_ROOT, "session_latest")
         
-        self.pdf_path = os.path.join(self.RUNTIME_PATH, f"SCRAPE-REPORT-{datetime.now().strftime('%y%m%d_%H%M')}.pdf")
-        self.xls_path = os.path.join(self.RUNTIME_PATH, f"SCRAPE-REPORT-{datetime.now().strftime('%y%m%d_%H%M')}.xlsx")
+        self.pdf_path = None
+        self.xls_path = None
         self.prev_path = os.path.join(self.SESSION_LATEST, "PROCESS_LATEST.json")
         
         self.compare_path = None
@@ -44,6 +44,8 @@ class BankScraper:
         self.comparison_xlsx = None
         self.email_msg = None #post comparison
         self.error_html_path = None
+        
+        # self.final_dict = 
 
         
 
@@ -211,7 +213,7 @@ class BankScraper:
         """Export human-readable text and HTML error summaries. Always returns file paths."""
         if not self.errors:
             self.logger.info("✅ No errors or missing-data notes to export.")
-            return None, None
+            return None
 
         errors,infos = [e for e in self.errors if e["severity"] == "ERROR"],[e for e in self.errors if e["severity"] == "INFO"]
 
@@ -312,20 +314,63 @@ class BankScraper:
             self.logger.debug(traceback.format_exc())
             return None
 
-    def create_scrape_report(self, cache_data, report_type="pdf"):
+    # def create_scrape_report(self, cache_data, report_type="pdf", report_name = "SCRAPE-REPORT", rewrite = False):
+    #     """Generate scrape report in PDF, Excel, or both."""
+
+    #     report_type = report_type.lower()
+    #     report_new = f"{report_name}-{datetime.now().strftime('%y%m%d_%H%M')}"
+        
+    #     # ===== PDF =====
+    #     if report_type in ("pdf", "both"):
+    #         self.pdf_path = os.path.join(self.RUNTIME_PATH, f"{report_new}.pdf")
+    #         self.reporter.build(cache_data, self.pdf_path)
+    #         self.logger.save(f"Cache PDF report generated at: {self.pdf_path}")
+
+    #     # ===== Excel =====
+    #     if report_type in ("xlsx", "both"):
+    #         self.xls_path = os.path.join(self.RUNTIME_PATH, f"{report_new}.xlsx")
+    #         self.reporter.write_excel_report(cache_data, self.xls_path)
+    #         self.logger.save(f"Cache Excel report generated at: {self.xls_path}")
+
+    #     return self.pdf_path, self.xls_path
+    
+    def create_scrape_report(self, cache_data, report_type="pdf", report_name="SCRAPE-REPORT", rewrite=False):
         """Generate scrape report in PDF, Excel, or both."""
+        if not report_type:
+            self.logger.info("As Instruced, not generating report.")
+            return None
+
+        report_type = report_type.lower()
+        timestamp = datetime.now().strftime('%y%m%d_%H%M')
+        report_new = f"{report_name}-{timestamp}"
 
         # ===== PDF =====
         if report_type in ("pdf", "both"):
-            self.reporter.build(cache_data, self.pdf_path)
-            self.logger.save(f"Cache PDF report generated at: {self.pdf_path}")
+            pdf_archive_path = os.path.join(self.RUNTIME_PATH, f"{report_new}.pdf")
+            pdf_latest_path = os.path.join(self.RUNTIME_PATH, f"{report_name}.pdf")
+
+            self.reporter.build(cache_data, pdf_archive_path)
+            self.logger.save(f"PDF report archived at: {pdf_archive_path}")
+
+            if rewrite or not os.path.exists(pdf_latest_path):
+                shutil.copy(pdf_archive_path, pdf_latest_path)
+                self.logger.save(f"PDF report updated at: {pdf_latest_path}")
 
         # ===== Excel =====
         if report_type in ("xlsx", "both"):
-            self.reporter.write_excel_report(cache_data, self.xls_path)
-            self.logger.save(f"Cache Excel report generated at: {self.xls_path}")
+            xls_archive_path = os.path.join(self.RUNTIME_PATH, f"{report_new}.xlsx")
+            xls_latest_path = os.path.join(self.RUNTIME_PATH, f"{report_name}.xlsx")
 
-        return self.pdf_path, self.xls_path
+            self.reporter.write_excel_report(cache_data, xls_archive_path)
+            self.logger.save(f"Excel report archived at: {xls_archive_path}")
+
+            if rewrite or not os.path.exists(xls_latest_path):
+                shutil.copy(xls_archive_path, xls_latest_path)
+                self.logger.save(f"Excel report updated at: {xls_latest_path}")
+
+        return pdf_archive_path if report_type in ("pdf", "both") else None, \
+            xls_archive_path if report_type in ("xlsx", "both") else None
+    
        
     def runner(self,bank_codes):
         

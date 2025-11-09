@@ -12,3 +12,5 @@ run.bat
 
 .venv/
 venv/
+
+app/wkhtmltopdf/

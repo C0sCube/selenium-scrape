@@ -2,7 +2,7 @@ import base64, tempfile, pdfkit,json, pandas as pd, os, pdfplumber, re
 from io import BytesIO
 from PyPDF2 import PdfMerger
 from datetime import datetime
-from app.constants import HTMLTOPDF_PATH
+from app.constants import get_paths
 
 import pandas as pd
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -15,7 +15,7 @@ class PDFReportBuilderPro:
         self.merger = PdfMerger()
         self.bank_titles = []
         self.config = pdfkit.configuration(
-            wkhtmltopdf=HTMLTOPDF_PATH
+            wkhtmltopdf=get_paths()["htmltopdf_path"]
         )
 
         # color palette for per-bank tinting (soft pastels)
