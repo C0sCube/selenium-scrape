@@ -5,27 +5,23 @@ warnings.filterwarnings('ignore')
 ssl._create_default_https_context = ssl._create_stdlib_context
 
 # --- Internal Imports ---
-from app.constants import ALL_BANK_CODES
-from app.constants import load_days, load_times,out_nse_path
 from app.logger import setup_logger, set_global_logger
+from app.constants import load_json
 from app.BankScraper import BankScraper
 from app.utils import Helper
 from app.mailer import Mailer
 
 PROGRAM_NAME = "Interest Rates Bank WebScraper"
+def load_paths():
+    return load_json(r"nse_paths.json")
 
 # --- Setup Global Logger ---
-global logger, log_path
-log_path = os.path.join(out_nse_path(),"log")
+log_path = os.path.join(load_paths()["output_nsepath"],"log")
 logger = setup_logger(name="scraper", log_dir=log_path, log_level=5)
 set_global_logger(logger)
 
-
-shared_json_path = os.path.join(out_nse_path(), "latest_scrape.json")
+shared_json_path = os.path.join(load_paths()["output_nsepath"], "latest_scrape.json")
 save_latest = True
-
-
-import json
 
 def update_nse_series(scraped_path, config_path = r"configs\param_table.json5"):
     
@@ -58,6 +54,7 @@ def main(
     send_mail = False, 
     report_type = "pdf",
     rewrite = False, 
+    headless = False,
     minimize = False,
     save_latest = True
 ):
@@ -67,8 +64,10 @@ def main(
     3️⃣ Saves raw cache
     4️⃣ Optionally processes, compares, and generates reports"""
     
-    output_root = out_nse_path()
-    runtime_path = Helper.create_dir(output_root, "session", f"session_nse")
+    paths = load_paths()
+    
+    output_root = paths["output_nsepath"]
+    runtime_path = Helper.create_dir(output_root, "session",datetime.now().strftime("%Y-%m-%d"))
     session_latest_path = os.path.join(output_root,"session","session_latest")
     
     scraper = BankScraper(
@@ -85,7 +84,7 @@ def main(
             data = bank_codes
         )
 
-    if not scraper.start_session(minimized=minimize):
+    if not scraper.start_session(minimized=minimize, headless=headless):
         raise RuntimeError("Failed to initialize Selenium driver")
     
     final_dict = scraper.runner(bank_codes)
@@ -95,7 +94,8 @@ def main(
         update_nse_series(shared_json_path)
             
     #report pdf,xlsx
-    scraper.create_scrape_report(final_dict,report_type,rewrite=rewrite)
+    rw_path = os.path.join(output_root,"session","SCRAPE-REPORT.xlsx")
+    scraper.create_scrape_report(final_dict,report_type,rewrite=rewrite, rw_path=rw_path)
     scraper.export_error_log()
     if process: scraper.process_cache(final_dict)
 
@@ -119,6 +119,7 @@ def scheduler_loop(
     times=None, 
     run_days=None, 
     send_mail = False,
+    headless = False,
     minimize = False,
     report_type = "pdf",
     rewrite = False,
@@ -177,7 +178,8 @@ def scheduler_loop(
                         minimize=minimize,
                         report_type=report_type,
                         rewrite=rewrite,
-                        save_latest=save_latest
+                        save_latest=save_latest,
+                        headless=headless
                     )
                     logger.info(f"Completed run at {datetime.now().strftime('%H:%M')}")
                 except Exception as e:
@@ -215,22 +217,29 @@ def scheduler_loop(
 import threading
 if __name__ == "__main__":
     logger.notice("Starting Scraper Scheduler...")
+    paths = load_paths()
+    sch_days = paths.get("schedule_days",["mon", "tue", "wed", "thu", "fri"])
+    sch_times = paths.get("schedule_time",["0900","0230"])
+    
+    initial_time = sch_times[0]
+    rest_times = sch_times[1:]
 
     # Thread for NSE_0
     t1 = threading.Thread(target=scheduler_loop, args=(["NSE_0"],), kwargs={
-        "times": ["1455"],
-        "run_days": load_days(),
-        "minimize": True,
+        "times": [initial_time],
+        "run_days": sch_days,
+        "headless": True,
         "report_type": None,
     })
 
     # Thread for NSE_1
     t2 = threading.Thread(target=scheduler_loop, args=(["NSE_1"],), kwargs={
-        "times": ["1500", "1510","1520","1530","1540","1550","1600", "1610","1620","1630","1640","1650","1700"],
-        "run_days": load_days(),
-        "minimize": True,
+        "times": rest_times,
+        "run_days":sch_days,
+        "headless": True,
         "report_type": "xlsx",
         "save_latest": False,
+        "rewrite":True
     })
 
     # Start both threads
@@ -241,26 +250,3 @@ if __name__ == "__main__":
     t1.join()
     t2.join()
       
-# if __name__ == "__main__":
-#     logger.notice("Starting Scraper Scheduler...")
-#     bank_codes = ["NSE_0"]
-#     scheduler_loop(
-#         bank_codes,
-#         times= ["1330"],
-#         run_days=load_days(),
-#         minimize = True,
-#         report_type = None,
-#     )
-
-    
-    
-#     bank_codes = ["NSE_1"]
-#     scheduler_loop(
-#         bank_codes,
-#         times= ["1335","1345"],
-#         run_days=load_days(),
-#         minimize = True,
-#         report_type = "xlsx",
-#         save_latest=False
-#     )
-

@@ -73,7 +73,8 @@ COOL_DOWN = 30
 
 PVT_BANK_CODES = [f"PVB_{i}" for i in range(1,23)]
 PUB_BANK_CODES = [f"PSB_{i}" for i in range(1,13)]
-FRN_BANK_CODES = [f"FRB_{i}" for i in range(1,37)]
+FRN_BANK_CODES = [f"FRB_{i}" for i in range(1,11)]
+SFB_BANK_CODES = [f"SFB_{i}" for i in range(1,12)]
 ALL_BANK_CODES = [f"PSB_{i}" for i in range(1,13)]+["PVB_22"]+[f"PVB_{i}" for i in range(1,22)]
 
 

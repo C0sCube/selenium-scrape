@@ -69,6 +69,7 @@ class BankScraper:
 
             except WebDriverException as e:
                 self.logger.error(f"WebDriver error: {e}. Retrying...")
+                self.executor.driver.quit()
                 self.record_error(bank_name="GLOBAL", exception=e, source="DRIVER")
                 time.sleep(retry_delay)
         self.logger.critical("Failed to create driver after multiple attempts.")
@@ -79,6 +80,7 @@ class BankScraper:
         if self.executor.driver:
             self.logger.info("Closing browser session...")
             self.executor.driver.quit()
+            # shutil.rmtree(self.executor.profile_dir, ignore_errors=True)
             self.logger.save("Driver closed successfully.")
 
     # =====================================================
@@ -313,28 +315,15 @@ class BankScraper:
             self.logger.error(f"process_cache failed: {type(e).__name__} - {e}")
             self.logger.debug(traceback.format_exc())
             return None
-
-    # def create_scrape_report(self, cache_data, report_type="pdf", report_name = "SCRAPE-REPORT", rewrite = False):
-    #     """Generate scrape report in PDF, Excel, or both."""
-
-    #     report_type = report_type.lower()
-    #     report_new = f"{report_name}-{datetime.now().strftime('%y%m%d_%H%M')}"
-        
-    #     # ===== PDF =====
-    #     if report_type in ("pdf", "both"):
-    #         self.pdf_path = os.path.join(self.RUNTIME_PATH, f"{report_new}.pdf")
-    #         self.reporter.build(cache_data, self.pdf_path)
-    #         self.logger.save(f"Cache PDF report generated at: {self.pdf_path}")
-
-    #     # ===== Excel =====
-    #     if report_type in ("xlsx", "both"):
-    #         self.xls_path = os.path.join(self.RUNTIME_PATH, f"{report_new}.xlsx")
-    #         self.reporter.write_excel_report(cache_data, self.xls_path)
-    #         self.logger.save(f"Cache Excel report generated at: {self.xls_path}")
-
-    #     return self.pdf_path, self.xls_path
     
-    def create_scrape_report(self, cache_data, report_type="pdf", report_name="SCRAPE-REPORT", rewrite=False):
+    def create_scrape_report(
+        self, 
+        cache_data, 
+        report_type="pdf", 
+        report_name="SCRAPE-REPORT", 
+        rewrite=False,
+        rw_path = None
+    ):
         """Generate scrape report in PDF, Excel, or both."""
         if not report_type:
             self.logger.info("As Instruced, not generating report.")
@@ -365,6 +354,8 @@ class BankScraper:
             self.logger.save(f"Excel report archived at: {xls_archive_path}")
 
             if rewrite or not os.path.exists(xls_latest_path):
+                if rw_path: xls_latest_path = rw_path
+                
                 shutil.copy(xls_archive_path, xls_latest_path)
                 self.logger.save(f"Excel report updated at: {xls_latest_path}")
 

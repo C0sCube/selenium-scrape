@@ -1,7 +1,7 @@
-import time, traceback, random
+import time, traceback, random, uuid
 from datetime import datetime
 import undetected_chromedriver as uc
-import pygetwindow as gw, time
+import pygetwindow as gw #type: ignore
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,18 +12,19 @@ from app.logger import get_global_logger
 from app.utils import Helper
 from app.constants import *
 from app.actions import (
-    downloadElem,textScrape, htmlScrape, 
+    downloadElem,textScrape, htmlScrape, selectList,
     clickSave,clickElem, genPdf,genSst, 
     webRedir, httpRequest, injectScript, apiGet,
     tabList, webList, manualAction,tablScrape,
-    selectList
 )
 
 
 class ActionExecutor:
     def __init__(self):
+        
         self.logger = get_global_logger()
         self.today = datetime.now()
+        # self.profile_dir = r"C:\\Users\\kaustubh.keny\\AutomationProfiles\\AutoProfile1"
         self.OUTPUT_PATH = None
         self.data = {}
         self.driver = None
@@ -105,9 +106,11 @@ class ActionExecutor:
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--disable-extensions")
         options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
+        
+        # if os.path.exists(self.profile_dir):
+        #     options.add_argument(f"--user-data-dir={self.profile_dir}")
 
-        if headless:
-            options.add_argument("--headless=new")
+        if headless: options.add_argument("--headless=new")
 
         options.add_experimental_option("prefs", {
             "download.default_directory": self.OUTPUT_PATH,
@@ -117,7 +120,20 @@ class ActionExecutor:
             "safebrowsing.enabled": True
         })
 
-        self.driver = uc.Chrome(options=options)
+        self.driver = uc.Chrome(options=options)        
+        if minimized and not headless:
+            try:
+                time.sleep(1)    
+                title = self.driver.title or "data:,"
+                for w in gw.getWindowsWithTitle(title):
+                    w.minimize()
+                    self.logger.notice("Chrome window minimized safely.")
+                    break
+            except Exception as e:
+                self.logger.warning(f"Minimize failed, fallback to visible small window: {e}")
+                self.driver.set_window_position(50, 50)
+                self.driver.set_window_size(800, 600)
+                
         # width, height = 900, 700
         # self.driver.set_window_size(width, height)
         
@@ -131,32 +147,18 @@ class ActionExecutor:
         #         self.logger.warning(f"Failed to hide window offscreen: {e}")
         #         self.window_stack = [self.driver.current_window_handle]
         #         return self.driver
+            
+        # self.driver.set_window_size(80,60)
+        # self.driver.set_window_position(-10,10)
+        # self.logger.notice("Driver window minimized to small visible size.")
         
-        if minimized and not headless:
-            try:
-                time.sleep(1)
-                
-                # self.driver.set_window_size(80,60)
-                # self.driver.set_window_position(-10,10)
-                # self.logger.notice("Driver window minimized to small visible size.")
-                
-                # title = self.driver.title or "data:,"
-                # time.sleep(0.5)
-                # for w in gw.getWindowsWithTitle(title):
-                #     w.moveTo(10,10)
-                #     w.lower()
-                #     self.logger.notice("Chrome window minimized safely.")
-                #     break
-                
-                title = self.driver.title or "data:,"
-                for w in gw.getWindowsWithTitle(title):
-                    w.minimize()
-                    self.logger.notice("Chrome window minimized safely.")
-                    break
-            except Exception as e:
-                self.logger.warning(f"Minimize failed, fallback to visible small window: {e}")
-                self.driver.set_window_position(50, 50)
-                self.driver.set_window_size(800, 600)
+        # title = self.driver.title or "data:,"
+        # time.sleep(0.5)
+        # for w in gw.getWindowsWithTitle(title):
+        #     w.moveTo(10,10)
+        #     w.lower()
+        #     self.logger.notice("Chrome window minimized safely.")
+        #     break
 
     
     def get_website(self, timeout = 60):
@@ -208,8 +210,7 @@ class ActionExecutor:
                 self.logger.trace("Fallback: Chrome shrunk to 250x200.")
             except Exception as e2:
                 self.logger.warning(f"Could not minimize or shrink: {e2}")
-
-    
+   
     def execute(self, _action_: dict):
         self.__set_website_parameters(_action_)
         time.sleep(random.uniform(self.DEFAULT_WAIT / 1.2, self.DEFAULT_WAIT))
@@ -224,7 +225,7 @@ class ActionExecutor:
                 scroll_height = self.driver.execute_script("return document.body.scrollHeight")
                 for y in range(0,scroll_height,400):
                     self.driver.execute_script(f"window.scrollTo(0,{y});")
-                    time.sleep(0.1)
+                    time.sleep(0.5)
                 self.driver.execute_script("window.scrollTo(0,document.body.scrollHeight);")
                 time.sleep(1)
                     

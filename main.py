@@ -15,7 +15,6 @@ from app.mailer import Mailer
 PROGRAM_NAME = "Interest Rates WebScraper"
 
 # --- Setup Global Logger ---
-global logger, log_path
 log_path = os.path.join(output_path(),"log")
 logger = setup_logger(name="scraper", log_dir=log_path, log_level=5)
 set_global_logger(logger)
@@ -23,10 +22,11 @@ set_global_logger(logger)
 
 def main(bank_codes, process=False, send_mail = False, report_type = "pdf", minimize = False):
     """Core scraping and processing routine.
-    1️⃣ Starts Selenium session
-    2️⃣ Runs scraping for given bank codes
-    3️⃣ Saves raw cache
-    4️⃣ Optionally processes, compares, and generates reports"""
+        1️⃣ Starts Selenium session
+        2️⃣ Runs scraping for given bank codes
+        3️⃣ Saves raw cache
+        4️⃣ Optionally processes, compares, and generates reports
+    """
     
     output_root = output_path()
     
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     scheduler_loop(
         bank_codes,
         process=True,
-        times= ["1455"], #load_times(), 
+        times= ["0932","1400","1520"], #load_times(), 
         run_days=load_days(),
         send_mail=True,
         minimize = True

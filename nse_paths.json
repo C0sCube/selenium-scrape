@@ -1,0 +1,50 @@
+{
+    "root": "C:\\Users\\kaustubh.keny\\Projects\\office-work\\selenium-scrape",
+    "configs": "configs\\param_table.json5",
+    "generic_config": "configs\\generic_actions.json5",
+    "output": "C:\\Users\\kaustubh.keny\\Projects\\OUTPUTS\\scrape_output",
+    "output_nsepath": "C:\\Users\\kaustubh.keny\\OneDrive - Cogencis Information Services Ltd\\Documents\\ROUTE_EMAIL\\NSE_SLB_IP_FEED",
+    "htmltopdf_path": "app\\wkhtmltopdf\\bin\\wkhtmltopdf.exe",
+    "mail_data": {
+        "sender": "newsrssfetch.fornse@cogencis.com",
+        "dev_recipients": [
+            "Kaustubh.Keny@cogencis.com"
+        ],
+        "recipients": [
+            "Kaustubh.Keny@cogencis.com"
+        ],
+        "cc": [
+            "Kaustubh.Keny@cogencis.com"
+        ],
+        "server": "172.17.0.126",
+        "port": 25
+    },
+    "send_mail": true,
+    "schedule_time": [
+        "0858",
+        "0900",
+        "0930",
+        "1000",
+        "1030",
+        "1100",
+        "1130",
+        "1200",
+        "1230",
+        "1300",
+        "1330",
+        "1400",
+        "1430",
+        "1500",
+        "1530",
+        "1600",
+        "1630",
+        "1700"
+    ],
+    "schedule_days": [
+        "mon",
+        "tue",
+        "wed",
+        "thu",
+        "fri"
+    ]
+}

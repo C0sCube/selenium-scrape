@@ -201,4 +201,436 @@
       },
     ],
   },
+  // "FRB_2": {
+  //   "bank_name": "AB Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_2",
+  //   "base_url": "https://abbl.com/mumbai-branch/",
+  //   "blocks": [
+  //     "action_download||xpath||//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'deposit rates')]||true||present||false"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_5": {
+  //   "bank_name": "Bank of Bahrain and Kuwait BSC",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_5",
+  //   "base_url": "https://www.bbkindia.com/",
+  //   "blocks": [
+  //     "action_download||xpath||//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'deposit rates')]||true||present||false"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_11": {
+  //   "bank_name": "Credit Suisse",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_11",
+  //   "base_url": "https://www.ubs.com/global/en/collections/credit-suisse/investment-bank/regulatory-directory/india/mumbai-bank-branch.html",
+  //   "blocks": [
+  //     "action_download||xpath||//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'deposit rate')]||true||present||false"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_12": {
+  //   "bank_name": "CTBC Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_12",
+  //   "base_url": "https://www.ctbcbank.com/content/dam/cbminisite/IN/deposit-rates.html",
+  //   "blocks": [
+  //     "action_table"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_16": {
+  //   "bank_name": "Doha Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_16",
+  //   "base_url": "https://in.dohabank.com/personal-banking/deposit-interest-rates/",
+  //   "blocks": [
+  //     "action_table"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_17": {
+  //   "bank_name": "Emirates NBD",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_17",
+  //   "base_url": "https://www.emiratesnbd.co.in/en/interest-rates",
+  //   "blocks": [
+  //     "action_table"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // FRB_20: {
+  //   bank_name: "ICBC Bank",
+  //   bank_type: "FOREIGN BANKS",
+  //   bank_type_code: "FRB",
+  //   base_url: "https://www.india.icbc.com.cn/icbc/%E6%B5%B7%E5%A4%96%E5%88%86%E8%A1%8C/%E5%AD%9F%E4%B9%B0%E7%BD%91%E7%AB%99/en/default.htm",
+  //   blocks: [
+  //     {
+  //       action: "click",
+  //       by: "xpath",
+  //       value: "//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'revised deposit rates')]",
+  //       default_wait: 5,
+  //       timeout: 10,
+  //     },
+  //     "action_table",
+  //   ],
+  //   headless: true,
+  //   pdf_or_excel: "pdf",
+  // },
+  // "FRB_21": {
+  //   "bank_name": "JPMorgan Chase Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_21",
+  //   "base_url": "https://www.jpmorgan.com/global",
+  //   "blocks": [
+  //     {
+  //       "action": "http",
+  //       "by": "tag",
+  //       "value": "body",
+  //       "wait_until": "present",
+  //       "url": "https://www.jpmorgan.com/content/dam/jpm/global/disclosures/IN/india_deposit_rate.pdf",
+  //       "export_format": "pdf"
+  //     }
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_23": {
+  //   "bank_name": "Mizuho Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_23",
+  //   "base_url": "https://www.mizuhogroup.com/asia-pacific/india/products-and-rates/rates#interest",
+  //   "blocks": [
+  //     "action_download||xpath||//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'term deposit interest')]||false||present||false"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_24": {
+  //   "bank_name": "MUFG Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_24",
+  //   "base_url": "https://www.bk.mufg.jp/report/indiarate/index.htm",
+  //   "blocks": [
+  //     "action_download||xpath||//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'FD Rate')]||false||present||false"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_26": {
+  //   "bank_name": "Rabo Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_26",
+  //   "base_url": "https://www.rabobank.com/asia/india/downloads",
+  //   "blocks": [
+  //     "action_download||xpath||//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'FD Rate')]||false||present||false"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_27": {
+  //   "bank_name": "Societe Generale Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_27",
+  //   "base_url": "https://www.societegenerale.asia/en/india/rates-and-charges/",
+  //   "blocks": [
+  //     "action_download||xpath||//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'download')]||false||present||false"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_28": {
+  //   "bank_name": "Sumitomo Mitsui Banking Corporation",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_28",
+  //   "base_url": "https://www.smbc.co.jp/asia/india/",
+  //   "blocks": [
+  //     "action_download||xpath||//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'deposit rates')]||false||present||false"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_30": {
+  //   "bank_name": "Shinhan Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_30",
+  //   "base_url": "https://www.shinhanbankindia.com",
+  //   "blocks": [
+  //     "action_website||https://www.shinhanbankindia.com/fixed-deposit.html",
+  //     "action_download||xpath||//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'interest rates')]||true||present||false"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_32": {
+  //   "bank_name": "SBM Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_32",
+  //   "base_url": "https://www.sbmbank.co.in/personal-banking/deposits/",
+  //   "blocks": [
+  //     "action_website||https://www.sbmbank.co.in/personal-banking/deposits/fixed-deposit/fixed-deposit-interest-rates",
+  //     "action_table"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  // "FRB_35": {
+  //   "bank_name": "UOB Bank",
+  //   "bank_type": "FOREIGN BANKS",
+  //   "bank_type_code": "FRB_35",
+  //   "base_url": "https://www.uobgroup.com/in/useful/index.page",
+  //   "blocks": [
+  //     "action_download||xpath||//a[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'interest rates')]||true||present||false"
+  //   ],
+  //   "headless": true,
+  //   "pdf_or_excel": "pdf"
+  // },
+  COB_1: {
+    bank_name: "Adarsh Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_2: {
+    bank_name: "Apna Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_3: {
+    bank_name: "Abhyudaya Co-op. Bank Ltd",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_4: {
+    bank_name: "Bharat Co-op Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_5: {
+    bank_name: "Bassein Catholic Co-operative Bank Ltd",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_6: {
+    bank_name: "Bombay Mercantile Co-op Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_7: {
+    bank_name: "Citizen Credit Co-operative Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_8: {
+    bank_name: "Cosmos Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_9: {
+    bank_name: "Dombivli Nagari Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_10: {
+    bank_name: "Jalgaon Janta Sahakari Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_11: {
+    bank_name: "Janata Sahakari Bank Ltd",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_12: {
+    bank_name: "Jankalyan Sahakari Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_13: {
+    bank_name: "Kallappanna Awade Ichalkaranji Janata Sahakari Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_14: {
+    bank_name: "Mahesh Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_15: {
+    bank_name: "Mumbai District Central Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_16: {
+    bank_name: "Maharashtra State Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_17: {
+    bank_name: "New India Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_18: {
+    bank_name: "NKGSB Cooperative Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_19: {
+    bank_name: "GP Parsik Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_20: {
+    bank_name: "Punjab and Maharashtra Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_21: {
+    bank_name: "Rajkot Nagarik Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_22: {
+    bank_name: "Saraswat Co-Op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_23: {
+    bank_name: "Thane Bharat Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_24: {
+    bank_name: "Thane District Central Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_25: {
+    bank_name: "TJSB Sahakari Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_26: {
+    bank_name: "The Greater Bombay Co-op Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_27: {
+    bank_name: "The Jalgaon People's Co-op. Bank Ltd",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_28: {
+    bank_name: "The Kalupur Commercial Co-op. Bank",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_29: {
+    bank_name: "SVC Co-operative Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+  COB_30: {
+    bank_name: "The Andhra Pradesh Mahesh Co-operative Urban Bank Ltd.",
+    bank_type: "CO-OPERATIVE BANKS",
+    bank_type_code: "COB",
+    base_url: "",
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
 }

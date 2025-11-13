@@ -33,7 +33,7 @@ def apiGet(executor):
 
     # --- loop through APIs ---
     for api_url in weblinks:
-        time.sleep(2)
+        time.sleep(executor.THROTTLE)
         logger.info(f"Fetching {api_url}")
 
         try:
