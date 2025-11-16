@@ -110,9 +110,9 @@ class OperationExecutorLatest:
         records = p_dict.get("records", [])
 
         for record in records:
-            if hasattr(self, "logger"):
-                self.logger.info(f"Processing -> {record['bank_name']}")
-            # print(f">>Processing {record['bank_name']}")
+            if hasattr(self, "logger"): self.logger.info(f"Processing -> {record['bank_name']}")
+            else: print(f">>Processing {record['bank_name']}")
+            
             response_data = record.get("scraped_data", [])
             if not response_data:
                 continue
@@ -300,8 +300,119 @@ class OperationExecutorLatest:
         return start_row + 6  # Next available row
 
     
+    # def _write_side_by_side_tables(self, ws, new_df, removed_df, start_row, title=None, gap=2):
+    #     """Writes new vs old data side-by-side with clear visual cues for changes."""
+    #     def to_df(data, placeholder):
+    #         if data is None:
+    #             return pd.DataFrame([[placeholder]])
+    #         if isinstance(data, pd.DataFrame):
+    #             return data if not data.empty else pd.DataFrame([[placeholder]])
+    #         if isinstance(data, list):
+    #             try:
+    #                 return pd.DataFrame(data) if data else pd.DataFrame([[placeholder]])
+    #             except Exception:
+    #                 return pd.DataFrame([[placeholder]])
+    #         return pd.DataFrame([[placeholder]])
+
+    #     new_df = to_df(new_df, "⚠️ No new data available")
+    #     removed_df = to_df(removed_df, "⚠️ No old data available")
+
+    #     # --- Layout setup ---
+    #     new_col_start = 1
+    #     removed_col_start = new_df.shape[1] + new_col_start + gap
+    #     comparison_col_start = removed_col_start + removed_df.shape[1] + gap
+    #     start_row += 3
+
+    #     # --- Write title (if any) ---
+    #     if title:
+    #         for i, line in enumerate(title):
+    #             ws.cell(row=start_row + i, column=1, value=line)
+    #         start_row += len(title)
+
+    #     # --- Compute grid size ---
+    #     max_rows = max(len(new_df), len(removed_df))
+    #     max_cols = max(new_df.shape[1], removed_df.shape[1])
+
+    #     # --- Write NEW Data Table ---
+    #     for r_idx, row in enumerate(dataframe_to_rows(new_df, index=False, header=True)):
+    #         for c_idx, val in enumerate(row):
+    #             cell = ws.cell(row=start_row + r_idx, column=new_col_start + c_idx, value=val)
+    #             cell.fill = self.SKY_BLUE_FILL
+    #             cell.border = self.BORDER
+
+    #     # --- Write OLD Data Table ---
+    #     for r_idx, row in enumerate(dataframe_to_rows(removed_df, index=False, header=True)):
+    #         for c_idx, val in enumerate(row):
+    #             cell = ws.cell(row=start_row + r_idx, column=removed_col_start + c_idx, value=val)
+    #             cell.fill = self.GREY_FILL
+    #             cell.border = self.BORDER
+
+    #     # --- Decide comparison eligibility ---
+    #     both_have_data = (
+    #         not new_df.empty and not removed_df.empty
+    #         and "⚠️ No new data available" not in str(new_df.iloc[0, 0])
+    #         and "⚠️ No old data available" not in str(removed_df.iloc[0, 0])
+    #     )
+
+    #     # --- Comparison grid section ---
+    #     if both_have_data:
+    #         for r in range(start_row + 1, start_row + max_rows + 1):
+    #             for c in range(max_cols):
+    #                 comp_cell = ws.cell(row=r, column=comparison_col_start + c)
+    #                 new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
+    #                 old_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
+    #                 comp_cell.value = f"={new_col_letter}{r}={old_col_letter}{r}"
+    #                 comp_cell.border = self.BORDER
+
+    #         # === conditional formatting ===
+    #         for c in range(max_cols):
+    #             col_letter = ws.cell(row=1, column=comparison_col_start + c).column_letter
+    #             # red fill → mismatch
+    #             ws.conditional_formatting.add(
+    #                 f"{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}",
+    #                 FormulaRule(formula=[f'{col_letter}{start_row + 1}=FALSE'], fill=self.RED_FILL)
+    #             )
+    #             # green fill → same (no change)
+    #             ws.conditional_formatting.add(
+    #                 f"{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}",
+    #                 FormulaRule(formula=[f'{col_letter}{start_row + 1}=TRUE'], fill=self.GREEN_FILL)
+    #             )
+    #     else:
+    #         # === One side missing → informational message ===
+    #         msg = "⚠️ Comparison skipped — incomplete data."
+    #         msg_cell = ws.cell(row=start_row + max_rows + 2, column=1, value=msg)
+    #         msg_cell.fill = self.RED_NOTE_FILL
+    #         msg_cell.border = self.BORDER
+
+
+    #     start_row += max_rows + 4
+    #     return start_row
+
+    
+    def _clean_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Remove fully empty rows and fully empty columns."""
+        if df is None or df.empty:
+            return df
+
+        df = df.copy()
+
+        # Remove rows where all cells are None/empty/whitespace
+        df = df.replace(r'^\s*$', pd.NA, regex=True)
+        df = df.dropna(axis=0, how='all')
+
+        # Remove empty columns
+        df = df.dropna(axis=1, how='all')
+
+        # If everything got removed, leave a placeholder
+        if df.empty:
+            return pd.DataFrame([["⚠️ Table contained only empty rows/cols"]])
+
+        return df
+
+    
     def _write_side_by_side_tables(self, ws, new_df, removed_df, start_row, title=None, gap=2):
-        """Writes new vs old data side-by-side with clear visual cues for changes."""
+        """Writes new vs old data side-by-side with NEW table visually showing changes."""
+
         def to_df(data, placeholder):
             if data is None:
                 return pd.DataFrame([[placeholder]])
@@ -316,45 +427,70 @@ class OperationExecutorLatest:
 
         new_df = to_df(new_df, "⚠️ No new data available")
         removed_df = to_df(removed_df, "⚠️ No old data available")
+        
+        # new_df = self._clean_df(new_df)
+        # removed_df = self._clean_df(removed_df)
 
-        # --- Layout setup ---
+        # layout positions
         new_col_start = 1
         removed_col_start = new_df.shape[1] + new_col_start + gap
         comparison_col_start = removed_col_start + removed_df.shape[1] + gap
         start_row += 3
 
-        # --- Write title (if any) ---
+        # write title
         if title:
             for i, line in enumerate(title):
                 ws.cell(row=start_row + i, column=1, value=line)
             start_row += len(title)
 
-        # --- Compute grid size ---
         max_rows = max(len(new_df), len(removed_df))
         max_cols = max(new_df.shape[1], removed_df.shape[1])
 
-        # --- Write NEW Data Table ---
+        # --- NEW TABLE ---
         for r_idx, row in enumerate(dataframe_to_rows(new_df, index=False, header=True)):
             for c_idx, val in enumerate(row):
                 cell = ws.cell(row=start_row + r_idx, column=new_col_start + c_idx, value=val)
                 cell.fill = self.SKY_BLUE_FILL
                 cell.border = self.BORDER
 
-        # --- Write OLD Data Table ---
+        # --- OLD TABLE ---
         for r_idx, row in enumerate(dataframe_to_rows(removed_df, index=False, header=True)):
             for c_idx, val in enumerate(row):
                 cell = ws.cell(row=start_row + r_idx, column=removed_col_start + c_idx, value=val)
                 cell.fill = self.GREY_FILL
                 cell.border = self.BORDER
 
-        # --- Decide comparison eligibility ---
+        # ======== NEW FEATURE: COLOR OVERLAY ON NEW TABLE ========
         both_have_data = (
             not new_df.empty and not removed_df.empty
             and "⚠️ No new data available" not in str(new_df.iloc[0, 0])
             and "⚠️ No old data available" not in str(removed_df.iloc[0, 0])
         )
 
-        # --- Comparison grid section ---
+        if both_have_data:
+            for c in range(max_cols):
+                new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
+                old_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
+
+                # --- GREEN: SAME VALUES ---
+                ws.conditional_formatting.add(
+                    f"{new_col_letter}{start_row + 1}:{new_col_letter}{start_row + max_rows}",
+                    FormulaRule(
+                        formula=[f"{new_col_letter}{start_row + 1}={old_col_letter}{start_row + 1}"],
+                        fill=self.GREEN_FILL
+                    )
+                )
+
+                # --- RED: DIFFERENT VALUES ---
+                ws.conditional_formatting.add(
+                    f"{new_col_letter}{start_row + 1}:{new_col_letter}{start_row + max_rows}",
+                    FormulaRule(
+                        formula=[f"{new_col_letter}{start_row + 1}<> {old_col_letter}{start_row + 1}"],
+                        fill=self.RED_FILL
+                    )
+                )
+
+        # ======== Existing Comparison Grid Logic (unchanged) ========
         # if both_have_data:
         #     for r in range(start_row + 1, start_row + max_rows + 1):
         #         for c in range(max_cols):
@@ -364,60 +500,47 @@ class OperationExecutorLatest:
         #             comp_cell.value = f"={new_col_letter}{r}={old_col_letter}{r}"
         #             comp_cell.border = self.BORDER
 
-        #     # === conditional formatting ===
         #     for c in range(max_cols):
         #         col_letter = ws.cell(row=1, column=comparison_col_start + c).column_letter
-        #         # red fill → mismatch
+
+        #         # mismatch
         #         ws.conditional_formatting.add(
         #             f"{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}",
-        #             FormulaRule(formula=[f'{col_letter}{start_row + 1}=FALSE'], fill=self.RED_FILL)
+        #             FormulaRule(
+        #                 formula=[f"{col_letter}{start_row + 1}=FALSE"],
+        #                 fill=self.RED_FILL
+        #             )
         #         )
-        #         # green fill → same (no change)
+        #         # match
         #         ws.conditional_formatting.add(
         #             f"{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}",
-        #             FormulaRule(formula=[f'{col_letter}{start_row + 1}=TRUE'], fill=self.GREEN_FILL)
+        #             FormulaRule(
+        #                 formula=[f"{col_letter}{start_row + 1}=TRUE"],
+        #                 fill=self.GREEN_FILL
+        #             )
         #         )
-        # else:
-        #     # === One side missing → informational message ===
-        #     msg = "⚠️ Comparison skipped — incomplete data."
-        #     msg_cell = ws.cell(row=start_row + max_rows + 2, column=1, value=msg)
-        #     msg_cell.fill = self.RED_NOTE_FILL
-        #     msg_cell.border = self.BORDER
-
-        # --- Superimpose comparison on NEW table ---
-        if both_have_data:
-            for r in range(start_row + 1, start_row + max_rows + 1):
-                for c in range(max_cols):
-                    new_cell = ws.cell(row=r, column=new_col_start + c)
-                    new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
-                    old_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
-
-                    # Apply conditional formatting directly to NEW cell
-                    cell_coord = f"{new_col_letter}{r}"
-                    old_coord = f"{old_col_letter}{r}"
-
-                    # Red fill if changed
-                    ws.conditional_formatting.add(
-                        cell_coord,
-                        FormulaRule(formula=[f'{cell_coord}<>"{old_coord}"'], fill=self.RED_FILL)
-                    )
-                    # Green fill if same
-                    ws.conditional_formatting.add(
-                        cell_coord,
-                        FormulaRule(formula=[f'{cell_coord}="{old_coord}"'], fill=self.GREEN_FILL)
-                    )
         
-        else:
-            # === One side missing → highlight NEW table with neutral fill ===
-            for r_idx, row in enumerate(dataframe_to_rows(new_df, index=False, header=True)):
-                for c_idx, val in enumerate(row):
-                    cell = ws.cell(row=start_row + r_idx, column=new_col_start + c_idx)
-                    cell.fill = self.GREY_FILL  # or any neutral fill
-                    cell.border = self.BORDER
+        if both_have_data:
+            for c in range(max_cols):
+                new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
+                old_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
 
-            # === Informational message below the table ===
-            msg = "⚠️ Comparison skipped — incomplete data (either new or old missing)."
-            msg_cell = ws.cell(row=start_row + len(new_df) + 2, column=new_col_start, value=msg)
+                # GREEN = same
+                ws.conditional_formatting.add(
+                    f"{new_col_letter}{start_row + 1}:{new_col_letter}{start_row + max_rows}",
+                    FormulaRule(formula=[f"{new_col_letter}{start_row + 1}={old_col_letter}{start_row + 1}"], fill=self.GREEN_FILL)
+                )
+
+                # RED = different
+                ws.conditional_formatting.add(
+                    f"{new_col_letter}{start_row + 1}:{new_col_letter}{start_row + max_rows}",
+                    FormulaRule(formula=[f"{new_col_letter}{start_row + 1}<> {old_col_letter}{start_row + 1}"], fill=self.RED_FILL)
+                )
+
+
+        else:
+            msg = "⚠️ Comparison skipped — incomplete data."
+            msg_cell = ws.cell(row=start_row + max_rows + 2, column=1, value=msg)
             msg_cell.fill = self.RED_NOTE_FILL
             msg_cell.border = self.BORDER
 
@@ -471,11 +594,11 @@ class OperationExecutorLatest:
             removed_entries = comparison_result.get("removed", [])
             summary = comparison_result.get("summary", {})
 
-            old_total = summary.get("old_total", 0)
-            new_total = summary.get("new_total", 0)
-            new_count = summary.get("new_count", 0)
-            removed_count = summary.get("removed_count", 0)
-            unchanged_count = summary.get("unchanged_count", 0)
+            old_total = summary.get("Total Old Data", 0)
+            new_total = summary.get("Total New Data", 0)
+            new_count = summary.get("New Data", 0)
+            removed_count = summary.get("Removed Data", 0)
+            unchanged_count = summary.get("Unchanged Data", 0)
 
             new_missing = len(new_entries) == 0
             old_missing = len(removed_entries) == 0
@@ -605,6 +728,7 @@ class OperationExecutorLatest:
 
                     new_df = self._parse_table(new_entry) if new_entry else pd.DataFrame([["⚠️ No new data available"]])
                     removed_df = self._parse_table(removed_entry) if removed_entry else pd.DataFrame([["⚠️ No old data available"]])
+
 
                     row_cursor = self._write_side_by_side_tables(ws, new_df, removed_df, start_row=row_cursor, title=title)
 
