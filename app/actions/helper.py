@@ -70,6 +70,10 @@ class ActionHelper:
                 if attr not in ALLOWED:
                     del tag.attrs[attr]
         final_html = str(soup)
+        
+        empty = re.findall(r"<table[^>]*>\s*(?:&nbsp;|\u00A0|\s)*</table>", final_html, re.IGNORECASE)
+        if empty:
+            return ""
         return final_html
     
     @staticmethod
@@ -104,7 +108,7 @@ class ActionHelper:
                     print(f"[INFO] Detected new file: {fname} with type: {ext}")
                     return path, ext
 
-            time.sleep(1)
+            time.sleep(2)
 
         print("[WARNING] Timeout reached — no valid file detected.")
         return None, None

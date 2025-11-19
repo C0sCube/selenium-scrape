@@ -48,6 +48,8 @@ class PDFReportBuilderPro:
     def _make_action_header(self, scrape):
         """Header block before each scrape section."""
         action = scrape.get("action", "")
+        if action == "website":
+            return None
         timestamp = scrape.get("timestamp", "")
         data_present = scrape.get("data_present", "")
         count = scrape.get("response_count", 0) if data_present else 0
@@ -76,58 +78,9 @@ class PDFReportBuilderPro:
         """Separator between tables or actions."""
         return """
         <div style='text-align:center;color:#999;font-size:8.5pt;
-                    margin:12px 0;'>──── End of Section ────</div>
+                    margin:12px 0;'>──── xxx ────</div>
         """
-
-    # def _html_to_pdf(self, html_content, output_file):
-    #     """Convert HTML string to PDF using pdfkit."""
-    #     html_template = f"""
-    #     <html>
-    #     <head>
-    #         <meta charset="utf-8">
-    #         <style>
-    #             @page {{
-    #                 size: A4;
-    #                 margin: 1.5cm 1cm 1.5cm 1cm;
-    #             }}
-    #             body {{
-    #                 font-family: Helvetica, Arial, sans-serif;
-    #                 font-size: 9pt;
-    #                 line-height: 1.25;
-    #                 color: #111;
-    #             }}
-    #             h1,h2,h3 {{ color: #1f4e79; }}
-    #             table {{
-    #                 border-collapse: collapse;
-    #                 width: 95%;
-    #                 margin: 6px auto;
-    #             }}
-    #             th,td {{
-    #                 border: 1px solid #999;
-    #                 padding: 3px 5px;
-    #                 font-size: 8.5pt;
-    #             }}
-    #             th {{
-    #                 background-color: #f0f0f0;
-    #             }}
-    #             tr:nth-child(even) {{
-    #                 background-color: #fafafa;
-    #             }}
-    #             tr:hover {{
-    #                 background-color: #eaf2fb;
-    #             }}
-    #             p {{ margin: 2px 0; }}
-    #             a {{ color: #1f4e79; text-decoration: none; }}
-                
-    #         </style>
-    #     </head>
-    #     <body>
-    #         {html_content}
-    #     </body>
-    #     </html>
-    #     """
-    #     pdfkit.from_string(html_template, output_file, configuration=self.config, options=self.pdf_options)
-
+        
     def _html_to_pdf(self, html_content, output_file):
         """Convert HTML string to PDF using pdfkit."""
         html_template = f"""
@@ -246,15 +199,11 @@ class PDFReportBuilderPro:
         for i, record in enumerate(self.cache_data.get("records", []), start=1):
             bank_name = record.get("bank_name", "Unknown Bank")
             bank_code = record.get("bank_code", "N/A")
-            bank_type = record.get("bank_type", "Commercial Bank")
             color = self.color_palette[(i - 1) % len(self.color_palette)]
 
             self.bank_titles.append(bank_name)
 
-            summary_text = (
-                f"{bank_type} | Compiled on {datetime.now().strftime('%d %b %Y')} "
-                f"from {len(record.get('scraped_data', []))} sources."
-            )
+            summary_text = (f"Compiled on {datetime.now().strftime('%d %b %Y')}"  f"from {len(record.get('scraped_data', []))} sources.")
 
             html_parts = [self._make_bank_header(bank_name, summary_text, color)]
             pdf_files = []
@@ -262,7 +211,10 @@ class PDFReportBuilderPro:
 
             # collect scrape data
             for scrape in record.get("scraped_data", []):
-                html_parts.append(self._make_action_header(scrape))
+                action_header = self._make_action_header(scrape)
+                if action_header:
+                    html_parts.append(action_header)
+                    
                 responses = scrape.get("response", [])
                 for response in responses:
                     typ = response.get("type")

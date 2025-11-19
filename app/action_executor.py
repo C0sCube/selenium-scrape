@@ -24,7 +24,6 @@ class ActionExecutor:
         
         self.logger = get_global_logger()
         self.today = datetime.now()
-        # self.profile_dir = r"C:\\Users\\kaustubh.keny\\AutomationProfiles\\AutoProfile1"
         self.OUTPUT_PATH = None
         self.data = {}
         self.driver = None
@@ -76,8 +75,9 @@ class ActionExecutor:
     
     def set_params(self,params):
         self.PARAMS = params
-        self.OUTPUT_PATH = Helper.create_dir(output_path(),"data",self.today.strftime("%Y-%m-%d"),params['bank_name'],f"d_{datetime.now().strftime("%H")}")
-        self.driver.execute_cdp_cmd("Page.setDownloadBehavior", {
+        self.OUTPUT_PATH = Helper.create_dir(output_path(),"data",self.today.strftime("%Y-%m-%d"),params['bank_name'],f"d_{datetime.now().strftime("%H%M")[:-1]}")
+        self.driver.execute_cdp_cmd(
+            "Page.setDownloadBehavior", {
             "behavior": "allow",
             "downloadPath": self.OUTPUT_PATH
         })
@@ -107,9 +107,6 @@ class ActionExecutor:
         options.add_argument("--disable-extensions")
         options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
         
-        # if os.path.exists(self.profile_dir):
-        #     options.add_argument(f"--user-data-dir={self.profile_dir}")
-
         if headless: options.add_argument("--headless=new")
 
         options.add_experimental_option("prefs", {
@@ -120,7 +117,9 @@ class ActionExecutor:
             "safebrowsing.enabled": True
         })
 
-        self.driver = uc.Chrome(options=options)        
+        self.driver = uc.Chrome(options=options)
+        self.driver.set_window_size(900, 700)
+        self.driver.set_window_position(-800, 100)
         if minimized and not headless:
             try:
                 time.sleep(1)    
@@ -131,26 +130,6 @@ class ActionExecutor:
                     break
             except Exception as e:
                 self.logger.warning(f"Minimize failed, fallback to visible small window: {e}")
-                self.driver.set_window_position(50, 50)
-                self.driver.set_window_size(800, 600)
-                
-        # width, height = 900, 700
-        # self.driver.set_window_size(width, height)
-        
-        # if minimized and not headless:
-        #     try:
-        #         # Instead of minimizing, place Chrome offscreen but keep it visible
-        #         self.driver.set_window_size(900, 700)
-        #         if window_position: self.driver.set_window_position(-3000, 0)
-        #         self.logger.notice("Driver window hidden offscreen (visible, not minimized).")
-        #     except Exception as e:
-        #         self.logger.warning(f"Failed to hide window offscreen: {e}")
-        #         self.window_stack = [self.driver.current_window_handle]
-        #         return self.driver
-            
-        # self.driver.set_window_size(80,60)
-        # self.driver.set_window_position(-10,10)
-        # self.logger.notice("Driver window minimized to small visible size.")
         
         # title = self.driver.title or "data:,"
         # time.sleep(0.5)
@@ -159,7 +138,6 @@ class ActionExecutor:
         #     w.lower()
         #     self.logger.notice("Chrome window minimized safely.")
         #     break
-
     
     def get_website(self, timeout = 60):
         if self.driver:
@@ -182,7 +160,7 @@ class ActionExecutor:
         try:
             self.logger.trace("Restoring Chrome window...")
             self.driver.set_window_size(900, 700)
-            self.driver.set_window_position(50, 50)
+            self.driver.set_window_position(-700, 200)
             title = self.driver.title or "data:,"
             for w in gw.getWindowsWithTitle(title):
                 w.activate()
@@ -436,18 +414,10 @@ class ActionExecutor:
 
                 do_action = generic_actions[action_key].copy()
 
-                if action_key == "action_website":
-                    do_action.update({"url": content[0]})
+                if action_key == "action_website": do_action.update({"url": content[0]})
                 elif action_key == "action_download":
                     by, value, multiple, wait_until,minimize_toggle,scroll = content
-                    do_action.update({
-                        "by": by,
-                        "value": value,
-                        "multiple": bool(multiple),
-                        "wait_until": wait_until,
-                        "minimize_toggle":bool(minimize_toggle),
-                        "scroll":bool(scroll)
-                    })
+                    do_action.update({"by": by, "value": value, "multiple": bool(multiple), "wait_until": wait_until, "minimize_toggle":bool(minimize_toggle), "scroll":bool(scroll) })
 
             elif isinstance(_action_, dict):
                 do_action = _action_

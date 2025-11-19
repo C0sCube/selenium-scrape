@@ -1,7 +1,6 @@
 # app/actions/table_action.py
 from app.logger import get_global_logger
 from app.actions.helper import ActionHelper
-from app.utils import Helper
 from selenium.webdriver.common.by import By
 
 
@@ -35,19 +34,20 @@ def tablScrape(executor):
 
     for idx, elem in enumerate(elements):
         try:
-            # --- find header(s) above table ---
             header_texts = ActionHelper._find_preceding_texts(elem)
             logger.info(f"Table {idx} header: {header_texts}")
 
             # --- extract HTML ---
             raw_html = elem.get_attribute("outerHTML")
+            final_html = raw_html
 
             # --- clean HTML if configured ---
             if executor.CLEAN_TABLE:
                 final_html = ActionHelper._clean_raw_table_html(raw_html)
-            else:
-                final_html = raw_html
-
+                
+            if not final_html.strip():
+                logger.info(f"Table {idx} HTML is empty after cleaning. Skipping.")
+                continue
             # --- form response packet ---
             scrape_content.append(
                 ActionHelper.generate_resp_packet(

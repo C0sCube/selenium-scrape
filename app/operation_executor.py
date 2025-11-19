@@ -299,117 +299,6 @@ class OperationExecutorLatest:
 
         return start_row + 6  # Next available row
 
-    
-    # def _write_side_by_side_tables(self, ws, new_df, removed_df, start_row, title=None, gap=2):
-    #     """Writes new vs old data side-by-side with clear visual cues for changes."""
-    #     def to_df(data, placeholder):
-    #         if data is None:
-    #             return pd.DataFrame([[placeholder]])
-    #         if isinstance(data, pd.DataFrame):
-    #             return data if not data.empty else pd.DataFrame([[placeholder]])
-    #         if isinstance(data, list):
-    #             try:
-    #                 return pd.DataFrame(data) if data else pd.DataFrame([[placeholder]])
-    #             except Exception:
-    #                 return pd.DataFrame([[placeholder]])
-    #         return pd.DataFrame([[placeholder]])
-
-    #     new_df = to_df(new_df, "⚠️ No new data available")
-    #     removed_df = to_df(removed_df, "⚠️ No old data available")
-
-    #     # --- Layout setup ---
-    #     new_col_start = 1
-    #     removed_col_start = new_df.shape[1] + new_col_start + gap
-    #     comparison_col_start = removed_col_start + removed_df.shape[1] + gap
-    #     start_row += 3
-
-    #     # --- Write title (if any) ---
-    #     if title:
-    #         for i, line in enumerate(title):
-    #             ws.cell(row=start_row + i, column=1, value=line)
-    #         start_row += len(title)
-
-    #     # --- Compute grid size ---
-    #     max_rows = max(len(new_df), len(removed_df))
-    #     max_cols = max(new_df.shape[1], removed_df.shape[1])
-
-    #     # --- Write NEW Data Table ---
-    #     for r_idx, row in enumerate(dataframe_to_rows(new_df, index=False, header=True)):
-    #         for c_idx, val in enumerate(row):
-    #             cell = ws.cell(row=start_row + r_idx, column=new_col_start + c_idx, value=val)
-    #             cell.fill = self.SKY_BLUE_FILL
-    #             cell.border = self.BORDER
-
-    #     # --- Write OLD Data Table ---
-    #     for r_idx, row in enumerate(dataframe_to_rows(removed_df, index=False, header=True)):
-    #         for c_idx, val in enumerate(row):
-    #             cell = ws.cell(row=start_row + r_idx, column=removed_col_start + c_idx, value=val)
-    #             cell.fill = self.GREY_FILL
-    #             cell.border = self.BORDER
-
-    #     # --- Decide comparison eligibility ---
-    #     both_have_data = (
-    #         not new_df.empty and not removed_df.empty
-    #         and "⚠️ No new data available" not in str(new_df.iloc[0, 0])
-    #         and "⚠️ No old data available" not in str(removed_df.iloc[0, 0])
-    #     )
-
-    #     # --- Comparison grid section ---
-    #     if both_have_data:
-    #         for r in range(start_row + 1, start_row + max_rows + 1):
-    #             for c in range(max_cols):
-    #                 comp_cell = ws.cell(row=r, column=comparison_col_start + c)
-    #                 new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
-    #                 old_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
-    #                 comp_cell.value = f"={new_col_letter}{r}={old_col_letter}{r}"
-    #                 comp_cell.border = self.BORDER
-
-    #         # === conditional formatting ===
-    #         for c in range(max_cols):
-    #             col_letter = ws.cell(row=1, column=comparison_col_start + c).column_letter
-    #             # red fill → mismatch
-    #             ws.conditional_formatting.add(
-    #                 f"{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}",
-    #                 FormulaRule(formula=[f'{col_letter}{start_row + 1}=FALSE'], fill=self.RED_FILL)
-    #             )
-    #             # green fill → same (no change)
-    #             ws.conditional_formatting.add(
-    #                 f"{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}",
-    #                 FormulaRule(formula=[f'{col_letter}{start_row + 1}=TRUE'], fill=self.GREEN_FILL)
-    #             )
-    #     else:
-    #         # === One side missing → informational message ===
-    #         msg = "⚠️ Comparison skipped — incomplete data."
-    #         msg_cell = ws.cell(row=start_row + max_rows + 2, column=1, value=msg)
-    #         msg_cell.fill = self.RED_NOTE_FILL
-    #         msg_cell.border = self.BORDER
-
-
-    #     start_row += max_rows + 4
-    #     return start_row
-
-    
-    def _clean_df(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Remove fully empty rows and fully empty columns."""
-        if df is None or df.empty:
-            return df
-
-        df = df.copy()
-
-        # Remove rows where all cells are None/empty/whitespace
-        df = df.replace(r'^\s*$', pd.NA, regex=True)
-        df = df.dropna(axis=0, how='all')
-
-        # Remove empty columns
-        df = df.dropna(axis=1, how='all')
-
-        # If everything got removed, leave a placeholder
-        if df.empty:
-            return pd.DataFrame([["⚠️ Table contained only empty rows/cols"]])
-
-        return df
-
-    
     def _write_side_by_side_tables(self, ws, new_df, removed_df, start_row, title=None, gap=2):
         """Writes new vs old data side-by-side with NEW table visually showing changes."""
 
@@ -428,10 +317,6 @@ class OperationExecutorLatest:
         new_df = to_df(new_df, "⚠️ No new data available")
         removed_df = to_df(removed_df, "⚠️ No old data available")
         
-        # new_df = self._clean_df(new_df)
-        # removed_df = self._clean_df(removed_df)
-
-        # layout positions
         new_col_start = 1
         removed_col_start = new_df.shape[1] + new_col_start + gap
         comparison_col_start = removed_col_start + removed_df.shape[1] + gap
@@ -546,7 +431,6 @@ class OperationExecutorLatest:
 
         start_row += max_rows + 4
         return start_row
-
     
     def generate_comparison_report(self, comparison_json, output_path="DepositRate_Comparison_Report.xlsx"):
         """Generate a color-coded Excel comparison report with clear summaries."""
@@ -590,15 +474,11 @@ class OperationExecutorLatest:
             bank_name = record.get("bank_name")
             bank_code = record.get("bank_code")
             comparison_result = record.get("comparison_result", {})
-            new_entries = comparison_result.get("new", [])
-            removed_entries = comparison_result.get("removed", [])
+            new_entries, removed_entries = comparison_result.get("new", []), comparison_result.get("removed", [])
             summary = comparison_result.get("summary", {})
 
-            old_total = summary.get("Total Old Data", 0)
-            new_total = summary.get("Total New Data", 0)
-            new_count = summary.get("New Data", 0)
-            removed_count = summary.get("Removed Data", 0)
-            unchanged_count = summary.get("Unchanged Data", 0)
+            old_total, new_total  = summary.get("Total Old Data", 0),summary.get("Total New Data", 0)
+            new_count,removed_count,unchanged_count = summary.get("New Data", 0),summary.get("Removed Data", 0),summary.get("Unchanged Data", 0)
 
             new_missing = len(new_entries) == 0
             old_missing = len(removed_entries) == 0
@@ -651,10 +531,8 @@ class OperationExecutorLatest:
                     cell.border = self.BORDER
 
             # --- Conditional Formatting based on Change% ---
-            change_col = self.summary_headers.index("Change %") + 1
-            note_col = self.summary_headers.index("Notes") + 1
+            change_col,note_col = self.summary_headers.index("Change %") + 1,self.summary_headers.index("Notes") + 1
             change_range = f"{ws_summary.cell(row=2, column=change_col).coordinate}:{ws_summary.cell(row=len(summary_df)+1, column=change_col).coordinate}"
-            note_range = f"{ws_summary.cell(row=2, column=note_col).coordinate}:{ws_summary.cell(row=len(summary_df)+1, column=note_col).coordinate}"
 
             # For numeric % only (ignore "-" strings)
             ws_summary.conditional_formatting.add(
@@ -670,14 +548,10 @@ class OperationExecutorLatest:
             # --- Row-level coloring based on Notes ---
             for row in ws_summary.iter_rows(min_row=2, max_row=len(summary_df)+1):
                 note_val = str(row[note_col-1].value or "")
-                if "No New Changes" in note_val:
-                    fill = self.GREEN_FILL
-                elif "No OLD data" in note_val or "Scraping failed" in note_val:
-                    fill = self.RED_NOTE_FILL
-                elif "Changes in Data" in note_val:
-                    fill = self.GREY_FILL
-                else:
-                    fill = None
+                if "No New Changes" in note_val: fill = self.GREEN_FILL
+                elif "No OLD data" in note_val or "Scraping failed" in note_val: fill = self.RED_NOTE_FILL
+                elif "Changes in Data" in note_val: fill = self.GREY_FILL
+                else: fill = None
 
                 if fill:
                     for cell in row:
@@ -711,8 +585,7 @@ class OperationExecutorLatest:
 
                 # --- no data case ---
                 if not new_entries and not removed_entries:
-                    ws.cell(row=row_cursor + 2, column=1,
-                            value="🟢 No differences found — data unchanged since last run.")
+                    ws.cell(row=row_cursor + 2, column=1, value="🟢 No differences found — data unchanged since last run.")
                     ws.cell(row=row_cursor + 2, column=1).fill = self.GREEN_FILL
                     continue
 

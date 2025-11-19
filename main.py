@@ -5,7 +5,7 @@ warnings.filterwarnings('ignore')
 ssl._create_default_https_context = ssl._create_stdlib_context
 
 # --- Internal Imports ---
-from app.constants import ALL_BANK_CODES
+from app.constants import ALL_BANK_CODES, FRN_BANK_CODES, SFB_BANK_CODES
 from app.constants import load_days, load_times,output_path
 from app.logger import setup_logger, set_global_logger
 from app.BankScraper import BankScraper
@@ -74,7 +74,7 @@ def scheduler_loop(bank_codes, process=True, times=None, run_days=None, send_mai
     and only on specified weekdays.
 
     Example:
-        times = ["0800", "1400", "2200"]
+        times = ["0800", "1240", "1530"]
         run_days = ["mon", "tue", "wed", "thu", "fri"]
     """
     logger.info(f"Scheduler configuration → Times: {times}, Run Days: {run_days}")
@@ -157,13 +157,13 @@ def scheduler_loop(bank_codes, process=True, times=None, run_days=None, send_mai
         
 if __name__ == "__main__":
     logger.notice("Starting Scraper Scheduler...")
-    bank_codes = ALL_BANK_CODES
+    bank_codes = ALL_BANK_CODES + FRN_BANK_CODES +SFB_BANK_CODES
     
 
     scheduler_loop(
         bank_codes,
         process=True,
-        times= ["0932","1400","1520"], #load_times(), 
+        times= ["0920","1220","1530"], #load_times(), 
         run_days=load_days(),
         send_mail=True,
         minimize = True

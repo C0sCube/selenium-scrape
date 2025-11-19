@@ -68,7 +68,8 @@ class BankScraper:
                 return True
 
             except WebDriverException as e:
-                self.logger.error(f"WebDriver error: {e}. Retrying...")
+                self.logger.error(f"WebDriver error: {type(e).__name__}. Retrying...")
+                self.logger.debug(traceback.format_exc())
                 self.executor.driver.quit()
                 self.record_error(bank_name="GLOBAL", exception=e, source="DRIVER")
                 time.sleep(retry_delay)
