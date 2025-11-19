@@ -56,7 +56,7 @@ class ActionExecutor:
         self.action_map = {
             "html": lambda: htmlScrape(self),
             "table": lambda: tablScrape(self),
-            "scrape": lambda: textScrape(self),
+            "text": lambda: textScrape(self),
             "pdf": lambda: genPdf(self),
             "screenshot": lambda: genSst(self),
             "click": lambda: clickElem(self), 
