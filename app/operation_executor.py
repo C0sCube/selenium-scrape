@@ -104,7 +104,28 @@ class OperationExecutorLatest:
 
         final_df = pd.concat(all_dfs, ignore_index=True) if all_dfs else pd.DataFrame(columns=cols)
         return final_df.to_csv(index=False,header=False, sep='|', lineterminator='\n')
-   
+    
+    
+    def print_content(self, data):
+        p_dict = data.copy()
+        records = p_dict.get("records", [])
+
+        for record in records:
+            print(f">>Processing {record.get('bank_name')}")
+
+            for action in record.get("scraped_data", []):
+                if not action.get("data_present"):
+                    continue
+
+                for packet in action.get("response", []):
+                    # Each packet looks like: {"name":..., "title":..., "value":..., "type":...}
+                    val = packet.get("value")
+                    print("VALUE:", val)
+        
+        return p_dict
+
+    
+    
     def runner(self, data, function_to_execute):
         p_dict = data.copy()
         records = p_dict.get("records", [])
