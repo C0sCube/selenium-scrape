@@ -319,7 +319,7 @@ class OperationExecutorLatest:
             ws.cell(row=start_row + 4, column=col, value=val)
 
         return start_row + 6  # Next available row
-
+    
     def _write_side_by_side_tables(self, ws, new_df, removed_df, start_row, title=None, gap=2):
         """Writes new vs old data side-by-side with NEW table visually showing changes."""
 
@@ -373,78 +373,31 @@ class OperationExecutorLatest:
             and "⚠️ No old data available" not in str(removed_df.iloc[0, 0])
         )
 
+        # --- Comparison grid section ---
         if both_have_data:
+            for r in range(start_row + 1, start_row + max_rows + 1):
+                for c in range(max_cols):
+                    comp_cell = ws.cell(row=r, column=comparison_col_start + c)
+                    new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
+                    old_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
+                    comp_cell.value = f"={new_col_letter}{r}={old_col_letter}{r}"
+                    comp_cell.border = self.BORDER
+
+            # === conditional formatting ===
             for c in range(max_cols):
-                new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
-                old_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
-
-                # --- GREEN: SAME VALUES ---
+                col_letter = ws.cell(row=1, column=comparison_col_start + c).column_letter
+                # red fill → mismatch
                 ws.conditional_formatting.add(
-                    f"{new_col_letter}{start_row + 1}:{new_col_letter}{start_row + max_rows}",
-                    FormulaRule(
-                        formula=[f"{new_col_letter}{start_row + 1}={old_col_letter}{start_row + 1}"],
-                        fill=self.GREEN_FILL
-                    )
+                    f"{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}",
+                    FormulaRule(formula=[f'{col_letter}{start_row + 1}=FALSE'], fill=self.RED_FILL)
                 )
-
-                # --- RED: DIFFERENT VALUES ---
+                # green fill → same (no change)
                 ws.conditional_formatting.add(
-                    f"{new_col_letter}{start_row + 1}:{new_col_letter}{start_row + max_rows}",
-                    FormulaRule(
-                        formula=[f"{new_col_letter}{start_row + 1}<> {old_col_letter}{start_row + 1}"],
-                        fill=self.RED_FILL
-                    )
+                    f"{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}",
+                    FormulaRule(formula=[f'{col_letter}{start_row + 1}=TRUE'], fill=self.GREEN_FILL)
                 )
-
-        # ======== Existing Comparison Grid Logic (unchanged) ========
-        # if both_have_data:
-        #     for r in range(start_row + 1, start_row + max_rows + 1):
-        #         for c in range(max_cols):
-        #             comp_cell = ws.cell(row=r, column=comparison_col_start + c)
-        #             new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
-        #             old_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
-        #             comp_cell.value = f"={new_col_letter}{r}={old_col_letter}{r}"
-        #             comp_cell.border = self.BORDER
-
-        #     for c in range(max_cols):
-        #         col_letter = ws.cell(row=1, column=comparison_col_start + c).column_letter
-
-        #         # mismatch
-        #         ws.conditional_formatting.add(
-        #             f"{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}",
-        #             FormulaRule(
-        #                 formula=[f"{col_letter}{start_row + 1}=FALSE"],
-        #                 fill=self.RED_FILL
-        #             )
-        #         )
-        #         # match
-        #         ws.conditional_formatting.add(
-        #             f"{col_letter}{start_row + 1}:{col_letter}{start_row + max_rows}",
-        #             FormulaRule(
-        #                 formula=[f"{col_letter}{start_row + 1}=TRUE"],
-        #                 fill=self.GREEN_FILL
-        #             )
-        #         )
-        
-        if both_have_data:
-            for c in range(max_cols):
-                new_col_letter = ws.cell(row=1, column=new_col_start + c).column_letter
-                old_col_letter = ws.cell(row=1, column=removed_col_start + c).column_letter
-
-                # GREEN = same
-                ws.conditional_formatting.add(
-                    f"{new_col_letter}{start_row + 1}:{new_col_letter}{start_row + max_rows}",
-                    FormulaRule(formula=[f"{new_col_letter}{start_row + 1}={old_col_letter}{start_row + 1}"], fill=self.GREEN_FILL)
-                )
-
-                # RED = different
-                ws.conditional_formatting.add(
-                    f"{new_col_letter}{start_row + 1}:{new_col_letter}{start_row + max_rows}",
-                    FormulaRule(formula=[f"{new_col_letter}{start_row + 1}<> {old_col_letter}{start_row + 1}"], fill=self.RED_FILL)
-                )
-
-
         else:
+            # === One side missing → informational message ===
             msg = "⚠️ Comparison skipped — incomplete data."
             msg_cell = ws.cell(row=start_row + max_rows + 2, column=1, value=msg)
             msg_cell.fill = self.RED_NOTE_FILL
