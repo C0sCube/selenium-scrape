@@ -111,6 +111,20 @@ class BankScraper:
             timeout = bank_params.get("base_timeout",40)
             self.executor.get_website(timeout)
             data = self.executor.execute_blocks()
+            
+            # Check each action block for errors
+            for block in data:
+                if not block.get("data_present") and block.get("response"):
+                    for err in block["response"]:
+                        if "error_type" in err:
+                            self.record_error(
+                                bank_name,
+                                exception=None,
+                                source=f"ACTION:{block.get('action')}",
+                                note=f"Action failed: {err.get('error_message')}",
+                                severity="ERROR"
+                            )
+                            
             scraped_data.extend(data)
         except Exception as e:
             self.record_error(bank_name, e)
@@ -362,8 +376,7 @@ class BankScraper:
 
         return pdf_archive_path if report_type in ("pdf", "both") else None, \
             xls_archive_path if report_type in ("xlsx", "both") else None
-    
-       
+        
     def runner(self,bank_codes):
         
         final_dict = self.get_final_struct()
