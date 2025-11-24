@@ -46,10 +46,11 @@ class PDFReportBuilderPro:
         """
 
     def _make_action_header(self, scrape):
+        
+        unattatch_actions = ["website"]
         """Header block before each scrape section."""
         action = scrape.get("action", "")
-        if action == "website":
-            return None
+        if action in unattatch_actions: return None
         timestamp = scrape.get("timestamp", "")
         data_present = scrape.get("data_present", "")
         count = scrape.get("response_count", 0) if data_present else 0

@@ -163,7 +163,7 @@ if __name__ == "__main__":
     scheduler_loop(
         bank_codes,
         process=True,
-        times= ["0920","1220","1530"], #load_times(), 
+        times= ["1635","1220","1530"], #load_times(), 
         run_days=load_days(),
         send_mail=True,
         minimize = True

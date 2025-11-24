@@ -252,7 +252,13 @@ class ActionExecutor:
             }])
             
         if self.MINIMIZE_TOGGLE: self._minimize_window()
-
+        
+        unattatched_action = ["website"]
+        if _action_.get("action","") in unattatched_action:
+            self.logger.info(f"The action not to be attatched in main scrape.")
+            return None
+        
+ 
         return self.__generate_packet(content) if content else self.__generate_packet([{
             "error_type": "NoneType",
             "error_message": "No content extracted.",
