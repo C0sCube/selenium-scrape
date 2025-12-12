@@ -291,7 +291,7 @@ class ActionExecutor:
         self.VERIFY_REQUEST = _action_.get("verify_request", True)
         self.API_RULE = _action_.get("resp_structure",{})
         self.NULL_RESPONSE = _action_.get("null_response",{})
-        self.THROTTLE = _action_.get("throttle",4)
+        self.THROTTLE = _action_.get("throttle",3)
         
         #toggle minimize
         self.MINIMIZE_TOGGLE = _action_.get("minimize_toggle",False)

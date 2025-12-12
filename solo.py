@@ -39,7 +39,7 @@ if __name__ == "__main__":
         bank_codes = ["PVB_22"]#FRN_BANK_CODES + SFB_BANK_CODES #PUB_BANK_CODES #ALL_BANK_CODES 
         main(
             bank_codes, 
-            process=True, 
+            process=False, 
             minimize=False,
             report_type="pdf"
         )

@@ -34,6 +34,7 @@ def webList(executor):
 
     for idx, url in enumerate(weblinks):
         try:
+            time.sleep(executor.THROTTLE)
             driver.get(url)
             logger.notice(f"Navigating to → {url}")
 

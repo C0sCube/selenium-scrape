@@ -1,10 +1,10 @@
 import os, re, time
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import urlencode
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from app.utils import Helper
-
+from itertools import product
 
 class ActionHelper:
     
@@ -113,17 +113,52 @@ class ActionHelper:
         print("[WARNING] Timeout reached — no valid file detected.")
         return None, None
     
+    
+    @staticmethod
+    def build_date_value(value: str):
+        today = datetime.now()
+        # Case 1: range with ||N (days back)
+        if "||" in value and "start=" not in value:
+            fmt, days_back = value.split("||")
+            days_back = int(days_back)
+            content =  [
+                (today - timedelta(days=i)).strftime(fmt)
+                for i in range(days_back)
+            ]
+            print(content)
+            return content
+        # Case 2: explicit start/end
+        if "||" in value and "start=" in value:
+            fmt, range_part = value.split("||")
+            parts = dict(p.split("=") for p in range_part.split(","))
+            start = datetime.strptime(parts["start"], "%Y-%m-%d")
+            end = datetime.strptime(parts["end"], "%Y-%m-%d")
+            delta = (end - start).days
+            return [
+                (start + timedelta(days=i)).strftime(fmt)
+                for i in range(delta + 1)
+            ]
+
+        # Case 3: just a single date
+        return today.strftime(value)
+    
     @staticmethod
     def build_multiple_urls(base_url, params):
-        from itertools import product
         urls = []
         constant_params = {}
         list_params = {}
-        
+
         for key, value in params.items():
-            if key == "date":constant_params[key] = datetime.now().strftime(value)
-            elif isinstance(value, str):constant_params[key] = value
-            elif isinstance(value, list):list_params[key] = value
+            if key == "date":
+                date_val = ActionHelper.build_date_value(value)
+                if isinstance(date_val, list):
+                    list_params[key] = date_val
+                else:
+                    constant_params[key] = date_val
+            elif isinstance(value, str):
+                constant_params[key] = value
+            elif isinstance(value, list):
+                list_params[key] = value
 
         if not list_params:
             query_string = urlencode(constant_params)
@@ -138,6 +173,7 @@ class ActionHelper:
             query_string = urlencode(full_params)
             urls.append(f"{base_url}?{query_string}")
         return urls
+
     
     @staticmethod
     def _find_preceding_texts(table, n=2, max_depth=5):
