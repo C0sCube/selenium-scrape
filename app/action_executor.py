@@ -15,7 +15,7 @@ from app.actions import (
     downloadElem,textScrape, htmlScrape, selectList,
     clickSave,clickElem, genPdf,genSst, 
     webRedir, httpRequest, injectScript, apiGet,
-    tabList, webList, manualAction,tablScrape,
+    tabList, webList, manualAction,tablScrape, inputAction
 )
 
 
@@ -70,7 +70,8 @@ class ActionExecutor:
             "manual": lambda: manualAction(self),
             "execute_script": lambda: injectScript(self),
             "api_get":lambda: apiGet(self),
-            "select":lambda: selectList(self)
+            "select":lambda: selectList(self),
+            "input":lambda: inputAction(self)
         }
     
     def set_params(self,params):

@@ -47,6 +47,7 @@ def tabList(executor):
                 step_content = result.get("response", [])
                 for packet in step_content:
                     packet["tabname"] = tab_name
+                    packet["title"].append(f"TabName: {tab_name}")
                 scrape_content.extend(step_content)
 
         except Exception as e:

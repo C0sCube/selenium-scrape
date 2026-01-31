@@ -78,7 +78,6 @@ def scheduler_loop(bank_codes, process=True, times=None, run_days=None, send_mai
         run_days = ["mon", "tue", "wed", "thu", "fri"]
     """
     logger.info(f"Scheduler configuration → Times: {times}, Run Days: {run_days}")
-
     try:
         while True:
             now = datetime.now()
