@@ -1,4 +1,6 @@
 import time, traceback, random, uuid
+import subprocess
+import re
 from datetime import datetime
 import undetected_chromedriver as uc
 import pygetwindow as gw #type: ignore
@@ -83,6 +85,20 @@ class ActionExecutor:
             "downloadPath": self.OUTPUT_PATH
         })
         self.logger.debug(f"Download Folder: {self.OUTPUT_PATH}")
+        
+    def get_chrome_major_version(self):
+        chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+
+        try:
+            out = subprocess.check_output(
+                [chrome_path, "--version"],
+                stderr=subprocess.STDOUT
+            ).decode()
+            print(" ", repr(out))
+
+            return int(re.search(r"(\d+)\.", out).group(1))
+        except Exception as e:
+            raise RuntimeError(f"Could not detect Chrome version: {e}")
     
     def create_uc_driver(self, headless=False, minimized=True):
         
@@ -103,10 +119,13 @@ class ActionExecutor:
         # --disable-popup-blocking         # Allow popups
         # --disable-infobars               # Hide "Chrome is being controlled..." banner
         
+        # chrome_major = self.get_chrome_major_version()
+        chrome_major = 144
+
         options = uc.ChromeOptions()
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--disable-extensions")
-        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
+        options.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36")
         
         if headless: options.add_argument("--headless=new")
 
@@ -117,8 +136,12 @@ class ActionExecutor:
             "download.directory_upgrade": True,
             "safebrowsing.enabled": True
         })
+        
 
-        self.driver = uc.Chrome(options=options)
+        self.driver = uc.Chrome(
+            options=options,
+            version_main=chrome_major
+        )
         self.driver.set_window_size(900, 700)
         self.driver.set_window_position(-800, 100)
         if minimized and not headless:
@@ -132,13 +155,6 @@ class ActionExecutor:
             except Exception as e:
                 self.logger.warning(f"Minimize failed, fallback to visible small window: {e}")
         
-        # title = self.driver.title or "data:,"
-        # time.sleep(0.5)
-        # for w in gw.getWindowsWithTitle(title):
-        #     w.moveTo(10,10)
-        #     w.lower()
-        #     self.logger.notice("Chrome window minimized safely.")
-        #     break
     
     def get_website(self, timeout = 60):
         if self.driver:

@@ -36,7 +36,7 @@ if __name__ == "__main__":
     
     try:
         logger.notice("Starting Scraper Program.")
-        bank_codes = ["NSE100"]#FRN_BANK_CODES + SFB_BANK_CODES #PUB_BANK_CODES #ALL_BANK_CODES 
+        bank_codes = PVT_BANK_CODES #["NSE100"]#FRN_BANK_CODES + SFB_BANK_CODES #PUB_BANK_CODES #ALL_BANK_CODES 
         main(
             bank_codes, 
             process=False, 
@@ -52,30 +52,3 @@ if __name__ == "__main__":
         logger.error(f"Unhandled Error in main.py: [{type(e).__name__}] {e}")
         logger.debug(traceback.format_exc())    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # finally:
-    #     # Always save partial cache if something fails
-    #     try:
-    #         if 'final_dict' in locals():
-    #             cache_path = os.path.join(session_dir, final_dict["metadata"]["cfname"])
-    #             Helper.save_json(final_dict, cache_path, typ="json")
-    #             logger.save(f"(Final) Cache safely written to {cache_path}")
-    #     except Exception as e:
-    #         logger.error(f"Failed to save final cache: {e}")
-
-    #     logger.info("Program Ended.")

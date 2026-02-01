@@ -1,6 +1,6 @@
 import pandas as pd
 import time ,re,os, hashlib, inspect, tempfile
-import dateutil, base64, pdfplumber, ocrmypdf
+import dateutil, base64, pdfplumber, ocrmypdf, fitz #type:ignore
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 from io import StringIO, BytesIO
@@ -255,38 +255,90 @@ class OperationExecutorLatest:
                 text_lines = soup.get_text().splitlines()
                 text_lines = [line.strip() for line in text_lines if line.strip()]
                 return pd.DataFrame({"text": text_lines})
-
+             
             elif content_type == "pdf":
                 pdf_bytes = base64.b64decode(raw_content)
-                pdf_file = BytesIO(pdf_bytes)
                 all_rows = []
+
                 try:
-                    with pdfplumber.open(pdf_file) as pdf:
-                        for page_num, page in enumerate(pdf.pages, start=1):
-                            tables = page.extract_tables()
+                    with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
+                        for page_num, page in enumerate(doc, start=1):
+                            tables = page.find_tables(strategy="lines_strict")
+
                             for table in tables:
                                 all_rows.append([f"[Page {page_num}]"])
-                                all_rows.extend(table)
+                                all_rows.extend(table.extract())
                 except Exception as e:
                     return pd.DataFrame([[f"Invalid PDF file: {e}"]])
-                return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in PDF"]])
+
+                return (
+                    pd.DataFrame(all_rows)
+                    if all_rows
+                    else pd.DataFrame([["No table found in PDF"]])
+                )
 
             elif content_type == "redir_pdf":
                 pdf_bytes = base64.b64decode(raw_content)
-                pdf_file = BytesIO(pdf_bytes)
                 all_rows = []
-                with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_output:
-                    ocrmypdf.ocr(pdf_file, temp_output.name)
+
                 try:
-                    with pdfplumber.open(temp_output.name) as pdf:
-                        for page_num, page in enumerate(pdf.pages, start=1):
-                            tables = page.extract_tables()
+                    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as input_pdf, \
+                        tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as ocr_pdf:
+
+                        input_pdf.write(pdf_bytes)
+                        input_pdf.flush()
+
+                        ocrmypdf.ocr(input_pdf.name, ocr_pdf.name, force_ocr=True)
+
+                    with fitz.open(ocr_pdf.name) as doc:
+                        for page_num, page in enumerate(doc, start=1):
+                            tables = page.find_tables(strategy="lines_strict")
+
                             for table in tables:
                                 all_rows.append([f"[Page {page_num}]"])
-                                all_rows.extend(table)
+                                all_rows.extend(table.extract())
+
                 except Exception as e:
                     return pd.DataFrame([[f"OCR PDF failed: {e}"]])
-                return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in OCR PDF"]])
+
+                return (
+                    pd.DataFrame(all_rows)
+                    if all_rows
+                    else pd.DataFrame([["No table found in OCR PDF"]])
+                )
+
+
+            # elif content_type == "pdf":
+            #     pdf_bytes = base64.b64decode(raw_content)
+            #     pdf_file = BytesIO(pdf_bytes)
+            #     all_rows = []
+            #     try:
+            #         with pdfplumber.open(pdf_file) as pdf:
+            #             for page_num, page in enumerate(pdf.pages, start=1):
+            #                 tables = page.extract_tables()
+            #                 for table in tables:
+            #                     all_rows.append([f"[Page {page_num}]"])
+            #                     all_rows.extend(table)
+            #     except Exception as e:
+            #         return pd.DataFrame([[f"Invalid PDF file: {e}"]])
+            #     return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in PDF"]])
+
+            # elif content_type == "redir_pdf":
+            #     pdf_bytes = base64.b64decode(raw_content)
+            #     pdf_file = BytesIO(pdf_bytes)
+            #     all_rows = []
+            #     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as temp_output:
+            #         ocrmypdf.ocr(pdf_file, temp_output.name)
+            #     try:
+            #         with pdfplumber.open(temp_output.name) as pdf:
+            #             for page_num, page in enumerate(pdf.pages, start=1):
+            #                 tables = page.extract_tables()
+            #                 for table in tables:
+            #                     all_rows.append([f"[Page {page_num}]"])
+            #                     all_rows.extend(table)
+            #     except Exception as e:
+            #         return pd.DataFrame([[f"OCR PDF failed: {e}"]])
+            #     return pd.DataFrame(all_rows) if all_rows else pd.DataFrame([["No table found in OCR PDF"]])
 
         except Exception as e:
             if hasattr(self, "logger") and self.logger:

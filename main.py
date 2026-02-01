@@ -12,13 +12,6 @@ from app.BankScraper import BankScraper
 from app.utils import Helper
 from app.mailer import Mailer
 
-PROGRAM_NAME = "Interest Rates WebScraper"
-
-# --- Setup Global Logger ---
-log_path = os.path.join(output_path(),"log")
-logger = setup_logger(name="scraper", log_dir=log_path, log_level=5)
-set_global_logger(logger)
-
 
 def main(bank_codes, process=False, send_mail = False, report_type = "pdf", minimize = False):
     """Core scraping and processing routine.
@@ -127,20 +120,6 @@ def scheduler_loop(bank_codes, process=True, times=None, run_days=None, send_mai
             else:
                 logger.info(f"Skipped run because today ({weekday_str.upper()}) is not in run days.")
 
-    except KeyboardInterrupt:
-        logger.warning("Scheduler interrupted manually.")
-        logger.debug(traceback.format_exc())
-        if send_mail:
-            mailer = Mailer()
-            mailer.fatal_error_mail(
-                program=f"{PROGRAM_NAME}: {datetime.now().strftime("%d-%m-%y")}",
-                custom_msg="Keyboard Interrupt",
-                error_message="User manually stopped the scheduler.",
-                exception_obj=None,
-                dev=True
-            )
-        
-
     except Exception as e:
         logger.critical(f"Unexpected scheduler failure: {type(e).__name__}: {e}")
         logger.debug(traceback.format_exc())
@@ -155,6 +134,15 @@ def scheduler_loop(bank_codes, process=True, times=None, run_days=None, send_mai
             )
         
 if __name__ == "__main__":
+    
+    PROGRAM_NAME = "Interest Rates WebScraper"
+
+    # --- Setup Global Logger ---
+    log_path = os.path.join(output_path(),"log")
+    logger = setup_logger(name="scraper", log_dir=log_path, log_level=5)
+    set_global_logger(logger)
+
+    
     logger.notice("Starting Scraper Scheduler...")
     bank_codes = ALL_BANK_CODES + FRN_BANK_CODES +SFB_BANK_CODES
     

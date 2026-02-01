@@ -70,7 +70,10 @@ class BankScraper:
             except WebDriverException as e:
                 self.logger.error(f"WebDriver error: {type(e).__name__}. Retrying...")
                 self.logger.debug(traceback.format_exc())
-                self.executor.driver.quit()
+                
+                if self.executor.driver:
+                    self.executor.driver.quit()
+                    
                 self.record_error(bank_name="GLOBAL", exception=e, source="DRIVER")
                 time.sleep(retry_delay)
         self.logger.critical("Failed to create driver after multiple attempts.")
@@ -266,7 +269,8 @@ class BankScraper:
 
         html_lines.append("<hr><p style='font-size:10pt;color:#777;'>Auto-generated scraper error summary.</p></body></html>")
 
-        Helper.save_text("\n".join(html_lines), self.error_html_path)
+        if self.error_html_path:
+            Helper.save_text("\n".join(html_lines), self.error_html_path)
         return self.error_html_path
 
     @log_exceptions(level="critical", raise_error=True)

@@ -288,14 +288,6 @@ class Helper:
     def get_file_extension(filename: str) -> str:
         return os.path.splitext(filename)[1]
     
-   
-    # @staticmethod
-    # def current_runnin_func():
-    #     current_func = inspect.currentframe().f_code.co_name
-    #     return current_func
-
-
-    #list chunk
     @staticmethod
     def chunk_list(data: list, size: int):
         return [data[i:i + size] for i in range(0, len(data), size)]
@@ -316,21 +308,6 @@ class Helper:
             for _ in range(segment_count)
         ]
         return '-'.join(segments)
-
-    
-    #try-catch #redacted failed
-    # @staticmethod
-    # def safe_execute(default=None, log_func=None):
-    #     def decorator(func):
-    #         def wrapper(*args, **kwargs):
-    #             try:
-    #                 return func(*args, **kwargs)
-    #             except Exception as e:
-    #                 if log_func:
-    #                     log_func(f"Error in {func.__name__}: {e}")
-    #                 return default
-    #         return wrapper
-    #     return decorator
 
     
     

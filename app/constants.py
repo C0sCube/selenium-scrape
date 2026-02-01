@@ -36,27 +36,15 @@ def out_nse_path():
 
 def load_days():
     paths = load_json(r"paths.json")
-    return paths.get("schedule_days",["mon", "tue", "wed", "thu", "fri"])
+    return paths.get("schedule_days")
 
 def load_times():
     paths = load_json(r"paths.json")
-    return paths.get("schedule_time",["0900","0230"])
+    return paths.get("schedule_time")
 
 def load_mail_data():
     paths = load_json(r"paths.json")
-    return paths.get("mail_data",{
-        "sender": "newsrssfetch.fornse@cogencis.com",
-        "dev_recipients": [
-            "Kaustubh.Keny@cogencis.com"
-        ],
-        "recipients": [
-            "Kaustubh.Keny@cogencis.com"
-        ],
-        "cc": [],
-        "bcc": [],
-        "server": "172.17.0.126",
-        "port": 25
-    })
+    return paths.get("mail_data")
 
 #file size constants
 MAX_REQUEST_BYTE_SIZE = 3_000_000 #2mb file
