@@ -31,8 +31,10 @@ def load_gen_config():
 def output_path():
     return get_paths()["output"]
 
-def out_nse_path():
-    return get_paths()["output_nsepath"]
+
+def get_session_dir():
+    out_dir = output_path()
+    return create_dir(out_dir,"session")
 
 def load_days():
     paths = load_json(r"paths.json")
