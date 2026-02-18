@@ -16,6 +16,7 @@ from .download_action import downloadElem
 from .apiget_action import apiGet
 from .select_action import selectList
 from .input_action import inputAction
+from .replist_action import repList
 
 __all__ = [
     "htmlScrape", "clickElem", "webRedir",
@@ -23,5 +24,5 @@ __all__ = [
     "downloadElem","genPdf", "genSst",
     "injectScript","tabList","webList",
     "manualAction", "clickSave", "apiGet",
-    "selectList","inputAction"
+    "selectList","inputAction","repList"
 ]

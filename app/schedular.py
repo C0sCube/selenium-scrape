@@ -1,4 +1,4 @@
-import time
+import time, traceback
 from datetime import timedelta, datetime
 
 def scheduler_loop(logger, run_fn, sch_days:list, sch_time:list):
@@ -48,6 +48,7 @@ def scheduler_loop(logger, run_fn, sch_days:list, sch_time:list):
                 logger.info(f"Completed Scheduled Run @ {datetime.now().strftime('%H:%M')}")
             except Exception as e:
                 logger.critical(f"Run failed: {type(e).__name__}: {e}")
+                logger.error(traceback.format_exc())
                 
         else:
             logger.info(f"Skipped run because today ({weekday_str.upper()}) is not in run days.")

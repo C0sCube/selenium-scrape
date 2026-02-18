@@ -5,9 +5,8 @@ warnings.filterwarnings('ignore')
 ssl._create_default_https_context = ssl._create_stdlib_context
 
 # --- Internal Imports ---
-from app.constants import ALL_BANK_CODES, FRN_BANK_CODES, SFB_BANK_CODES
-from app.constants import load_days, load_times,output_path, get_session_dir, create_dir
-from app.logger import setup_logger, set_global_logger
+from app.constants import output_path, get_schedule_config,load_config
+from app.logger import setup_logger, get_global_logger, set_global_logger
 from app.BankScraper import BankScraper
 from app.utils import Helper
 from app.mailer import Mailer
@@ -15,20 +14,24 @@ from app.schedular import scheduler_loop
 
 
 def program_handler(
-    bank_codes,
-    logger,
-    process=False,
-    send_mail=False,
+    process=True,
     report_type="pdf",
-    minimize=False,
+    minimize=True,
 ):
 
     scraper = BankScraper()
     mailer = Mailer()
+    logger = get_global_logger()
+    
+    gen_config = load_config()
+    # bank_codes = list(gen_config.keys())
+    bank_codes = ["PSB_4"]
+    
 
     try:
+        logger.info(f"Running Program: {PROGRAM_NAME}")
         # ---- Start mail ----
-        if send_mail:
+        if mailer.SEND_MAIL:
             logger.info("Sending start email...")
             mailer.start_mail(
                 program=PROGRAM_NAME,
@@ -51,13 +54,14 @@ def program_handler(
             scraper.process_cache(final_dict)
 
         # ---- Completion mail ----
-        if send_mail:
+        if mailer.SEND_MAIL:
             logger.info("Sending completion email...")
             attachments = [
                 scraper.paths["xlsx_latest"],
                 scraper.paths["pdf_latest"],
-                scraper.comparison_xlsx
+                scraper.paths["compare_xlsx"]
             ]
+            print(attachments)
             mailer.end_mail(
                 program=PROGRAM_NAME,
                 attachments=attachments,
@@ -68,8 +72,8 @@ def program_handler(
 
     except Exception:
         logger.critical("Scraping run failed.")
-        logger.debug(traceback.format_exc())
-        raise  # let scheduler log failure
+        logger.error(traceback.format_exc())
+        raise
 
     finally:
         # ---- Always cleanup ----
@@ -79,22 +83,25 @@ def program_handler(
             logger.warning("Failed to cleanly close scraper session.")
 
 
-def main():
-    logger.info(f"Running Program: {PROGRAM_NAME}")
-    program_handler(
-        BANK_CODES,
-        logger=logger,
-        process=PROCESS_FILE,
-        send_mail=SEND_MAIL,
-        minimize=MINIMIZE,
-    )
+# def main():
+#     mailer = Mailer()
+#     logger = get_global_logger()
+#     gen_config = load_config()
+#     bank_codes = list(gen_config.keys())
+    
+#     program_handler(
+#         bank_codes,
+#         logger,
+#         mailer,
+#         process=PROCESS_FILE,
+#         minimize=MINIMIZE,
+#     )
 
 
 if __name__ == "__main__":
     
     PROGRAM_NAME = "Interest Rates WebScraper"
     PROCESS_FILE= True
-    SEND_MAIL = False
     MINIMIZE = False
     # --- Setup Global Logger ---
     log_path = os.path.join(output_path(),"log")
@@ -103,11 +110,14 @@ if __name__ == "__main__":
 
     
     logger.notice("Starting Scraper Scheduler...")
-    BANK_CODES = ["PSB_4"]#ALL_BANK_CODES + FRN_BANK_CODES +SFB_BANK_CODES
+    # BANK_CODES = ALL_BANK_CODES + FRN_BANK_CODES +SFB_BANK_CODES
+    
+    config_sch = get_schedule_config()
+    
     
     scheduler_loop(
         logger,
-        main,
-        load_days(), #days
-        load_times() #times
+        program_handler,
+        config_sch["days"], 
+        config_sch["time"] 
     )

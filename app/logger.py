@@ -6,7 +6,7 @@ from logging.handlers import RotatingFileHandler
 
 # --- Optional ColorLog Support ---
 try:
-    import colorlog
+    import colorlog #type: ignore
     COLORLOG_AVAILABLE = True
 except ImportError:
     COLORLOG_AVAILABLE = False
@@ -65,33 +65,6 @@ def _add_console_handler(logger, level, use_color=True):
     handler.setLevel(level)
     logger.addHandler(handler)
 
-# # --- Generic Logger Setup ---
-# def setup_logger(
-#     name="app_logger",
-#     log_dir="logs",
-#     log_level=logging.DEBUG,
-#     to_console=True,
-#     to_file=True,
-#     use_color=True
-# ):
-#     os.makedirs(log_dir, exist_ok=True)
-#     logger = logging.getLogger(name)
-#     if logger.hasHandlers():
-#         return logger
-#     logger.setLevel(log_level)
-#     logger.propagate = False
-
-#     if to_file:
-#         file_path = os.path.join(log_dir, f"{name}.log")
-#         file_handler = logging.FileHandler(file_path, encoding='utf-8')
-#         file_handler.setFormatter(_get_formatter(use_color=False))
-#         file_handler.setLevel(TRACE_LEVEL_NUM)
-#         logger.addHandler(file_handler)
-
-#     if to_console:
-#         _add_console_handler(logger, log_level, use_color)
-
-#     return logger
 
 from logging.handlers import TimedRotatingFileHandler
 
@@ -142,7 +115,7 @@ def setup_logger(
     # --- Console handler ---
     if to_console:
         _add_console_handler(logger, log_level, use_color)
-
+    
     return logger
 
 

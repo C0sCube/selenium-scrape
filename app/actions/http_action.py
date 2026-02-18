@@ -5,7 +5,7 @@ import requests
 from urllib.parse import urlparse
 from app.utils import Helper
 from app.logger import get_global_logger
-from app.constants import MAX_REQUEST_BYTE_SIZE
+from app.constants import load_gen_config
 from app.actions.helper import ActionHelper
 
 
@@ -53,6 +53,7 @@ def download_file(executor, file_url, output_dir, idx, extension):
     """
     logger = get_global_logger()
     driver = executor.driver
+    config_gen = load_gen_config()["program_config"]
 
     try:
         cookies = {c["name"]: c["value"] for c in driver.get_cookies()}
@@ -71,7 +72,7 @@ def download_file(executor, file_url, output_dir, idx, extension):
     file_size = len(file_data)
     logger.info(f"Received {file_size} bytes from {file_url}")
 
-    if file_size >= MAX_REQUEST_BYTE_SIZE:
+    if file_size >= config_gen["MAX_REQUEST_BYTE_SIZE"]:
         logger.warning(f"File too large ({file_size} bytes) — skipped.")
         return "", ""
 

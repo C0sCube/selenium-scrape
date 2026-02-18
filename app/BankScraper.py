@@ -38,14 +38,9 @@ class BankScraper:
         self.RUNTIME_PATH = create_dir(get_session_dir(), f"session_{self.date_now.strftime('%y%m%d_%H%M')}")
         self.SESSION_LATEST = create_dir(get_session_dir(), "session_latest")
         self.PREV_SCRP_JSN = os.path.join(self.SESSION_LATEST, "PROCESS_LATEST.json")
+        self.ERROR_HTML_PATH = os.path.join(self.RUNTIME_PATH,"error_data.html")
         
-        # self.compare_path = None
-        # self.cache_path = None
-        # self.process_path = None
-        # self.comparison_xlsx = None
         self.email_msg = None
-        self.error_html_path = None
-        
         self.metadata = self.build_metadata(self.date_now)
         self.paths = self.build_paths(self.RUNTIME_PATH, self.metadata)
 
@@ -274,9 +269,9 @@ class BankScraper:
 
         html_lines.append("<hr><p style='font-size:10pt;color:#777;'>Auto-generated scraper error summary.</p></body></html>")
 
-        if self.error_html_path:
-            Helper.save_text("\n".join(html_lines), self.error_html_path)
-        return self.error_html_path
+        if self.ERROR_HTML_PATH:
+            Helper.save_text("\n".join(html_lines), self.ERROR_HTML_PATH)
+        return self.ERROR_HTML_PATH
 
     @log_exceptions(level="critical", raise_error=True)
     def process_cache(self, final_dict):
@@ -303,8 +298,8 @@ class BankScraper:
 
             # ===== Stage 2: Compare with Previous Cache =====
             try:
-                if os.path.exists(paths["prev_processed"]):
-                    old_data = Helper.load_json(paths["prev_processed"])
+                if os.path.exists(self.PREV_SCRP_JSN):
+                    old_data = Helper.load_json(self.PREV_SCRP_JSN)
 
                     if isinstance(old_data, dict):
                         self.logger.notice("Loaded previous processed cache for comparison.")
@@ -334,9 +329,9 @@ class BankScraper:
                 self.logger.warning(f"Comparison failed: {type(e).__name__} - {e}")
 
             # ===== Stage 3: Update Baseline =====
-            Helper.save_json(baseline, paths["prev_processed"])
+            Helper.save_json(baseline, self.PREV_SCRP_JSN)
             self.logger.debug(
-                f"Updated baseline processed cache for next run at: {paths['prev_processed']}"
+                f"Updated baseline processed cache for next run at: {self.PREV_SCRP_JSN}"
             )
 
             self.logger.info("Cache Process & Comparison Done.")
@@ -367,7 +362,7 @@ class BankScraper:
                 shutil.copy(paths["xlsx_archive"], paths["xlsx_latest"])
     
          
-    def runner(self, bank_codes):
+    def runner(self,bank_codes):
        
         final_dict  = self.get_final_struct()
         

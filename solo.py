@@ -9,17 +9,14 @@ from app.constants import * #paths
 from app.logger import setup_logger, set_global_logger
 from app.BankScraper import BankScraper
  
-log_dir = os.path.join(output_path(),"log")
-logger = setup_logger(name="scraper", log_dir=log_dir, log_level=5)
-set_global_logger(logger)
-
 def main(
     bank_codes, 
     process = False,
     minimize = False,
     report_type = "pdf"
 ):
-        
+    
+    logger.notice("Starting Scraper Program.")
     scraper = BankScraper()
     if not scraper.start_session(minimized=minimize):  
         raise RuntimeError("Failed to initialize Selenium driver")
@@ -35,18 +32,17 @@ def main(
 if __name__ == "__main__":
     
     try:
-        logger.notice("Starting Scraper Program.")
-        bank_codes = PVT_BANK_CODES #["NSE100"]#FRN_BANK_CODES + SFB_BANK_CODES #PUB_BANK_CODES #ALL_BANK_CODES 
+        # --- Setup Global Logger ---
+        log_path = os.path.join(output_path(),"log")
+        logger = setup_logger(name="scraper", log_dir=log_path, log_level=5)
+        set_global_logger(logger)
+        bank_codes = ["BSE_1"] 
         main(
             bank_codes, 
             process=False, 
             minimize=False,
-            report_type="xlsx"
+            report_type="pdf"
         )
-        
-    except KeyboardInterrupt:
-        logger.warning("Process interrupted by user.")
-        logger.debug(traceback.format_exc())
 
     except Exception as e:
         logger.error(f"Unhandled Error in main.py: [{type(e).__name__}] {e}")

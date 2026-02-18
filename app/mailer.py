@@ -6,7 +6,7 @@ from pathlib import Path
 from datetime import datetime
 
 
-from app.constants import load_mail_data
+from app.constants import load_mail_config
 from app.logger import get_global_logger
 
 class Mailer:
@@ -17,7 +17,7 @@ class Mailer:
                 cc=None, bcc=None, logger=None):
         
         try:
-            mail_config = load_mail_data()
+            mail_config = load_mail_config()
             server = mail_config.get("server", server)
             port = mail_config.get("port", port)
             sender = mail_config.get("sender", sender)
@@ -35,6 +35,8 @@ class Mailer:
         self.DEVRECPTS = dev_recipients if isinstance(dev_recipients, list) else [dev_recipients] if dev_recipients else []
         self.CC = cc if isinstance(cc, list) else [cc] if cc else []
         self.BCC = bcc if isinstance(bcc, list) else [bcc] if bcc else []
+        
+        self.SEND_MAIL = mail_config.get("send_mail",False)
         
         self.logger = get_global_logger()
 

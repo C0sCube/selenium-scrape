@@ -6,7 +6,7 @@ from urllib.parse import urljoin, urlparse
 from selenium.webdriver.common.by import By
 from app.utils import Helper
 from app.logger import get_global_logger
-from app.constants import MAX_REQUEST_BYTE_SIZE
+from app.constants import load_gen_config
 from app.actions.helper import ActionHelper
 
 
@@ -87,6 +87,7 @@ def _download_file(executor, file_url, idx, extension):
 
     logger = get_global_logger()
     driver = executor.driver
+    config_gen = load_gen_config()["program_config"]
 
     try:
         cookies = {c["name"]: c["value"] for c in driver.get_cookies()}
@@ -110,7 +111,7 @@ def _download_file(executor, file_url, idx, extension):
     file_data = response.content
     file_size = len(file_data)
 
-    if file_size >= MAX_REQUEST_BYTE_SIZE:
+    if file_size >= config_gen["MAX_REQUEST_BYTE_SIZE"]:
         logger.warning(f"Skipped {safe_filename} — size {file_size} bytes exceeds limit.")
         return ""
     

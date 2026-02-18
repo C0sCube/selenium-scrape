@@ -1,0 +1,45 @@
+{
+  POST_SCRAPE_OPS: {
+    SHAONE: {
+      primary: [
+        ["normalize_df", "value", "norm_table", "table_html"],
+        ["sha1", "value", "SHA_ONE", "pdf"],
+      ],
+      secondary: [["sha1", "norm_table", "SHA_ONE"]],
+    },
+  },
+  BSE_1: {
+    bank_name: "BSE India",
+    bank_type: "Public Sector",
+    bank_type_code: "BSE_1",
+    base_url: "https://www.bseindia.com/corporates/Sharehold_Searchnew.aspx",
+    base_timeout: 30,
+    blocks: [
+      {
+        action: "replist",
+        by: "css",
+        value: "#ContentPlaceHolder1_gvData img",
+        skip_if_not_found: true,
+        default_wait: 10,
+        timeout: 20,
+        log_message: "Performing Repeater List.",
+        steps: [
+          {
+            action: "table",
+            table_name: "bse_data",
+            by: "tag",
+            value: "table",
+            wait_until: "present",
+            multiple: true,
+            skip_if_not_found: true,
+            default_wait: 20,
+            timeout: 30,
+            log_message: "Save Html Tables.",
+          },
+        ],
+      },
+    ],
+    headless: true,
+    pdf_or_excel: "pdf",
+  },
+}

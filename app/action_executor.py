@@ -17,7 +17,8 @@ from app.actions import (
     downloadElem,textScrape, htmlScrape, selectList,
     clickSave,clickElem, genPdf,genSst, 
     webRedir, httpRequest, injectScript, apiGet,
-    tabList, webList, manualAction,tablScrape, inputAction
+    tabList, webList, manualAction,tablScrape, inputAction,
+    repList
 )
 
 
@@ -68,6 +69,7 @@ class ActionExecutor:
             "redir_pdf": lambda: genPdf(self), 
             "tablist": lambda: tabList(self), 
             "weblist": lambda: webList(self), 
+            "replist": lambda: repList(self),
             "http": lambda: httpRequest(self),
             "manual": lambda: manualAction(self),
             "execute_script": lambda: injectScript(self),

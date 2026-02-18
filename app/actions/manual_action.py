@@ -2,7 +2,7 @@
 import os, time, base64
 from app.logger import get_global_logger
 from app.actions.helper import ActionHelper
-from app.constants import MAX_DOWNLOAD_TIMEOUT, MAX_DOWNLOAD_WAIT
+from app.constants import load_gen_config
 
 
 def manualAction(executor):
@@ -18,6 +18,8 @@ def manualAction(executor):
 
     logger.info("Waiting for manual file download...")
     scrape_content = []
+    
+    gen_conf = load_gen_config()["program_config"]
 
     try:
         # Record initial folder state
@@ -28,9 +30,9 @@ def manualAction(executor):
         file_path, ext = ActionHelper._wait_for_download(
             output_path,
             initial_files,
-            timeout=MAX_DOWNLOAD_TIMEOUT
+            timeout=gen_conf["MAX_DOWNLOAD_TIMEOUT"]
         )
-        time.sleep(MAX_DOWNLOAD_WAIT)
+        time.sleep(gen_conf["MAX_DOWNLOAD_WAIT"])
 
         if file_path:
             with open(file_path, "rb") as f:
