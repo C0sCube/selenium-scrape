@@ -24,8 +24,11 @@ def program_handler(
     logger = get_global_logger()
     
     gen_config = load_config()
-    # bank_codes = list(gen_config.keys())
-    bank_codes = ["PSB_4"]
+    bank_codes = [
+        k for k in gen_config.keys()
+        if k != "POST_SCRAPE_OPS"
+    ]
+    # bank_codes = ["PSB_4"]
     
 
     try:

@@ -247,3 +247,70 @@ class ActionHelper:
         "data_present": bool(value)
     }
 
+    @staticmethod
+    def classify_navigation(element):
+        href = element.get_attribute("href")
+        onclick = element.get_attribute("onclick")
+
+        if href:
+            href = href.strip()
+
+            if href.startswith("http"):
+                return {"type": "absolute", "value": href}
+
+            if href.startswith("/"):
+                return {"type": "relative", "value": href}
+
+            if href.startswith("javascript:"):
+                return {"type": "javascript", "value": href.replace("javascript:", "")}
+
+            if href.startswith("#"):
+                return {"type": "anchor", "value": href}
+
+            if href.startswith("data:"):
+                return {"type": "data", "value": href}
+
+            return {"type": "unknown_href", "value": href}
+
+        if onclick:
+            return {"type": "onclick", "value": onclick}
+
+        return {"type": "click_only", "value": None}
+
+    @staticmethod
+    def perform_navigation(driver, nav_info, element=None):
+        nav_type = nav_info["type"]
+        value = nav_info["value"]
+
+        if nav_type in ["absolute", "relative"]:
+            driver.get(value)
+
+        elif nav_type == "javascript":
+            driver.execute_script(value)
+
+        elif nav_type == "onclick":
+            driver.execute_script(value)
+
+        elif nav_type == "click_only":
+            if element:
+                driver.execute_script("arguments[0].click();", element)
+
+        elif nav_type == "anchor":
+            if element:
+                driver.execute_script("arguments[0].scrollIntoView();", element)
+
+        elif nav_type == "data":
+            # handle base64 extraction logic here later
+            pass
+
+        else:
+            if element:
+                driver.execute_script("arguments[0].click();", element)
+
+    @staticmethod
+    def wait_for_dom_change(driver, old_html, timeout=10):
+        from selenium.webdriver.support.ui import WebDriverWait
+
+        WebDriverWait(driver, timeout).until(
+            lambda d: d.page_source != old_html
+        )
