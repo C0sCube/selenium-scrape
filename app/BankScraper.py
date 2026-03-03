@@ -1,19 +1,15 @@
 from app.action_executor import ActionExecutor
 from app.operation_executor import  OperationExecutorLatest
 from app.pdf_report import PDFReportBuilderPro
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException #type: ignore
 
 # app/BankScraper.py
-import traceback, time, hashlib, pprint, os, time, shutil
+import traceback, time, hashlib, os, time, shutil
 from copy import deepcopy
 from datetime import datetime
-from selenium.common.exceptions import WebDriverException
 from app.logger import get_global_logger, log_exceptions
 from app.utils import Helper
 from app.constants import load_config, get_session_dir, create_dir
-
-from dataclasses import dataclass
-from pathlib import Path
 
 class BankScraper:
     """Main controller for orchestrating scraping per bank."""
@@ -59,7 +55,7 @@ class BankScraper:
                 if not self.executor.driver:
                     raise RuntimeError("Driver creation returned None")
 
-                self.executor.driver.set_page_load_timeout(50)
+                self.executor.driver.set_page_load_timeout(120)
                 self.logger.save("Driver created successfully.")
                 return True
 
@@ -107,7 +103,7 @@ class BankScraper:
         try:
             self.executor.set_params(bank_params)
             
-            timeout = bank_params.get("base_timeout",40)
+            timeout = bank_params.get("base_timeout",120)
             self.executor.get_website(timeout)
             data = self.executor.execute_blocks()
             

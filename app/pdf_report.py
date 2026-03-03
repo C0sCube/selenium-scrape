@@ -212,21 +212,25 @@ class PDFReportBuilderPro:
 
             # collect scrape data
             for scrape in record.get("scraped_data", []):
+                
                 action_header = self._make_action_header(scrape)
                 if action_header:
                     html_parts.append(action_header)
                     
                 responses = scrape.get("response", [])
                 for response in responses:
+                    #value
                     typ = response.get("type")
                     value = response.get("value", "")
                     if not value:
                         continue
-
+                    
+                    #title
                     titles = response.get("title", [])
-                    titles = [titles] if isinstance(titles, str) else titles
-                    html_parts.append(self._make_title_block(titles))
+                    if len(titles): #if only
+                        html_parts.append(self._make_title_block(titles))
 
+                    #format to save report
                     if typ in ("html", "table_html"):
                         html_str = value.strip()
                         if len(html_str) < 150:
@@ -399,7 +403,6 @@ class PDFReportBuilderPro:
 
         return sections
 
-
     def parse_structured_json_for_excel(self, data: dict, structure: dict):
         if not data or not structure:
             return [("⚠ No Data", "No data found in API response.")]
@@ -490,27 +493,31 @@ class PDFReportBuilderPro:
 
         # ===== PER BANK SHEETS =====
         for i, record in enumerate(self.cache_data.get("records", []), start=1):
-            bank_name = record.get("bank_name", "Unknown Bank")
-            bank_code = record.get("bank_code", "N/A")
-            bank_type = record.get("bank_type", "Commercial Bank")
-            sheet_name = f"{bank_name[:28]}_{i}"[:31]  # Excel sheet name limit
+            name = record.get("bank_name", "N/A")
+            code = record.get("bank_code", "N/A")
+            type_ = record.get("bank_type", "N/A")
 
-            ws = wb.create_sheet(title=sheet_name)
-            ws.append(["Bank Name", bank_name])
-            ws.append(["Bank Code", bank_code])
-            ws.append(["Bank Type", bank_type])
+            ws = wb.create_sheet(title=f"{name[:28]}_{i}"[:31]) # Excel sheet name limit
+            # ws.append(["Bank Name", name])
+            # ws.append(["Bank Code", code])
+            # ws.append(["Bank Type", type_])
+            # ws.append([])
+            ws.append(["Domain_Details",f"{code}",f"{name}", f"{type_}"])
             ws.append([])
-
+            
             scraped_data = record.get("scraped_data", [])
             total_sources = len(scraped_data)
-            row_cursor = 5
+            row_cursor = 3
 
             for scrape in scraped_data:
-                ws.append([f"Action: {scrape.get('action','')}"])
-                ws.append([f"Timestamp: {scrape.get('timestamp','')}"])
-                ws.append([f"Webpage: {scrape.get('webpage','')}"])
+                
+                ws.append(["Action_Details",f"{scrape.get('action','')}",f"{scrape.get('timestamp','')}", f"{scrape.get('webpage','')}"])
                 ws.append([])
-                row_cursor += 4
+                # ws.append([f"Action: {scrape.get('action','')}"])
+                # ws.append([f"Timestamp: {scrape.get('timestamp','')}"])
+                # ws.append([f"Webpage: {scrape.get('webpage','')}"])
+                # ws.append([])
+                row_cursor += 2
 
                 responses = scrape.get("response", [])
                 for response in responses:
@@ -606,7 +613,7 @@ class PDFReportBuilderPro:
                     ws.append([])  # add spacing between responses
 
             # ===== Append to Summary =====
-            ws_summary.append([i, bank_code, bank_name, bank_type, total_sources])
+            ws_summary.append([i, code, name,type_, total_sources])
             summary_row += 1
 
         # ===== Apply styling to Summary =====

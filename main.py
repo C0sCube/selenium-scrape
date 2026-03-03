@@ -15,7 +15,7 @@ from app.schedular import scheduler_loop
 
 def program_handler(
     process=True,
-    report_type="pdf",
+    report_type="xlsx",
     minimize=True,
 ):
 
@@ -86,25 +86,11 @@ def program_handler(
             logger.warning("Failed to cleanly close scraper session.")
 
 
-# def main():
-#     mailer = Mailer()
-#     logger = get_global_logger()
-#     gen_config = load_config()
-#     bank_codes = list(gen_config.keys())
-    
-#     program_handler(
-#         bank_codes,
-#         logger,
-#         mailer,
-#         process=PROCESS_FILE,
-#         minimize=MINIMIZE,
-#     )
-
 
 if __name__ == "__main__":
     
     PROGRAM_NAME = "Interest Rates WebScraper"
-    PROCESS_FILE= True
+    PROCESS_FILE= False
     MINIMIZE = False
     # --- Setup Global Logger ---
     log_path = os.path.join(output_path(),"log")
@@ -113,8 +99,6 @@ if __name__ == "__main__":
 
     
     logger.notice("Starting Scraper Scheduler...")
-    # BANK_CODES = ALL_BANK_CODES + FRN_BANK_CODES +SFB_BANK_CODES
-    
     config_sch = get_schedule_config()
     
     

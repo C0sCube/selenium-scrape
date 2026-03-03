@@ -153,7 +153,7 @@ def log_exceptions(level="error", return_value=None, raise_error=False):
 
                 log_func = getattr(logger, level, logger.error)
                 log_func(f"{context} {type(e).__name__}: {e}")
-                logger.debug(traceback.format_exc())
+                logger.error(traceback.format_exc())
 
                 if raise_error:
                     raise

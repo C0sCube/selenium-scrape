@@ -18,7 +18,7 @@ from app.actions import (
     clickSave,clickElem, genPdf,genSst, 
     webRedir, httpRequest, injectScript, apiGet,
     tabList, webList, manualAction,tablScrape, inputAction,
-    repList
+    repList, dummyTable
 )
 
 
@@ -75,7 +75,8 @@ class ActionExecutor:
             "execute_script": lambda: injectScript(self),
             "api_get":lambda: apiGet(self),
             "select":lambda: selectList(self),
-            "input":lambda: inputAction(self)
+            "input":lambda: inputAction(self),
+            "dummy": lambda: dummyTable(self)
         }
     
     def set_params(self,params):
@@ -158,7 +159,7 @@ class ActionExecutor:
                 self.logger.warning(f"Minimize failed, fallback to visible small window: {e}")
         
     
-    def get_website(self, timeout = 60):
+    def get_website(self, timeout = 120):
         if self.driver:
             try:
                 self.driver.set_page_load_timeout(timeout)
@@ -333,7 +334,7 @@ class ActionExecutor:
         self.LOG_MESSAGE = _action_.get("log_message", "Log Msg For Action Not Attached.")
         
         self.CLEAN_TABLE = _action_.get("clean_table",True)
-        
+        self.REQUIRE_TABLE_TITLE = _action_.get("require_title",True)
         #field
         self.ATTRIBUTE = _action_.get("attribute")
         self.SCRAPE_FIELDS = _action_.get("scrape_fields")
@@ -396,6 +397,7 @@ class ActionExecutor:
         return mapping.get(by_string.lower(), By.CSS_SELECTOR)
      
     def __generate_packet(self, content):
+        print("Running This")
         packet = {
             "action": self.ACTION_TYPE,
             "uid": Helper.generate_uid(),
@@ -432,6 +434,22 @@ class ActionExecutor:
             data = None
 
             if isinstance(_action_, str):
+                
+                if _action_ == "action_dummy":
+                    content = self.__perform_action(self.action_map["dummy"])
+                    block_data.append(self.__generate_packet(content))
+                    return block_data
+                
+                #early exit if the block is quarantined
+                if _action_ =="QUARANTINE":
+                    self.logger.warning(f"BLOCK IS QUARANTINED.")
+                    block_data.append(self.__generate_packet({
+                        "error_type": "quarantine",
+                        "error_message": "Block Quarantined.",
+                        "error_from": "ActionExecutor.execute_blocks"
+                    }))
+                    return block_data
+                
                 action_key, *content = _action_.split("||")
                 if action_key not in generic_actions:
                     self.logger.warning(f"{action_key} not part of generic_action_keys. Skipping.")

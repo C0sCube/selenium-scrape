@@ -34,14 +34,14 @@ if __name__ == "__main__":
     try:
         # --- Setup Global Logger ---
         log_path = os.path.join(output_path(),"log")
-        logger = setup_logger(name="scraper", log_dir=log_path, log_level=5)
+        logger = setup_logger(name="scraper", log_dir=log_path, log_level=4)
         set_global_logger(logger)
-        bank_codes = ["BSE_1"] 
+        bank_codes =["BSE"] 
         main(
             bank_codes, 
             process=False, 
             minimize=False,
-            report_type="pdf"
+            report_type="xlsx"
         )
 
     except Exception as e:

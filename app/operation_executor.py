@@ -1,7 +1,7 @@
 import pandas as pd
 import time ,re,os, hashlib, inspect, tempfile
 import dateutil, base64, pdfplumber, ocrmypdf, fitz #type:ignore
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup #type: ignore
 from dateutil.parser import parse
 from io import StringIO, BytesIO
 

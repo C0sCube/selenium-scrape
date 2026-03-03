@@ -34,8 +34,10 @@ def tablScrape(executor):
 
     for idx, elem in enumerate(elements):
         try:
-            header_texts = ActionHelper._find_preceding_texts(elem)
-            logger.info(f"Table {idx} header: {header_texts}")
+            header_texts = []
+            if executor.REQUIRE_TABLE_TITLE:
+                header_texts = ActionHelper._find_preceding_texts(elem)
+                logger.info(f"Table {idx} header: {header_texts}")
 
             # --- extract HTML ---
             raw_html = elem.get_attribute("outerHTML")

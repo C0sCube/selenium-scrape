@@ -6,6 +6,8 @@
     DRIVER_LOAD_RETRIES: 5,
     LOAD_IN_BETWEEN_DELAY: 10,
     COOL_DOWN: 30,
+    PAGE_LOAD_TIMEOUT:120,
+    WEBSITE_LOAD_TIMEOUT:120
   },
   scripts: {
     disable_anim: "const style=document.createElement('style');style.innerHTML='*{animation:none!important;transition:none!important;}';document.head.appendChild(style);",
@@ -50,6 +52,7 @@
     default_wait: 3,
     timeout: 20,
     clean_table: true,
+    require_title:true,
     log_message: "Save Html Table(s)",
   },
   action_unclean_table: {
@@ -92,6 +95,11 @@
     default_wait: 4,
     timeout: 30,
     file_save: true,
+  },
+  action_dummy:{
+    action:"dummy",
+    by: "css",
+    value: "body",
   },
   action_website: {
     action: "website",

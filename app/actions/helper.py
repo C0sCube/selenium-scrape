@@ -176,7 +176,7 @@ class ActionHelper:
 
     
     @staticmethod
-    def _find_preceding_texts(table, n=2, max_depth=5):
+    def _find_preceding_texts(table, n=2, max_depth=5)->list:
         """
         Finds up to `n` pieces of readable text above a <table>.
         It climbs the DOM tree up to `max_depth` levels to find headings like <h2> or <p>.
@@ -229,7 +229,7 @@ class ActionHelper:
                 break
 
         # Nothing found
-        return list(reversed(texts)) if texts else ["Header not found"] * n
+        return list(reversed(texts)) if texts else []
 
     
     

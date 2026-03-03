@@ -25,18 +25,21 @@ def textScrape(executor):
         
         by,value = fetch_data.split("||")
         
-        element = driver.find_element(by, value)
-        txt = element.get_attribute("textContent")
-        print(f"{key}:{txt}")
-        
-        # scrape_content.append(
-        #     ActionHelper.generate_resp_packet(
-        #         name=f"text_{executor.html_name}",
-        #         header=f"Scraped via {by}={value}",
-        #         value=data,
-        #         type="text",
-        #     )
-        # )
+        by = executor.locator_map.get(by,"css")
+        logger.info(f"Fetching via: {by} and value:{value}")
+
+        elements = driver.find_elements(by, value) if executor.MULTIPLE else [driver.find_element(by, value)]
+
+        for element in elements:
+            txt = element.get_attribute("textContent")
+            scrape_content.append(
+                ActionHelper.generate_resp_packet(
+                    name=f"text_{executor.html_name}",
+                    header=f"{driver.current_url}",
+                    value=txt,
+                    type="text",
+                )
+            )
 
     return scrape_content
 
