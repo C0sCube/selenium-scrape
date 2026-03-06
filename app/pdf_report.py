@@ -511,7 +511,7 @@ class PDFReportBuilderPro:
 
             for scrape in scraped_data:
                 
-                ws.append(["Action_Details",f"{scrape.get('action','')}",f"{scrape.get('timestamp','')}", f"{scrape.get('webpage','')}"])
+                ws.append(["action_Detail(s)",f"{scrape.get('action','')}",f"{scrape.get('timestamp','')}", f"{scrape.get('webpage','')}"])
                 ws.append([])
                 # ws.append([f"Action: {scrape.get('action','')}"])
                 # ws.append([f"Timestamp: {scrape.get('timestamp','')}"])

@@ -1,10 +1,9 @@
-import time, requests
+import time, requests, json
 
 from app.logger import get_global_logger
 from app.actions.helper import ActionHelper
 
 def apiGet(executor):
-    import json, time, requests
     logger = get_global_logger()
 
     # --- executor params ---

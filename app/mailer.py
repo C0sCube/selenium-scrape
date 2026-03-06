@@ -10,27 +10,19 @@ from app.constants import load_mail_config
 from app.logger import get_global_logger
 
 class Mailer:
-    def __init__(self, server='172.17.0.126', port=25, 
-                sender='Kaustubh.Keny@cogencis.com', 
-                recipients=['Kaustubh.Keny@cogencis.com'], 
-                dev_recipients = ['Kaustubh.Keny@cogencis.com'],
-                cc=None, bcc=None, logger=None):
+    def __init__(self):
         
-        try:
-            mail_config = load_mail_config()
-            server = mail_config.get("server", server)
-            port = mail_config.get("port", port)
-            sender = mail_config.get("sender", sender)
-            recipients = mail_config.get("recipients", recipients)
-            dev_recipients = mail_config.get("dev_recipients", dev_recipients)
-            cc = mail_config.get("cc", cc)
-            bcc = mail_config.get("bcc", bcc)               
-        except FileNotFoundError:
-            print("paths.json file not found. Using default values.")
+  
+        mail_config = load_mail_config()
+        recipients = mail_config.get("recipients")
+        dev_recipients = mail_config.get("dev_recipients")
+        cc = mail_config.get("cc")
+        bcc = mail_config.get("bcc")               
+     
         
-        self.SERVER = server
-        self.PORT = port
-        self.FROM = sender or "noreply@example.com"
+        self.SERVER = mail_config.get("server")
+        self.PORT = mail_config.get("port")
+        self.FROM = mail_config.get("sender")
         self.RECPTS = recipients if isinstance(recipients, list) else [recipients] if recipients else []
         self.DEVRECPTS = dev_recipients if isinstance(dev_recipients, list) else [dev_recipients] if dev_recipients else []
         self.CC = cc if isinstance(cc, list) else [cc] if cc else []
@@ -38,7 +30,7 @@ class Mailer:
         
         self.SEND_MAIL = mail_config.get("send_mail",False)
         
-        self.logger = get_global_logger()
+        self.LOGGER = get_global_logger()
 
 
     def start_mail(self, program, data=None, attachments=None,custom_html = None, dev=True):
@@ -63,9 +55,9 @@ class Mailer:
             self.send_mail(msg, dev=dev)
 
         except Exception as e:
-            self.logger.error("Start Mail not Sent.")
-            self.logger.error(f"{type(e).__name__}: {e}")
-            self.logger.error(traceback.format_exc())
+            self.LOGGER.error("Start Mail not Sent.")
+            self.LOGGER.error(f"{type(e).__name__}: {e}")
+            self.LOGGER.error(traceback.format_exc())
             raise
    
     def end_mail(self, program, data=None, attachments=None,custom_html = None, dev=False):
@@ -90,9 +82,9 @@ class Mailer:
             self.send_mail(msg, dev=dev)
 
         except Exception as e:
-            self.logger.error("End Mail not Sent.")
-            self.logger.error(f"{type(e).__name__}: {e}")
-            self.logger.error(traceback.format_exc())
+            self.LOGGER.error("End Mail not Sent.")
+            self.LOGGER.error(f"{type(e).__name__}: {e}")
+            self.LOGGER.error(traceback.format_exc())
             raise
 
     def fatal_error_mail(self, program,custom_msg = None, error_message=None, exception_obj=None, attachments=None, dev = True):
@@ -115,9 +107,9 @@ class Mailer:
             msg = self.construct_mail(subject=subject, body_html=body, attachments=attachments, dev=dev)
             self.send_mail(msg, dev=dev)
         except Exception as e:
-            self.logger.error("Fatal Error Mail not sent.")
-            self.logger.error(f"{type(e).__name__}: {e}")
-            self.logger.error(traceback.format_exc())
+            self.LOGGER.error("Fatal Error Mail not sent.")
+            self.LOGGER.error(f"{type(e).__name__}: {e}")
+            self.LOGGER.error(traceback.format_exc())
     
     def default_body(self):
         return """
@@ -165,7 +157,7 @@ class Mailer:
                         part['Content-Disposition'] = f'attachment; filename="{path.name}"'
                         msg.attach(part)
                 else:
-                    self.logger.warning(f"Attachment not found: {file_path}")
+                    self.LOGGER.warning(f"Attachment not found: {file_path}")
 
         return msg
 
@@ -175,6 +167,6 @@ class Mailer:
             all_recipients = recpts + self.CC + self.BCC
             with smtplib.SMTP(self.SERVER, self.PORT) as server:
                 server.send_message(msg, from_addr=self.FROM, to_addrs=all_recipients)
-            self.logger.info("Email sent successfully.")
+            self.LOGGER.info("Email sent successfully.")
         except Exception as e:
-            self.logger.error(f"Failed to send email: {e}")
+            self.LOGGER.error(f"Failed to send email: {e}")

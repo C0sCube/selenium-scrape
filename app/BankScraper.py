@@ -39,6 +39,12 @@ class BankScraper:
         self.email_msg = None
         self.metadata = self.build_metadata(self.date_now)
         self.paths = self.build_paths(self.RUNTIME_PATH, self.metadata)
+        
+        
+        BASE_TIMEOUT = 120
+        SESSION_RETRIES = 3
+        SESSION_RETRY_DELAY = 10
+        DRIVER_PAGE_LOAD_TIMEOUT = 120
 
                
     # =====================================================
@@ -50,13 +56,13 @@ class BankScraper:
         """Initialize Selenium driver with retries."""
         for attempt in range(retries):
             try:
-                self.logger.notice(f"Attempt {attempt + 1} to create driver...")
+                self.logger.info(f"Attempt {attempt + 1} to create driver...")
                 self.executor.create_uc_driver(headless=headless, minimized=minimized)
                 if not self.executor.driver:
                     raise RuntimeError("Driver creation returned None")
 
                 self.executor.driver.set_page_load_timeout(120)
-                self.logger.save("Driver created successfully.")
+                self.logger.info("Driver created successfully.")
                 return True
 
             except WebDriverException as e:
@@ -74,10 +80,8 @@ class BankScraper:
     @log_exceptions(level="warning")
     def close_session(self):
         if self.executor.driver:
-            self.logger.info("Closing browser session...")
             self.executor.driver.quit()
-            # shutil.rmtree(self.executor.profile_dir, ignore_errors=True)
-            self.logger.save("Driver closed successfully.")
+            self.logger.info("Driver closed successfully.")
 
     # =====================================================
     # SCRAPING LOGIC
@@ -97,7 +101,7 @@ class BankScraper:
     def scrape_bank(self, bank_params: dict) -> dict:
         """Scrape a single bank using its parameters."""
         bank_name = bank_params.get("bank_name")
-        self.logger.notice(f"=== {bank_params['bank_type_code']}: {bank_name} ===")
+        self.logger.info(f"=== {bank_params['bank_type_code']}: {bank_name} ===")
 
         scraped_data = []
         try:
@@ -242,14 +246,14 @@ class BankScraper:
     def export_error_log(self):
         """Export human-readable text and HTML error summaries. Always returns file paths."""
         if not self.errors:
-            self.logger.info("✅ No errors or missing-data notes to export.")
+            self.logger.info("No errors or missing-data notes to export.")
             return None
 
         errors,infos = [e for e in self.errors if e["severity"] == "ERROR"],[e for e in self.errors if e["severity"] == "INFO"]
         # --- Build HTML Summary ---
         html_lines = [
             "<html><body style='font-family:Arial, sans-serif;'>",
-            f"<h2>📘 Scraper Execution Summary — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</h2>",
+            f"<h2> Scraper Execution Summary — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</h2>",
             "<hr>"
         ]
 
@@ -285,12 +289,12 @@ class BankScraper:
 
         try:
             # ===== Stage 1: Process Current Cache =====
-            self.logger.notice("Starting cache processing pipeline...")
+            self.logger.info("Starting cache processing pipeline...")
             processed_cache = self.operator.runner(final_dict, pipeline)
             baseline = deepcopy(processed_cache)
 
             Helper.save_json(processed_cache, paths["process"])
-            self.logger.save(f"Processed cache saved at: {paths['process']}")
+            self.logger.info(f"Processed cache saved at: {paths['process']}")
 
             # ===== Stage 2: Compare with Previous Cache =====
             try:
@@ -298,7 +302,7 @@ class BankScraper:
                     old_data = Helper.load_json(self.PREV_SCRP_JSN)
 
                     if isinstance(old_data, dict):
-                        self.logger.notice("Loaded previous processed cache for comparison.")
+                        self.logger.info("Loaded previous processed cache for comparison.")
                         comparison = self.operator.process_comparison(
                             old_data, processed_cache, key="SHA_ONE"
                         )
@@ -344,7 +348,7 @@ class BankScraper:
         if report_type.lower() in ("pdf", "both"):
             #write report in pdf
             self.reporter.build(cache_data, paths["pdf_archive"])
-            self.logger.save(f"PDF archived at: {paths['pdf_archive']}")
+            self.logger.info(f"PDF archived at: {paths['pdf_archive']}")
 
             if rewrite or not os.path.exists(paths["pdf_latest"]):
                 shutil.copy(paths["pdf_archive"], paths["pdf_latest"])
@@ -352,12 +356,11 @@ class BankScraper:
         if report_type.lower() in ("xlsx", "both"):
             #write report in excel
             self.reporter.write_excel_report(cache_data, paths["xlsx_archive"])
-            self.logger.save(f"Excel archived at: {paths['xlsx_archive']}")
+            self.logger.info(f"Excel archived at: {paths['xlsx_archive']}")
 
             if rewrite or not os.path.exists(paths["xlsx_latest"]):
                 shutil.copy(paths["xlsx_archive"], paths["xlsx_latest"])
     
-         
     def runner(self,bank_codes):
        
         final_dict  = self.get_final_struct()
@@ -373,7 +376,7 @@ class BankScraper:
                 result = self.scrape_bank(bank_params)
                 result = BankScraper.dedupe_responses(result)
 
-                # 🟡 Detect banks with no data
+                #Detect Banks with No Data
                 scraped_blocks = result.get("scraped_data", [])
                 if not scraped_blocks or all(
                     not block.get("data_present", False) for block in scraped_blocks
@@ -394,12 +397,12 @@ class BankScraper:
 
             final_dict["records"].append(result)
 
-        # ✅ cache save is now explicit
+        # cache save is now explicit
         Helper.save_json(final_dict, self.paths["cache"])
-        self.logger.save(f"Cache saved at: {self.paths['cache']}")
+        self.logger.info(f"Cache saved at: {self.paths['cache']}")
 
         self.close_session()
-        self.logger.save("Closing Session !!")
+        self.logger.info("Closing Session !!")
 
         return final_dict
     

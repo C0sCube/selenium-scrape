@@ -1,6 +1,6 @@
 # app/actions/click_save_action.py
 import os, time, base64
-from selenium.webdriver import ActionChains
+from selenium.webdriver import ActionChains #type: ignore
 from app.logger import get_global_logger
 from app.actions.helper import ActionHelper
 

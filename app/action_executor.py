@@ -1,14 +1,13 @@
-import time, traceback, random, uuid
+import time, traceback, random
 import subprocess
 import re
 from datetime import datetime
-import undetected_chromedriver as uc
 import pygetwindow as gw #type: ignore
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.support import expected_conditions as EC
+import undetected_chromedriver as uc #type: ignore
+from selenium.webdriver.common.by import By #type: ignore
+from selenium.webdriver.support.ui import WebDriverWait #type: ignore
+from selenium.common.exceptions import TimeoutException #type: ignore
+from selenium.webdriver.support import expected_conditions as EC #type: ignore
 
 from app.logger import get_global_logger
 from app.utils import Helper
@@ -48,6 +47,8 @@ class ActionExecutor:
             "ptxt": By.PARTIAL_LINK_TEXT,
         }
 
+        # ========== Locators and Conditions ==========
+        
         self.condition_map = {
             "clickable": EC.element_to_be_clickable,
             "visible": EC.visibility_of_element_located,
@@ -105,9 +106,9 @@ class ActionExecutor:
     
     def create_uc_driver(self, headless=False, minimized=True):
         
-        # --headless                         # Run Chrome in headless mode (no GUI)
-        # --disable-gpu                     # Disable GPU hardware acceleration
-        # --no-sandbox                      # Bypass OS security model (useful in Docker)
+        # --headless                       # Run Chrome in headless mode (no GUI)
+        # --disable-gpu                    # Disable GPU hardware acceleration
+        # --no-sandbox                     # Bypass OS security model (useful in Docker)
         # --disable-dev-shm-usage          # Avoid shared memory issues in containers
         # --start-maximized                # Start browser maximized
         # --window-size=1920,1080          # Set specific window size
@@ -153,12 +154,11 @@ class ActionExecutor:
                 title = self.driver.title or "data:,"
                 for w in gw.getWindowsWithTitle(title):
                     w.minimize()
-                    self.logger.notice("Chrome window minimized safely.")
+                    self.logger.info("Chrome window minimized safely.")
                     break
             except Exception as e:
                 self.logger.warning(f"Minimize failed, fallback to visible small window: {e}")
-        
-    
+         
     def get_website(self, timeout = 120):
         if self.driver:
             try:
@@ -178,7 +178,7 @@ class ActionExecutor:
     def _restore_window(self):
         """Restore or bring Chrome to front if minimized/tiny."""
         try:
-            self.logger.trace("Restoring Chrome window...")
+            self.logger.info("Restoring Chrome window...")
             self.driver.set_window_size(900, 700)
             self.driver.set_window_position(-700, 200)
             title = self.driver.title or "data:,"
@@ -186,26 +186,26 @@ class ActionExecutor:
                 w.activate()
                 break
             time.sleep(0.5)
-            self.logger.trace("Chrome restored to visible window.")
+            self.logger.info("Chrome restored to visible window.")
         except Exception as e:
             self.logger.warning(f"Could not restore window: {e}")
 
     def _minimize_window(self):
         """Minimize or shrink Chrome after action completes."""
         try:
-            self.logger.trace("Minimizing Chrome window...")
+            self.logger.info("Minimizing Chrome window...")
             title = self.driver.title or "data:,"
             for w in gw.getWindowsWithTitle(title):
                 w.minimize()
                 break
             time.sleep(0.3)
-            self.logger.trace("Chrome minimized again.")
+            self.logger.info("Chrome minimized again.")
         except Exception as e:
             # Fallback to shrink if minimize fails
             try:
                 self.driver.set_window_size(250, 200)
                 self.driver.set_window_position(10, 10)
-                self.logger.trace("Fallback: Chrome shrunk to 250x200.")
+                self.logger.info("Fallback: Chrome shrunk to 250x200.")
             except Exception as e2:
                 self.logger.warning(f"Could not minimize or shrink: {e2}")
    
@@ -219,7 +219,7 @@ class ActionExecutor:
         #auto scroll
         try:
             if _action_.get("scroll",False):
-                self.logger.trace("Auto-scrolling to load lazy elements...")
+                self.logger.info("Auto-scrolling to load lazy elements...")
                 scroll_height = self.driver.execute_script("return document.body.scrollHeight")
                 for y in range(0,scroll_height,400):
                     self.driver.execute_script(f"window.scrollTo(0,{y});")
@@ -232,7 +232,7 @@ class ActionExecutor:
             
         #perform action
         try:
-            self.logger.notice(f"Performing _action_: {self.ACTION_TYPE} on {self.VALUE}")
+            self.logger.info(f"Performing _action_: {self.ACTION_TYPE} on {self.VALUE}")
 
             if self.WAIT_UNTIL:
 
@@ -428,7 +428,7 @@ class ActionExecutor:
         generic_actions = self.GENERIC_ACTIONS
 
         block = self.PARAMS["blocks"]
-        self.logger.notice(f"Total Action(s) {len(block)}")
+        self.logger.info(f"Total Action(s) {len(block)}")
 
         for _, _action_ in enumerate(block):
             data = None
@@ -474,8 +474,3 @@ class ActionExecutor:
                 block_data.append(data)
 
         return block_data
-
-
-
-
-    

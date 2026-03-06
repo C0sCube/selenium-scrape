@@ -1,15 +1,8 @@
 # app/actions/text_action.py
 from app.logger import get_global_logger
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException #type: ignore
 from app.actions.helper import ActionHelper
-
-
-# try:
-#     logger.info(f"Scraping text using BY={by}, VALUE={value}")
-#     elements = driver.find_elements(by, value)
-# except Exception as e:
-#     logger.error(f"Failed to locate text elements: {type(e).__name__} - {e}")
-#     return []
+import pandas as pd
 
 def textScrape(executor):
 
@@ -18,7 +11,7 @@ def textScrape(executor):
     by = executor.BY
     value = executor.VALUE
     fields = executor.SCRAPE_FIELDS
-    scrape_content = []
+    scrape_content = [["instance","field","value"]]
 
     
     for key, fetch_data in fields.items():
@@ -30,18 +23,31 @@ def textScrape(executor):
 
         elements = driver.find_elements(by, value) if executor.MULTIPLE else [driver.find_element(by, value)]
 
-        for element in elements:
+        for idx, element in enumerate(elements):
             txt = element.get_attribute("textContent")
-            scrape_content.append(
-                ActionHelper.generate_resp_packet(
-                    name=f"text_{executor.html_name}",
-                    header=f"{driver.current_url}",
-                    value=txt,
-                    type="text",
-                )
-            )
+            
+            scrape_content.append([idx,key,txt])
+            # scrape_content.append(
+            #     ActionHelper.generate_resp_packet(
+            #         name=f"text_{executor.html_name}",
+            #         header=f"{driver.current_url}",
+            #         value=txt,
+            #         type="text",
+            #     )
+            # )
 
-    return scrape_content
+    df = pd.DataFrame(scrape_content[1:], columns=scrape_content[0])
+    html_string = df.to_html(index = False)
+    final_content = [
+        ActionHelper.generate_resp_packet(
+            name=f"text_{executor.html_name}",
+            header=f"{driver.current_url}",
+            value=html_string,
+            type="table_html",
+        )  
+    ]
+    
+    return final_content
 
 
 # for elem in elements:

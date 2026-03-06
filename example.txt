@@ -1,0 +1,65 @@
+[SCHEDULER]
+   ↓
+program_handler()
+   ↓
+load_config() → bank_codes
+   ↓
+(optional) start_mail
+   ↓
+start_session()  ← Selenium driver created here (always)
+   ↓
+runner(bank_codes)
+   ↓
+   for each bank_code:
+        scrape_bank(params)
+           ↓
+        executor.set_params()
+           ↓
+        executor.get_website()  → driver.get(url)
+           ↓
+        executor.execute_blocks() → DOM extraction
+           ↓
+        delete_all_cookies()
+   ↓
+save cache JSON
+   ↓
+close_session()  ← driver quits
+   ↓
+create reports + process_cache + mail end
+
+
+================TARGET=================
+
+[SCHEDULER]
+   ↓
+program_handler()
+   ↓
+load_config() → bank_codes
+   ↓
+(optional) start_mail
+   ↓
+PLAN: partition contracts by strategy
+   ↓
+┌──────────────────────────────┐
+│ Phase A: HTTP bucket (20)    │
+│   - request HTML             │
+│   - parse & extract blocks   │
+│   - build results            │
+└──────────────────────────────┘
+   ↓
+┌──────────────────────────────┐
+│ Phase B: Selenium bucket (30)│
+│   if not empty:              │
+│     start_session() (once)   │
+│     for each contract:       │
+│        driver.get(url)       │
+│        execute_blocks()      │
+│        delete_all_cookies()  │
+│     close_session()          │
+└──────────────────────────────┘
+   ↓
+merge results → final_dict
+   ↓
+save cache JSON
+   ↓
+create reports + process_cache + mail end
