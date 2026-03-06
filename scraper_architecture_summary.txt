@@ -1,0 +1,83 @@
+Conversation Summary — Web Scraper Architecture & Refactor Plan
+
+1) Context / Current System
+- Your scraper is config-driven: each “contract” (e.g., PSB_5) defines bank metadata, base_url, and a list of blocks (actions) like table/text/html.
+- Current runtime always starts Selenium (undetected-chromedriver) once per run, then loops through all contracts using the same driver, clearing cookies between banks.
+- Output is stored as “packets” (action results) inside a cache.json (final_dict) and then used for PDF/XLSX reporting and comparison.
+
+2) Key Problem Identified
+- Selenium is heavy and is being used even for SSR/static pages where an HTTP request + HTML parsing (BS4) would suffice.
+- Auto-detecting page type at runtime can add overhead if done every run; also you want to preserve your optimized “single driver reuse” model.
+
+3) Proposed Execution Model (Conceptual)
+- Move from a “browser-first” model to a “planned/bucketed” model:
+  Load → Normalize → Partition (Soup vs Selenium) → Execute buckets → Merge results → Report.
+- Do not revert to per-contract driver launches. Instead:
+  - Run Soup bucket (HTTP+BS4) first with no driver.
+  - Start one Selenium session only if Selenium bucket is non-empty; then loop those contracts.
+- Strategy selection should be explicit (user/config-driven), not repeated runtime detection.
+  Optional later: ‘auto’ mode could learn/cache strategy per domain, but not required now.
+
+4) What “Soup Mode” Means (Technical Boundaries)
+- Soup/HTTP mode extracts only what exists in the HTTP response HTML (plus any directly fetchable links/resources).
+- No JS execution, no clicks, no DOM-hydration waits. Therefore:
+  - Drop XPath in Soup v1.
+  - Drop Selenium-only actions (click/select/input/tablist/screenshot/pdf/execute_script, etc.).
+  - Drop wait_until and similar DOM wait semantics in Soup.
+- Soup v1 scope: actions = table, text, html (later add aggregate actions like weblist).
+- Keep selection methods that make sense: by=css and by=tag.
+
+5) Generic Action Config Findings
+- Your generic_config includes actions: text/select/table/screenshot/download/http/website/html/requests/click_save/tablist/weblist/api_get, etc.
+- For Soup v1 you decided:
+  - Keep: table, text, html.
+  - Remove/ignore: xpath, wait_until, and all Selenium-only configs/keys.
+  - Keep output storage schema unchanged.
+
+6) Canonical Storage for Text (Solved)
+- Core challenge for text isn’t extraction; it’s consistent storage and reporting (Excel/PDF), especially when values repeat.
+- You chose a canonical “long/fact-row” structure for action_text response items:
+  - field, instance, value
+  Example:
+    Company  0  ABC Ltd
+    Index    0  NIFTY 50
+    MarketCap 0 ₹ 5,00,000 Cr
+    MarketCap 1 ₹ 5,10,000 Cr
+- This is lossless and lets you render later as:
+  - KV table (Field/Value/Instance) for PDF
+  - Pivoted/wide table (columns=field, rows=instance) for Excel
+- Mismatched field lengths are handled at render-time by filling missing cells with blank/NA/null (policy chosen later).
+
+7) Display/Reporting Guidance
+- PDF is for human readability; Excel is for analysis.
+- Tables → Excel tables; text fact-rows → KV sheet and optional pivot sheet; HTML → heuristic or hint-based rendering (paragraph vs list vs raw) with optional raw evidence.
+- Use a rendering policy (config-driven hints + heuristics) rather than assuming scraped HTML implies a single correct display format.
+
+8) Architecture Diagnosis from Your Code
+- program_handler loads config and ALWAYS starts Selenium before scraping.
+- BankScraper orchestrates the run but is coupled to ActionExecutor.
+- ActionExecutor is Selenium-centric and bundles: driver lifecycle, navigation, block interpretation, wait+find_element, action dispatch, packet building.
+- app.actions contains the action implementations.
+
+9) Refactor Goal & Recommended Modular Roles
+- First priority: decouple BankScraper from ActionExecutor.
+- Introduce an “engine/executor” abstraction so BankScraper depends on capabilities, not Selenium.
+- Split execution into:
+  - SeleniumEngine (existing behavior, all actions)
+  - SoupEngine (HTTP+BS4, v1 supports table/text/html)
+- Introduce a StrategyPlanner (or loader planning stage) to partition contracts into soup vs selenium before starting any driver.
+- Extract a shared PacketBuilder so both engines produce identical packet schema (preserves cache.json compatibility).
+- Move generic action expansion out of ActionExecutor into ConfigLoader/Normalizer so executors receive normalized dict blocks.
+
+10) Recommended Execution Start Point
+- Use main.py (or program_handler) as the “composition root”: wiring services, loading config, planning buckets, running engines, then reporting.
+- Keep BankScraper as an orchestrator/library component invoked by main, not the entry point.
+
+11) Parallelism (Later Task)
+- Once bucket execution is stable, you can run Soup and Selenium in parallel using separate workers.
+- Selenium parallelism is generally safer with process isolation than threads.
+
+Next Steps (When You Resume)
+- Finalize soup config schema for table/text/html and cleaning flags (clean_table, clean_text, clean_html).
+- Decide reporting fill policy for missing pivot cells (blank vs NA vs null).
+- Implement refactor incrementally using “golden run” snapshots to ensure output compatibility.
