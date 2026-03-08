@@ -239,9 +239,6 @@ class ActionExecutor:
                 cond = self.__get_condition(self.WAIT_UNTIL, self.WAIT_BY, self.WAIT_VALUE)
                 try:
                     WebDriverWait(self.driver, self.TIMEOUT).until(cond)
-                    # self.driver.execute_script("window.stop();")
-                    # self.logger.info(f"Website Loading paused as {self.WAIT_VALUE} present in DOMME")
-                
                 except TimeoutException:
                     
                     page_state = self.driver.execute_script("return document.readyState")

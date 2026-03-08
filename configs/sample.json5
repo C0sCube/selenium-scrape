@@ -1,0 +1,45 @@
+{
+  ATTRIBUTE: {
+    report_type: "pdf",
+    process_cache: false,
+    minimize_selenium: false,
+    strategy: ["soup", "selenium"], //soup, selenium, thread
+    post_scrape: {
+      SHAONE: {
+        primary: [
+          ["normalize_df", "value", "norm_table", "table_html"],
+          ["sha1", "value", "SHA_ONE", "pdf"],
+        ],
+        secondary: [["sha1", "norm_table", "SHA_ONE"]],
+      },
+    },
+  },
+  CONTRACTS: {
+    PSB_2: {
+      contract_name: "Bank of India",
+      contract_type: "PUBLIC SECTOR BANKS",
+      contract_code: "PSB_2",
+      engine: "selenium",
+      hero_url: "https://bankofindia.bank.in/interest-rate/saving-bank-deposit-rate",
+      hero_timeout: 60,
+      headers: true,
+      steps: ["action_table"],
+    },
+    PSB_3: {
+      contract_name: "Bank of Maharashtra",
+      contract_type: "PUBLIC SECTOR BANKS",
+      contract_code: "PSB_3",
+      engine: "soup",
+      hero_url: "https://bankofmaharashtra.bank.in/domestic-term-deposits",
+      hero_timeout: 30,
+      headers: true,
+      steps: [
+        "action_table",
+        "action_website||https://bankofmaharashtra.bank.in/nre-deposits",
+        "action_table",
+        "action_website||https://bankofmaharashtra.bank.in/fcnr-deposits",
+        "action_table",
+      ],
+    },
+  },
+}

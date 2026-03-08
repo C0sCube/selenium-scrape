@@ -1,7 +1,7 @@
 import time, traceback
 from datetime import timedelta, datetime
 
-def scheduler_loop(logger, run_fn, sch_days:list, sch_time:list):
+def schedule_program(logger, run_fn, sch_days:list, sch_time:list):
     """
     Wraps the main() scraper function to run at specific times (HHMM format)
     and only on specified weekdays. times = ["0800", "1240", "1530"] run_days = ["mon", "tue", "wed", "thu", "fri"]

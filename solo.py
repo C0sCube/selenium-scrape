@@ -36,7 +36,7 @@ if __name__ == "__main__":
         log_path = os.path.join(output_path(),"log")
         logger = setup_logger(name="scraper", log_dir=log_path, log_level=4)
         set_global_logger(logger)
-        bank_codes =["BSE_3"] 
+        bank_codes =["BSE_4"] 
         main(
             bank_codes, 
             process=False, 

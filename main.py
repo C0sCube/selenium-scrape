@@ -10,7 +10,7 @@ from app.logger import setup_logger, get_global_logger, set_global_logger
 from app.BankScraper import BankScraper
 from app.utils import Helper
 from app.mailer import Mailer
-from app.schedular import scheduler_loop
+from app.schedular import schedule_program
 
 
 def program_handler(

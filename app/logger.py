@@ -124,7 +124,7 @@ def setup_logger(
 # --- Global Logger Registry ---
 _active_logger = None
 
-def set_global_logger(logger):
+def globalize_logger(logger):
     global _active_logger
     _active_logger = logger
 

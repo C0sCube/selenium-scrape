@@ -39,11 +39,11 @@ def load_gen_config():
     return load_json5(config_path)
 
 
-def get_session_dir():
+def session_dir():
     out_dir = output_path()
     return create_dir(out_dir,"session")
 
-def get_schedule_config():
+def schedule_config():
     paths = get_paths()
     return paths["config_schedule"]
 

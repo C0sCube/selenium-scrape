@@ -9,7 +9,7 @@ from copy import deepcopy
 from datetime import datetime
 from app.logger import get_global_logger, log_exceptions
 from app.utils import Helper
-from app.constants import load_config, get_session_dir, create_dir
+from app.constants import load_config, session_dir, create_dir
 
 class BankScraper:
     """Main controller for orchestrating scraping per bank."""
@@ -31,8 +31,8 @@ class BankScraper:
         self.errors = []  # structured error store
         
         self.date_now = datetime.now()
-        self.RUNTIME_PATH = create_dir(get_session_dir(), f"session_{self.date_now.strftime('%y%m%d_%H%M')}")
-        self.SESSION_LATEST = create_dir(get_session_dir(), "session_latest")
+        self.RUNTIME_PATH = create_dir(session_dir(), f"session_{self.date_now.strftime('%y%m%d_%H%M')}")
+        self.SESSION_LATEST = create_dir(session_dir(), "session_latest")
         self.PREV_SCRP_JSN = os.path.join(self.SESSION_LATEST, "PROCESS_LATEST.json")
         self.ERROR_HTML_PATH = os.path.join(self.RUNTIME_PATH,"error_data.html")
         
