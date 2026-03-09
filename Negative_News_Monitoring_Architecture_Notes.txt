@@ -1,0 +1,200 @@
+
+NEGATIVE COMPANY NEWS MONITORING – ARCHITECTURE NOTES
+====================================================
+
+OBJECTIVE
+---------
+Aggregate ALL negative company-related news in a rolling 24-hour format
+with minimal maintenance cost and acceptable recall for compliance use cases
+(e.g., NSE risk monitoring, adverse media detection, ESG/legal risk tracking).
+
+
+PROBLEM STATEMENT
+-----------------
+Traditional RSS aggregators (Google News RSS / Bing News RSS / Yahoo News RSS)
+are NOT exhaustive news feeds.
+
+They are:
+    - Ranked retrieval systems
+    - Top-K limited (typically 20–100 results)
+    - Authority-biased
+    - Regionally weighted
+    - Volatile over time
+
+This means:
+    - Articles may be indexed by Google
+    - But NOT retrievable via company-name queries
+    - And may disappear from RSS after re-ranking
+
+Example:
+    Article appears in RSS at 08:00
+    Drops out of Top-K at 10:00
+    Still exists online
+    But no longer retrievable via RSS
+
+Hence:
+    RSS = Sliding ranked window
+    NOT a historical archive
+
+
+RSS VOLATILITY
+-------------
+RSS feeds are ephemeral.
+News that appears at time T1 may vanish from the feed at T2
+because:
+    - Newer articles published
+    - Cluster merging
+    - Ranking suppression
+    - Regional relevance adjustments
+    - Source authority weighting
+
+Therefore:
+    Fetch Once = Lose Forever
+
+Solution:
+    Poll-and-Persist model
+
+
+POLLING BUCKET MODEL
+--------------------
+Instead of:
+    500 companies × 120 keywords = 60,000 daily queries
+
+Use:
+    Company-only queries
+    Every 2 hours
+
+24h = 12 runs
+
+Each run:
+    500 companies × 1 query = 500 calls
+
+Daily:
+    500 × 12 = 6000 RSS calls/day
+
+Persist ALL results returned in each run.
+
+This creates:
+    Union of 12 Top-K windows
+
+Which approximates:
+    Temporal Recall Expansion
+
+Meaning:
+    Even if an adverse article is ranked out later,
+    it may have appeared briefly in an earlier polling window.
+
+Negative news is typically:
+    - Republished
+    - Syndicated
+    - Escalated to Tier-1 press
+
+So capturing ANY credible coverage within 24h is sufficient
+for regulatory monitoring.
+
+
+MULTI-ENGINE SAMPLING
+---------------------
+Use:
+    Google RSS
+    Bing News RSS
+    Yahoo News RSS
+
+Each engine applies different ranking logic.
+
+Union(Google ∪ Bing ∪ Yahoo)
+    increases publisher diversity
+    improves recall of:
+        - Regional portals
+        - Trade journals
+        - ESG publications
+        - Legal reporting sites
+
+
+SOURCE FILTERING STRATEGY
+-------------------------
+Optional Tier-1 Query:
+
+Query 1 (Open Universe):
+    "Company Name" when:2h
+
+Query 2 (Tier-1 Sources):
+    "Company Name"
+    (source:"Reuters" OR source:"Economic Times" OR source:"Business Standard")
+    when:2h
+
+Persist:
+    Union(Query1 ∪ Query2)
+
+Note:
+    Source filtering increases precision
+    but reduces recall.
+    Hence should be used as secondary bucket.
+
+
+GDELT – EXHAUSTIVE NEWS LAYER
+-----------------------------
+GDELT (Global Database of Events, Language and Tone)
+provides:
+
+    - Ingestion from ~65,000 global sources
+    - Full-corpus querying
+    - Historical stability
+    - Keyword filtering
+    - Built-in sentiment (Tone)
+
+Unlike RSS:
+    GDELT does NOT apply Top-K ranking suppression.
+
+Sample API:
+
+https://api.gdeltproject.org/api/v2/doc/doc
+?query="Tata Steel"
+&mode=ArtList
+&timespan=24h
+&maxrecords=100
+&format=json
+
+Tone range:
+    -100 to +100
+
+Filter negative:
+    tone < -2
+
+GDELT captures:
+    - Trade journals
+    - Legal portals
+    - ESG watchdogs
+    - Regional litigation coverage
+
+Often missed by Google RSS.
+
+
+FINAL DAILY PIPELINE
+--------------------
+Every 2 hours:
+    Poll RSS (Google + Bing + Yahoo)
+    Persist all results
+
+Daily Aggregation (Rolling 24h):
+    1. Filter Published >= NOW - 24h
+    2. Deduplicate by URL
+    3. Company/Alias match
+    4. Keyword detection
+    5. Sentiment classification
+    6. Keep Negative news only
+
+Optional:
+    Query GDELT once daily
+    Merge with RSS persistence
+
+
+OUTCOME
+-------
+Provides:
+    - Low-maintenance ingestion
+    - Volatility mitigation
+    - High probability adverse capture
+    - Cost-efficient polling
+    - 24h compliance-aligned reporting
+

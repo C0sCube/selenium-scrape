@@ -1,5 +1,5 @@
 {
-  BSE_3: {
+  IBBI: {
     bank_name: "IBBI GOV",
     bank_type: "Private Sector",
     bank_type_code: "BSE_3",
@@ -75,10 +75,10 @@
     headless: true,
     pdf_or_excel: "pdf",
   },
-  NSE100: {
+  NGT: {
     bank_name: "GREEN_TRIBUNAL",
     bank_type: "NSE_INDIA",
-    bank_type_code: "NSE100",
+    bank_type_code: "NGT",
     base_url: "https://www.greentribunal.gov.in/",
     base_timeout: 60,
     blocks: [
@@ -484,46 +484,6 @@
         default_wait: 10,
         timeout: 30,
         log_message: "Save Html.",
-      },
-    ],
-    headless: true,
-    pdf_or_excel: "pdf",
-  },
-  KOTAK: {
-    bank_name: "KOTAK MF",
-    bank_type: "Public Sector",
-    bank_type_code: "BSE_1",
-    base_url: "https://www.kotakmf.com/",
-    base_timeout: 30,
-    blocks: [
-      {
-        action: "weblist",
-        by: "tag",
-        value: "body",
-        skip_if_not_found: true,
-        default_wait: 10,
-        timeout: 20,
-        log_message: "Performing webList.",
-        web_links: [
-          "https://www.kotakmf.com/mutual-funds/passive-funds/kotak-nifty200-quality-30-etf",
-          "https://www.kotakmf.com/mutual-funds/passive-funds/kotak-silver-etf",
-          "https://www.kotakmf.com/mutual-funds/passive-funds/kotak-nifty-psu-bank-etf",
-        ],
-        steps: [
-          {
-            action: "text",
-            by: "tag",
-            value: "body",
-            scrape_fields: {
-              company: "css||#pd_banner .mb-1 span",
-              timestamp: "css||#pd_banner span span",
-              inav: "css||.nextLine",
-            },
-            multiple: true,
-            default_wait: 3,
-            timeout: 20,
-          },
-        ],
       },
     ],
     headless: true,

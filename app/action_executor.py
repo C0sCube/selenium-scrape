@@ -1,7 +1,5 @@
-import time, traceback, random
-import subprocess
-import re
 from datetime import datetime
+import time, traceback, random, subprocess, re
 import pygetwindow as gw #type: ignore
 import undetected_chromedriver as uc #type: ignore
 from selenium.webdriver.common.by import By #type: ignore

@@ -43,6 +43,10 @@ def session_dir():
     out_dir = output_path()
     return create_dir(out_dir,"session")
 
+def data_dir():
+    out_dir = output_path()
+    return create_dir(out_dir,"data") 
+
 def schedule_config():
     paths = get_paths()
     return paths["config_schedule"]
