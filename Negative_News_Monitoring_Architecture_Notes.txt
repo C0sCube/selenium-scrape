@@ -1,4 +1,3 @@
-
 NEGATIVE COMPANY NEWS MONITORING – ARCHITECTURE NOTES
 ====================================================
 
