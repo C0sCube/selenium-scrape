@@ -5,8 +5,8 @@ warnings.filterwarnings('ignore')
 ssl._create_default_https_context = ssl._create_stdlib_context
 
 # --- Internal Imports ---
-from app.constants import output_path, get_schedule_config,load_config
-from app.logger import setup_logger, get_global_logger, set_global_logger
+from app.constants import output_path, schedule_config,load_config
+from app.logger import setup_logger, get_global_logger, globalize_logger
 from app.BankScraper import BankScraper
 from app.utils import Helper
 from app.mailer import Mailer
@@ -33,7 +33,6 @@ def program_handler(
 
     try:
         logger.info(f"Running Program: {PROGRAM_NAME}")
-        # ---- Start mail ----
         if mailer.SEND_MAIL:
             logger.info("Sending start email...")
             mailer.start_mail(
@@ -42,21 +41,16 @@ def program_handler(
                 dev=True
             )
 
-        # ---- Start Selenium ----
         if not scraper.start_session(minimized=minimize):
             raise RuntimeError("Failed to initialize Selenium driver")
 
-        # ---- Main scrape ----
         final_dict = scraper.runner(bank_codes)
-
-        # ---- Reports ----
         scraper.create_scrape_report(final_dict, report_type)
         error_html_path = scraper.export_error_log()
 
         if process:
             scraper.process_cache(final_dict)
 
-        # ---- Completion mail ----
         if mailer.SEND_MAIL:
             logger.info("Sending completion email...")
             attachments = [
@@ -79,7 +73,7 @@ def program_handler(
         raise
 
     finally:
-        # ---- Always cleanup ----
+
         try:
             scraper.close()
         except Exception:
@@ -95,14 +89,14 @@ if __name__ == "__main__":
     # --- Setup Global Logger ---
     log_path = os.path.join(output_path(),"log")
     logger = setup_logger(name="scraper", log_dir=log_path, log_level=5)
-    set_global_logger(logger)
+    globalize_logger(logger)
 
     
     logger.notice("Starting Scraper Scheduler...")
-    config_sch = get_schedule_config()
+    config_sch = schedule_config()
     
     
-    scheduler_loop(
+    schedule_program(
         logger,
         program_handler,
         config_sch["days"], 

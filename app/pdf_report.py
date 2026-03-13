@@ -81,7 +81,31 @@ class PDFReportBuilderPro:
         <div style='text-align:center;color:#999;font-size:8.5pt;
                     margin:12px 0;'>──── xxx ────</div>
         """
-        
+    
+    def _make_excel_safe(self, df):
+        def clean_cell(x):
+            if pd.isna(x):
+                return None
+
+            if isinstance(x, str):
+                x = x.strip()
+                x = re.sub(r'[₹,$,%\s]', '', x)
+                x = x.replace(',', '')
+
+            try:
+                num = pd.to_numeric(x)
+                if pd.notna(num):
+                    return num.item() if hasattr(num, "item") else num
+            except:
+                pass
+
+            if hasattr(x, "item"):
+                return x.item()
+
+            return x
+
+        return df.applymap(clean_cell)
+      
     def _html_to_pdf(self, html_content, output_file):
         """Convert HTML string to PDF using pdfkit."""
         html_template = f"""
@@ -471,14 +495,11 @@ class PDFReportBuilderPro:
         ws_summary = wb.active
         ws_summary.title = "Summary"
         
-        def sanitize_Win_filename(name):
-            # Replace illegal Windows characters with underscores
-            return re.sub(r'[<>:"/\\|?*]', '_', name)
+        def sanitize_Win_filename(name): return re.sub(r'[<>:"/\\|?*]', '_', name)
 
         # Style helpers
         header_fill = PatternFill(start_color="DCE6F1", end_color="DCE6F1", fill_type="solid")
-        border = Border(left=Side(style="thin"), right=Side(style="thin"),
-                        top=Side(style="thin"), bottom=Side(style="thin"))
+        border = Border(left=Side(style="thin"), right=Side(style="thin"), top=Side(style="thin"), bottom=Side(style="thin"))
         align_center = Alignment(horizontal="center", vertical="center")
 
         # ===== SUMMARY HEADERS =====
@@ -535,6 +556,7 @@ class PDFReportBuilderPro:
                     try:
                         if typ in ("html", "table_html"):
                             df = pd.read_html(value)[0]
+                            df = self._make_excel_safe(df)
                             for r in dataframe_to_rows(df, index=False, header=True):
                                 ws.append(r)
 
@@ -543,15 +565,7 @@ class PDFReportBuilderPro:
                             df = pd.read_excel(BytesIO(xlsx_bytes))
                             for r in dataframe_to_rows(df, index=False, header=True):
                                 ws.append(r)
-
-                        # elif typ == "json":
-                        #     json_bytes = base64.b64decode(value)
-                        #     json_text = json_bytes.decode("utf-8", errors="ignore")
-                        #     data = json.loads(json_text)
-                        #     df = pd.json_normalize(data)
-                        #     for r in dataframe_to_rows(df, index=False, header=True):
-                        #         ws.append(r)
-                        
+                                
                         elif typ == "json":
                             value = response.get("value")
                             structure = response.get("structure", {})
@@ -570,7 +584,7 @@ class PDFReportBuilderPro:
 
                         elif typ == "pdf":
                             try:
-                                # Decode and save the PDF locally
+                            
                                 pdf_bytes = base64.b64decode(value)
 
                                 # Build attachment folder & filename
@@ -583,7 +597,6 @@ class PDFReportBuilderPro:
                                 with open(pdf_path, "wb") as f:
                                     f.write(pdf_bytes)
 
-                                # Extract tables from the saved PDF using pdfplumber
                                 with pdfplumber.open(pdf_path) as pdf:
                                     for page in pdf.pages:
                                         tables = page.extract_tables()

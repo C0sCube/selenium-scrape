@@ -6,7 +6,7 @@ ssl._create_default_https_context = ssl._create_stdlib_context
 # --- Internal Imports ---
 from app.constants import * #paths
 
-from app.logger import setup_logger, set_global_logger
+from app.logger import setup_logger,globalize_logger
 from app.BankScraper import BankScraper
  
 def main(
@@ -35,8 +35,8 @@ if __name__ == "__main__":
         # --- Setup Global Logger ---
         log_path = os.path.join(output_path(),"log")
         logger = setup_logger(name="scraper", log_dir=log_path, log_level=4)
-        set_global_logger(logger)
-        bank_codes =["BSE_4"] 
+        globalize_logger(logger)
+        bank_codes =["iNAV_4"] 
         main(
             bank_codes, 
             process=False, 

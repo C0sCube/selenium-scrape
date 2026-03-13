@@ -248,8 +248,9 @@ class OperationExecutorLatest:
 
         try:
             if content_type == "table_html":
-                return pd.read_html(StringIO(raw_content))[0]
-
+                df = pd.read_html(StringIO(raw_content))[0]
+                df = df.apply(pd.to_numeric, errors='ignore')
+                return df
             elif content_type == "html":
                 soup = BeautifulSoup(raw_content, "html.parser")
                 text_lines = soup.get_text().splitlines()
