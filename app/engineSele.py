@@ -27,32 +27,122 @@ class SeleniumEngine:
 
         # executor handles selenium actions
         self.executor = ActionExecutor()
+        self.driver = None
+        
+        self.PAGE_LOAD_TIMEOUT = 120
+        self.RETRIES = 3
+        self.RETRY_DELAY = 5
+        
+
+        self.DOWNLOAD_FOLDER = data_dir()
+        self.CONTRACT_DONWLOAD_FOLDER = None
 
     # -----------------------------------------------------
     # DRIVER LIFECYCLE
     # -----------------------------------------------------
+    
+    def create_uc_driver(self, headless=False, minimized=True):
+        
+        # --headless                       # Run Chrome in headless mode (no GUI)
+        # --disable-gpu                    # Disable GPU hardware acceleration
+        # --no-sandbox                     # Bypass OS security model (useful in Docker)
+        # --disable-dev-shm-usage          # Avoid shared memory issues in containers
+        # --start-maximized                # Start browser maximized
+        # --window-size=1920,1080          # Set specific window size
+        # --incognito                      # Launch in incognito mode
+        # --disable-extensions             # Disable all Chrome extensions
+        # --disable-blink-features=AutomationControlled  # Hide automation flags
+        # --user-data-dir="path"           # Use custom Chrome user profile directory
+        # --profile-directory="Profile 2"  # Specify profile folder inside user-data-dir
+        # --remote-debugging-port=9222     # Enable remote debugging
+        # --lang=en                        # Set browser language
+        # --ignore-certificate-errors      # Skip SSL certificate errors
+        # --disable-popup-blocking         # Allow popups
+        # --disable-infobars               # Hide "Chrome is being controlled..." banner
+        
+        # chrome_major = self.get_chrome_major_version()
+        chrome_major = 144
 
+        options = uc.ChromeOptions()
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("--disable-extensions")
+        options.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36")
+        
+        if headless: options.add_argument("--headless=new")
+
+        options.add_experimental_option("prefs", {
+            "download.default_directory": self.DOWNLOAD_FOLDER,
+            "download.prompt_for_download": False,
+            "plugins.always_open_pdf_externally": True,
+            "download.directory_upgrade": True,
+            "safebrowsing.enabled": True
+        })
+        
+
+        self.driver = uc.Chrome(
+            options=options,
+            version_main=chrome_major
+        )
+        self.driver.set_window_size(900, 700)
+        self.driver.set_window_position(-800, 100)
+        if minimized and not headless:
+            try:
+                time.sleep(1)    
+                title = self.driver.title or "data:,"
+                for w in gw.getWindowsWithTitle(title):
+                    w.minimize()
+                    self.logger.info("Chrome window minimized safely.")
+                    break
+            except Exception as e:
+                self.logger.warning(f"Minimize failed, fallback to visible small window: {e}")
+         
+    def set_contract_params(self,params):
+        self.PARAMS = params
+        self.CONTRACT_DONWLOAD_FOLDER = Helper.create_dir(self.DOWNLOAD_FOLDER,self.date, params['contract_name'],f"d{self.timestamp[:-1]}")
+        self.driver.execute_cdp_cmd(
+            "Page.setDownloadBehavior", {
+            "behavior": "allow",
+            "downloadPath": self.CONTRACT_DONWLOAD_FOLDER
+        })
+        self.logger.debug(f"Download Folder: {self.CONTRACT_DONWLOAD_FOLDER}")
+    
+    def get_website(self, timeout = 120):
+        if self.driver:
+            try:
+                self.driver.set_page_load_timeout(timeout)
+                self.driver.get(self.PARAMS["base_url"])
+                self.logger.info("Website Fetched.")
+                WebDriverWait(self.driver, 10).until(lambda d: d.execute_script("return document.readyState") in ["interactive", "complete"])
+                return
+            except Exception:
+                self.logger.warning("Page load hung — stopping manually.")
+                self.driver.execute_script("window.stop();")
+                return
+
+        self.logger.warning(f"Driver not created. Couldnt get website.")
+        return
+     
     @log_exceptions(level="critical", return_value=False)
     def start_session(self):
 
-        retries = 3
-        retry_delay = 5
+        # retries = 3
+        # retry_delay = 5
 
-        for attempt in range(retries):
+        for attempt in range(self.RETRIES):
 
             try:
-                self.logger.info(f"[SeleniumEngine] Creating driver (Attempt {attempt+1})")
+                self.logger.info(f"[SeleniumEngine] Creating Driver (Attempt {attempt+1})")
 
-                self.executor.create_uc_driver(
+                self.create_uc_driver(
                     headless=self.metadata.get("headless", False),
                     minimized=self.metadata.get("minimize_selenium", True)
                 )
 
-                if not self.executor.driver:
-                    raise RuntimeError("Driver creation returned None")
+                if not self.driver:
+                    raise RuntimeError("Driver Creation Returned None")
 
-                self.executor.driver.set_page_load_timeout(
-                    self.metadata.get("hero_timeout", 120)
+                self.driver.set_page_load_timeout(
+                    self.metadata.get("hero_timeout", self.PAGE_LOAD_TIMEOUT)
                 )
 
                 self.logger.info("[SeleniumEngine] Driver created successfully")
@@ -61,7 +151,7 @@ class SeleniumEngine:
             except WebDriverException as e:
 
                 self.logger.error(f"Driver creation failed: {type(e).__name__}")
-                self.logger.debug(traceback.format_exc())
+                self.logger.error(traceback.format_exc())
 
         self.logger.critical("Failed to initialize Selenium driver")
         return False
@@ -74,13 +164,19 @@ class SeleniumEngine:
                 self.logger.info("[SeleniumEngine] Driver closed")
 
         except Exception as e:
-            self.logger.warning(f"Driver close failed: {e}")
+            self.logger.error(f"Driver close failed: {e}")
+            self.logger.error(traceback.format_exc())
 
     # -----------------------------------------------------
     # MAIN ENGINE
     # -----------------------------------------------------
 
     def run(self, contracts: list):
+        """ 
+        Summary: 
+        Args: contracts (list): List of contracts to execute via selenium scraper.
+        Returns: results (list): Processes contract after fetching in selenium and returning the list.
+        """
 
         results = []
 
@@ -115,9 +211,9 @@ class SeleniumEngine:
         scraped_data = []
 
         try:
-            self.executor.set_contract_params(contract)
+            self.set_contract_params(contract)
             timeout = contract.get("hero_timeout", 120)
-            self.executor.get_website(timeout)
+            self.get_website(timeout)
             data = self.executor.execute_blocks()
             scraped_data.extend(data)
 
@@ -216,15 +312,6 @@ class ActionExecutor:
             "dummy": lambda: dummyTable(self)
         }
     
-    def set_contract_params(self,params):
-        self.PARAMS = params
-        self.CONTRACT_DONWLOAD_FOLDER = Helper.create_dir(self.DOWNLOAD_FOLDER,self.date, params['contract_name'],f"d{self.timestamp[:-1]}")
-        self.driver.execute_cdp_cmd(
-            "Page.setDownloadBehavior", {
-            "behavior": "allow",
-            "downloadPath": self.CONTRACT_DONWLOAD_FOLDER
-        })
-        self.logger.debug(f"Download Folder: {self.CONTRACT_DONWLOAD_FOLDER}")
         
     def get_chrome_major_version(self):
         chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
@@ -240,76 +327,76 @@ class ActionExecutor:
         except Exception as e:
             raise RuntimeError(f"Could not detect Chrome version: {e}")
     
-    def create_uc_driver(self, headless=False, minimized=True):
+    # def create_uc_driver(self, headless=False, minimized=True):
         
-        # --headless                       # Run Chrome in headless mode (no GUI)
-        # --disable-gpu                    # Disable GPU hardware acceleration
-        # --no-sandbox                     # Bypass OS security model (useful in Docker)
-        # --disable-dev-shm-usage          # Avoid shared memory issues in containers
-        # --start-maximized                # Start browser maximized
-        # --window-size=1920,1080          # Set specific window size
-        # --incognito                      # Launch in incognito mode
-        # --disable-extensions             # Disable all Chrome extensions
-        # --disable-blink-features=AutomationControlled  # Hide automation flags
-        # --user-data-dir="path"           # Use custom Chrome user profile directory
-        # --profile-directory="Profile 2"  # Specify profile folder inside user-data-dir
-        # --remote-debugging-port=9222     # Enable remote debugging
-        # --lang=en                        # Set browser language
-        # --ignore-certificate-errors      # Skip SSL certificate errors
-        # --disable-popup-blocking         # Allow popups
-        # --disable-infobars               # Hide "Chrome is being controlled..." banner
+    #     # --headless                       # Run Chrome in headless mode (no GUI)
+    #     # --disable-gpu                    # Disable GPU hardware acceleration
+    #     # --no-sandbox                     # Bypass OS security model (useful in Docker)
+    #     # --disable-dev-shm-usage          # Avoid shared memory issues in containers
+    #     # --start-maximized                # Start browser maximized
+    #     # --window-size=1920,1080          # Set specific window size
+    #     # --incognito                      # Launch in incognito mode
+    #     # --disable-extensions             # Disable all Chrome extensions
+    #     # --disable-blink-features=AutomationControlled  # Hide automation flags
+    #     # --user-data-dir="path"           # Use custom Chrome user profile directory
+    #     # --profile-directory="Profile 2"  # Specify profile folder inside user-data-dir
+    #     # --remote-debugging-port=9222     # Enable remote debugging
+    #     # --lang=en                        # Set browser language
+    #     # --ignore-certificate-errors      # Skip SSL certificate errors
+    #     # --disable-popup-blocking         # Allow popups
+    #     # --disable-infobars               # Hide "Chrome is being controlled..." banner
         
-        # chrome_major = self.get_chrome_major_version()
-        chrome_major = 144
+    #     # chrome_major = self.get_chrome_major_version()
+    #     chrome_major = 144
 
-        options = uc.ChromeOptions()
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_argument("--disable-extensions")
-        options.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36")
+    #     options = uc.ChromeOptions()
+    #     options.add_argument("--disable-blink-features=AutomationControlled")
+    #     options.add_argument("--disable-extensions")
+    #     options.add_argument(f"user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_major}.0.0.0 Safari/537.36")
         
-        if headless: options.add_argument("--headless=new")
+    #     if headless: options.add_argument("--headless=new")
 
-        options.add_experimental_option("prefs", {
-            "download.default_directory": self.DOWNLOAD_FOLDER,
-            "download.prompt_for_download": False,
-            "plugins.always_open_pdf_externally": True,
-            "download.directory_upgrade": True,
-            "safebrowsing.enabled": True
-        })
+    #     options.add_experimental_option("prefs", {
+    #         "download.default_directory": self.DOWNLOAD_FOLDER,
+    #         "download.prompt_for_download": False,
+    #         "plugins.always_open_pdf_externally": True,
+    #         "download.directory_upgrade": True,
+    #         "safebrowsing.enabled": True
+    #     })
         
 
-        self.driver = uc.Chrome(
-            options=options,
-            version_main=chrome_major
-        )
-        self.driver.set_window_size(900, 700)
-        self.driver.set_window_position(-800, 100)
-        if minimized and not headless:
-            try:
-                time.sleep(1)    
-                title = self.driver.title or "data:,"
-                for w in gw.getWindowsWithTitle(title):
-                    w.minimize()
-                    self.logger.info("Chrome window minimized safely.")
-                    break
-            except Exception as e:
-                self.logger.warning(f"Minimize failed, fallback to visible small window: {e}")
+    #     self.driver = uc.Chrome(
+    #         options=options,
+    #         version_main=chrome_major
+    #     )
+    #     self.driver.set_window_size(900, 700)
+    #     self.driver.set_window_position(-800, 100)
+    #     if minimized and not headless:
+    #         try:
+    #             time.sleep(1)    
+    #             title = self.driver.title or "data:,"
+    #             for w in gw.getWindowsWithTitle(title):
+    #                 w.minimize()
+    #                 self.logger.info("Chrome window minimized safely.")
+    #                 break
+    #         except Exception as e:
+    #             self.logger.warning(f"Minimize failed, fallback to visible small window: {e}")
          
-    def get_website(self, timeout = 120):
-        if self.driver:
-            try:
-                self.driver.set_page_load_timeout(timeout)
-                self.driver.get(self.PARAMS["base_url"])
-                self.logger.info("Website Fetched.")
-                WebDriverWait(self.driver, 10).until(lambda d: d.execute_script("return document.readyState") in ["interactive", "complete"])
-                return
-            except Exception:
-                self.logger.warning("Page load hung — stopping manually.")
-                self.driver.execute_script("window.stop();")
-                return
+    # def get_website(self, timeout = 120):
+    #     if self.driver:
+    #         try:
+    #             self.driver.set_page_load_timeout(timeout)
+    #             self.driver.get(self.PARAMS["base_url"])
+    #             self.logger.info("Website Fetched.")
+    #             WebDriverWait(self.driver, 10).until(lambda d: d.execute_script("return document.readyState") in ["interactive", "complete"])
+    #             return
+    #         except Exception:
+    #             self.logger.warning("Page load hung — stopping manually.")
+    #             self.driver.execute_script("window.stop();")
+    #             return
 
-        self.logger.warning(f"Driver not created. Couldnt get website.")
-        return
+    #     self.logger.warning(f"Driver not created. Couldnt get website.")
+    #     return
     
     def _restore_window(self):
         """Restore or bring Chrome to front if minimized/tiny."""
@@ -529,81 +616,81 @@ class ActionExecutor:
         }
         return mapping.get(by_string.lower(), By.CSS_SELECTOR)
      
-    def __generate_packet(self, content):
-        print("Running This")
-        packet = {
-            "action": self.ACTION_TYPE,
-            "uid": Helper.generate_uid(),
-            "timestamp": datetime.now().strftime("%d%m%Y %H:%M"),
-            "webpage": self.driver.current_url,
-            "data_present": not any(
-                key in entity for entity in content
-                for key in ["status", "error_type", "error_message", "error"]
-            ),
-            "log_message": self.LOG_MESSAGE,
-            "response_count": len(content),
-            "response": content if content else None
-        }
+    # def __generate_packet(self, content):
+    #     print("Running This")
+    #     packet = {
+    #         "action": self.ACTION_TYPE,
+    #         "uid": Helper.generate_uid(),
+    #         "timestamp": datetime.now().strftime("%d%m%Y %H:%M"),
+    #         "webpage": self.driver.current_url,
+    #         "data_present": not any(
+    #             key in entity for entity in content
+    #             for key in ["status", "error_type", "error_message", "error"]
+    #         ),
+    #         "log_message": self.LOG_MESSAGE,
+    #         "response_count": len(content),
+    #         "response": content if content else None
+    #     }
 
-        if self.ACTION_TYPE == "tablist":
-            packet["tab_found"] = getattr(self, "TABS_FOUND", [])
-            packet["follow_ups"] = [step.get("action") for step in getattr(self, "FOLLOW_UP_ACTIONS", [])if "action" in step]
+    #     if self.ACTION_TYPE == "tablist":
+    #         packet["tab_found"] = getattr(self, "TABS_FOUND", [])
+    #         packet["follow_ups"] = [step.get("action") for step in getattr(self, "FOLLOW_UP_ACTIONS", [])if "action" in step]
         
-        if self.ACTION_TYPE == "weblist":
-            packet["web_links"] = getattr(self, "WEBLINKS", [])
-            packet["follow_ups"] = [step.get("action") for step in getattr(self, "FOLLOW_UP_ACTIONS", [])if "action" in step]
+    #     if self.ACTION_TYPE == "weblist":
+    #         packet["web_links"] = getattr(self, "WEBLINKS", [])
+    #         packet["follow_ups"] = [step.get("action") for step in getattr(self, "FOLLOW_UP_ACTIONS", [])if "action" in step]
 
-        return packet
+    #     return packet
 
     #BLOCK EXECUTION
-    def execute_blocks(self):
-        block_data = []
-        generic_actions = self.GENERIC_ACTIONS
+    # def execute_blocks(self):
+    #     block_data = []
+    #     generic_actions = self.GENERIC_ACTIONS
 
-        block = self.PARAMS["blocks"]
-        self.logger.info(f"Total Action(s) {len(block)}")
+    #     block = self.PARAMS["blocks"]
+    #     self.logger.info(f"Total Action(s) {len(block)}")
 
-        for _, _action_ in enumerate(block):
-            data = None
+    #     for _, _action_ in enumerate(block):
+    #         data = None
 
-            if isinstance(_action_, str):
+    #         if isinstance(_action_, str):
                 
-                if _action_ == "action_dummy":
-                    content = self.__perform_action(self.action_map["dummy"])
-                    block_data.append(self.__generate_packet(content))
-                    return block_data
+    #             if _action_ == "action_dummy":
+    #                 content = self.__perform_action(self.action_map["dummy"])
+    #                 block_data.append(self.__generate_packet(content))
+    #                 return block_data
                 
-                #early exit if the block is quarantined
-                if _action_ =="QUARANTINE":
-                    self.logger.warning(f"BLOCK IS QUARANTINED.")
-                    block_data.append(self.__generate_packet({
-                        "error_type": "quarantine",
-                        "error_message": "Block Quarantined.",
-                        "error_from": "ActionExecutor.execute_blocks"
-                    }))
-                    return block_data
+    #             #early exit if the block is quarantined
+    #             if _action_ =="QUARANTINE":
+    #                 self.logger.warning(f"BLOCK IS QUARANTINED.")
+    #                 block_data.append(self.__generate_packet({
+    #                     "error_type": "quarantine",
+    #                     "error_message": "Block Quarantined.",
+    #                     "error_from": "ActionExecutor.execute_blocks"
+    #                 }))
+    #                 return block_data
                 
-                action_key, *content = _action_.split("||")
-                if action_key not in generic_actions:
-                    self.logger.warning(f"{action_key} not part of generic_action_keys. Skipping.")
-                    continue
+    #             action_key, *content = _action_.split("||")
+    #             if action_key not in generic_actions:
+    #                 self.logger.warning(f"{action_key} not part of generic_action_keys. Skipping.")
+    #                 continue
 
-                do_action = generic_actions[action_key].copy()
+    #             do_action = generic_actions[action_key].copy()
 
-                if action_key == "action_website": do_action.update({"url": content[0]})
-                elif action_key == "action_download":
-                    by, value, multiple, wait_until,minimize_toggle,scroll = content
-                    do_action.update({"by": by, "value": value, "multiple": bool(multiple), "wait_until": wait_until, "minimize_toggle":bool(minimize_toggle), "scroll":bool(scroll) })
+    #             if action_key == "action_website": do_action.update({"url": content[0]})
+    #             elif action_key == "action_download":
+    #                 by, value, multiple, wait_until,minimize_toggle,scroll = content
+    #                 do_action.update({"by": by, "value": value, "multiple": bool(multiple), "wait_until": wait_until, "minimize_toggle":bool(minimize_toggle), "scroll":bool(scroll) })
 
-            elif isinstance(_action_, dict):
-                do_action = _action_
+    #         elif isinstance(_action_, dict):
+    #             do_action = _action_
 
-            else:
-                self.logger.warning(f"Unsupported action format: {_action_}")
-                continue
+    #         else:
+    #             self.logger.warning(f"Unsupported action format: {_action_}")
+    #             continue
 
-            data = self.execute(do_action)
-            if data:
-                block_data.append(data)
+    #         data = self.execute(do_action)
+    #         if data:
+    #             block_data.append(data)
 
-        return block_data
+    #     return block_data

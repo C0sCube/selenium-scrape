@@ -162,7 +162,6 @@ class ScraperHandler:
             return results
 
         except Exception as e:
-
             self.logger.error(f"Engine {engine_name} failed: {e}")
             self.logger.debug(traceback.format_exc())
             
