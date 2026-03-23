@@ -122,7 +122,7 @@ class ActionExecutor:
         # --disable-infobars               # Hide "Chrome is being controlled..." banner
         
         # chrome_major = self.get_chrome_major_version()
-        chrome_major = 144
+        chrome_major = 145
 
         options = uc.ChromeOptions()
         options.add_argument("--disable-blink-features=AutomationControlled")

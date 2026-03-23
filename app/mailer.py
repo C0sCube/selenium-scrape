@@ -1,3 +1,4 @@
+from logging import config
 import smtplib,os,json, logging, traceback
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
@@ -10,10 +11,12 @@ from app.constants import load_mail_config
 from app.logger import get_global_logger
 
 class Mailer:
-    def __init__(self):
+    def __init__(self, config = None):
         
-  
-        mail_config = load_mail_config()
+        mail_config = config
+        if not config:
+            mail_config = load_mail_config()
+
         recipients = mail_config.get("recipients")
         dev_recipients = mail_config.get("dev_recipients")
         cc = mail_config.get("cc")
